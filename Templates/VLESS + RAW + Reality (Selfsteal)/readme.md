@@ -12,6 +12,7 @@
 3) Команда для выдачи сертификатов: <br>
 ```bash
 certbot certonly --standalone -d **yourdomain.com** --non-interactive --agree-tos -m admin@example.com <br>
+```
 
 ### В панели Remnawave Ваш домен используется в двух местах:
 ![При добавлении ноды (можно заменить на IP ноды)](../../source/images/AddNode.png)
