@@ -75,7 +75,7 @@ echo "✅ Конфигурация nginx создана!"
 # Замените yourdomain.com на ваш домен
 cat /opt/remnanode/nginx.conf | grep "yourdomain.com"
 ```
-## 4. docker-compose.yml
+### 4. docker-compose.yml
 ```bash
 cat > /opt/remnanode/docker-compose.yml <<'EOF'
 x-logging: &logging
@@ -147,10 +147,10 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 ![При добавлении хоста](../../source/images/AddHost.png)
 
 ### Базовая терминология для дальнейшей успешной работы:
-#### Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в "protocol": "...",<br>
+#### Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в **"protocol": "..."**,<br>
 - Имеет свои настройки: <br>"settings": {"...", "..."}<br>
 
-#### Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hysteia, - это то, что вы вводите в "network": "...",<br>
+#### Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hysteia, - это то, что вы вводите в **"network": "..."**,<br>
 - Определяет, как именно переносится поток данных, например через RAW, WebSocket, gRPC, Hysteria и другие.<br>
 - Имеет свои настройки  <br>- "rawSettings": {"...", "..."} (в нашем примере пустой),<br>
                         - "xhttpSettings": {"...", "..."},<br>
@@ -160,7 +160,7 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
                         - "httpupgradeSettings": {"...", "..."},<br>
                         - "hysteriaSettings": {"...", "..."}<br>
 
-#### Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в "security": "...",<br>
+#### Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в **"security": "..."**,<br>
 - Определяет механизм защиты, например TLS или REALITY.<br>
 - Имеет свои настройки: <br>- "realitySettings": {"...", "..."} (Выбор в нашем примере),<br>
                         - "tlsSettings": {"...", "..."}<br>
