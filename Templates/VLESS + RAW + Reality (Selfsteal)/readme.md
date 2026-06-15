@@ -16,23 +16,23 @@ certbot certonly --standalone -d **yourdomain.com** --non-interactive --agree-to
 ![При добавлении хоста](../../source/images/AddHost.png)
 
 # Базовая терминология для дальнейшей успешной работы:
-Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в "protocol": "...",
-- Имеет свои настройки, обычно на следующей строке: "settings": {"...", "..."}
+Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в "protocol": "...",<br>
+- Имеет свои настройки, обычно на следующей строке: "settings": {"...", "..."}<br>
 
-Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hysteia, - это то, что вы вводите в "network": "...",
-- Определяет, как именно переносится поток данных, например через RAW, WebSocket, gRPC, Hysteria и другие.
-- Имеет свои настройки  "rawSettings": {"...", "..."} (в нашем примере пустой),
-                        "xhttpSettings": {"...", "..."},
-                        "kcpSettings": {"...", "..."},
-                        "grpcSettings": {"...", "..."},
-                        "wsSettings": {"...", "..."},
-                        "httpupgradeSettings": {"...", "..."},
-                        "hysteriaSettings": {"...", "..."}
+Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hysteia, - это то, что вы вводите в "network": "...",<br>
+- Определяет, как именно переносится поток данных, например через RAW, WebSocket, gRPC, Hysteria и другие.<br>
+- Имеет свои настройки  "rawSettings": {"...", "..."} (в нашем примере пустой),<br>
+                        "xhttpSettings": {"...", "..."},<br>
+                        "kcpSettings": {"...", "..."},<br>
+                        "grpcSettings": {"...", "..."},<br>
+                        "wsSettings": {"...", "..."},<br>
+                        "httpupgradeSettings": {"...", "..."},<br>
+                        "hysteriaSettings": {"...", "..."}<br>
 
-Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в "security": "...",
-- Определяет механизм защиты, например TLS или REALITY.
-- Имеет свои настройки: "realitySettings": {"...", "..."} (Выбор в нашем примере),
-                        "tlsSettings": {"...", "..."}
+Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в "security": "...",<br>
+- Определяет механизм защиты, например TLS или REALITY.<br>
+- Имеет свои настройки: "realitySettings": {"...", "..."} (Выбор в нашем примере),<br>
+                        "tlsSettings": {"...", "..."}<br>
 
-Эти три группы относятся к разным уровням и в определенных пределах могут комбинироваться
+Эти три группы относятся к разным уровням и в определенных пределах могут комбинироваться<br>
 
