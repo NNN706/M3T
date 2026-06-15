@@ -1,4 +1,5 @@
-# На VPS Ваш домен (усл. yourdomain.com) используется всего в 3 местах и в 6 строках:
+# Базовая настройка протокола VLESS с конфигурацией транспорта RAW + Reality
+### На VPS Ваш домен (усл. yourdomain.com) используется всего в 3 местах и в 6 строках:
 1) Файл server.json: <br>
 30 строка:   ("**yourdomain.com**" // Replace with your domain)<br>
 
@@ -9,13 +10,14 @@
 16 строка:   ssl_trusted_certificate "/etc/letsencrypt/live/**yourdomain.com**/chain.pem";<br>
 
 3) Команда для выдачи сертификатов: <br>
+```bash
 certbot certonly --standalone -d **yourdomain.com** --non-interactive --agree-tos -m admin@example.com <br>
 
-# В панели Remnawave Ваш домен используется в двух местах:
+### В панели Remnawave Ваш домен используется в двух местах:
 ![При добавлении ноды (можно заменить на IP ноды)](../../source/images/AddNode.png)
 ![При добавлении хоста](../../source/images/AddHost.png)
 
-# Базовая терминология для дальнейшей успешной работы:
+### Базовая терминология для дальнейшей успешной работы:
 Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в "protocol": "...",<br>
 - Имеет свои настройки: <br>"settings": {"...", "..."}<br>
 
