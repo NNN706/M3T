@@ -147,10 +147,10 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 ![При добавлении хоста](../../source/images/AddHost.png)
 
 ### Базовая терминология для дальнейшей успешной работы:
-##### Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в **"protocol": "..."**,<br>
+#### Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в **"protocol": "..."**,<br>
 - Имеет свои настройки: <br>"settings": {"...", "..."}<br>
 
-#####  Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hysteia, - это то, что вы вводите в **"network": "..."**,<br>
+####  Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hysteia, - это то, что вы вводите в **"network": "..."**,<br>
 - Определяет, как именно переносится поток данных, например через RAW, WebSocket, gRPC, Hysteria и другие.<br>
 - Имеет свои настройки  <br>- "rawSettings": {"...", "..."} (в нашем примере пустой),<br>
                         - "xhttpSettings": {"...", "..."},<br>
@@ -160,10 +160,10 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
                         - "httpupgradeSettings": {"...", "..."},<br>
                         - "hysteriaSettings": {"...", "..."}<br>
 
-#####  Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в **"security": "..."**,<br>
+####  Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в **"security": "..."**,<br>
 - Определяет механизм защиты, например TLS или REALITY.<br>
 - Имеет свои настройки: <br>- "realitySettings": {"...", "..."} (Выбор в нашем примере),<br>
                         - "tlsSettings": {"...", "..."}<br>
 
-##### Эти три группы относятся к разным уровням и в определенных пределах могут комбинироваться<br>
+#### Эти три группы относятся к разным уровням и в определенных пределах могут комбинироваться<br>
 
