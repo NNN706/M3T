@@ -1,0 +1,43 @@
+x-logging: &logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 100m
+      max-file: 5
+
+x-common: &common
+  restart: always
+  network_mode: host
+  ulimits:
+    nofile:
+      soft: 1048576
+      hard: 1048576
+
+
+services:
+  remnanode-nginx:
+    image: nginx:1.28
+    container_name: remnawave-nginx
+    hostname: remnawave-nginx
+    <<: [*common, *logging]
+    volumes:
+      - /opt/remnanode/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /dev/shm:/dev/shm:rw
+      - /var/www/html:/var/www/html:ro
+      - /etc/letsencrypt/:/etc/letsencrypt:ro
+    command: sh -c 'rm -f /dev/shm/nginx.sock && exec nginx -g "daemon off;"'
+
+  remnanode:
+    container_name: remnanode
+    hostname: remnanode
+    image: remnawave/node:latest
+    cap_add:
+      - NET_ADMIN
+    <<: [*common, *logging]
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - '/var/log/remnanode:/var/log/remnanode'
+      - /dev/shm:/dev/shm:rw
+    environment:
+      - NODE_PORT=2222
+      - SECRET_KEY="Your secrey key from Remnawave - Nodes - Management - Create new node - Secret Key (SECRET_KEY)"
