@@ -1,15 +1,15 @@
 # На VPS Ваш домен (усл. yourdomain.com) используется всего в 3 местах и в 6 строках:
-1) Файл server.json: 
-30 строка:   ("**yourdomain.com**" // Replace with your domain)
+1) Файл server.json: <br>
+30 строка:   ("**yourdomain.com**" // Replace with your domain)<br>
 
-2) Файл nginx.conf:  
-12 строка:   server_name yourdomain.com;
-14 строка:   ssl_certificate "/etc/letsencrypt/live/**yourdomain.com**/fullchain.pem";
-15 строка:   ssl_certificate_key "/etc/letsencrypt/live/**yourdomain.com**/privkey.pem";
-16 строка:   ssl_trusted_certificate "/etc/letsencrypt/live/**yourdomain.com**/chain.pem";
+2) Файл nginx.conf:  <br>
+12 строка:   server_name yourdomain.com;<br>
+14 строка:   ssl_certificate "/etc/letsencrypt/live/**yourdomain.com**/fullchain.pem";<br>
+15 строка:   ssl_certificate_key "/etc/letsencrypt/live/**yourdomain.com**/privkey.pem";<br>
+16 строка:   ssl_trusted_certificate "/etc/letsencrypt/live/**yourdomain.com**/chain.pem";<br>
 
-3) Команда для выдачи сертификатов: 
-certbot certonly --standalone -d **yourdomain.com** --non-interactive --agree-tos -m admin@example.com 
+3) Команда для выдачи сертификатов: <br>
+certbot certonly --standalone -d **yourdomain.com** --non-interactive --agree-tos -m admin@example.com <br>
 
 # В панели Remnawave Ваш домен используется в двух местах:
 ![При добавлении ноды (можно заменить на IP ноды)](../../source/images/AddNode.png)
