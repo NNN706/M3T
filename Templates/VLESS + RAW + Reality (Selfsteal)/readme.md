@@ -18,9 +18,9 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 ```
 Итогом правильных действий этого пункта будет отображение вашего домена в директории с сертификатами:<br>
 ```bash
-ls -lah /etc/letsencrypt/live
+ls /etc/letsencrypt/live
 ```
-## 4. nginx.comf
+## 4. nginx.conf
 Директории с remnanode создадим файл nginx.conf в директории remnanode
 ```bash
 cat > /opt/remnanode/nginx.conf <<EOF
