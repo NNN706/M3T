@@ -125,7 +125,7 @@ services:
 EOF
 echo "✅ Docker Compose файл создан!"
 ```
-## По итогу на VPS ваш домен (усл. yourdomain.com) используется всего в 3 местах и в 6 строках:
+### По итогу на VPS ваш домен (усл. yourdomain.com) используется всего в 3 местах и в 6 строках:
 #### 1) Файл server.json: <br>
 30 строка:   ("**yourdomain.com**" // Replace with your domain)<br>
 
