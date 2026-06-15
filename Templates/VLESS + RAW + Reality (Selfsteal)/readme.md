@@ -20,7 +20,7 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 ```bash
 ls /etc/letsencrypt/live
 ```
-## #4. nginx.conf
+### 4. nginx.conf
 Директории с remnanode создадим файл nginx.conf в директории remnanode
 ```bash
 cat > /opt/remnanode/nginx.conf <<EOF
