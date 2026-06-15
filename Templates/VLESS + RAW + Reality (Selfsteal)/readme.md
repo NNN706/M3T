@@ -12,8 +12,8 @@
 certbot certonly --standalone -d **yourdomain.com** --non-interactive --agree-tos -m admin@example.com 
 
 # В панели Remnawave Ваш домен используется в двух местах:
-![При добавлении ноды (можно заменить на IP ноды)](../source/images/AddNode.png)
-![При добавлении хоста](../source/images/AddHost.png)
+![При добавлении ноды (можно заменить на IP ноды)](../../source/images/AddNode.png)
+![При добавлении хоста](../../source/images/AddHost.png)
 
 # Базовая терминология для дальнейшей успешной работы:
 Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в "protocol": "...",
