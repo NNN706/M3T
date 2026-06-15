@@ -18,7 +18,7 @@
           "geosite:discord"
         ],
         "inboundTag": [
-           "inbounds, с которых нет блока на Discord"
+           "" //inbounds, с которых нет блока на Discord
         ],
         "outboundTag": "DIRECT"
       },
@@ -27,7 +27,7 @@
           "geosite:discord"
         ],
         "inboundTag": [
-           "inbounds, с которых нет доступа в Discord"
+           "" //inbounds, с которых нет доступа в Discord
         ],
         "balancerTag": "BalancerDS"
       },
@@ -36,7 +36,7 @@
           "geosite:youtube"
         ],
         "inboundTag": [
-           "inbounds, с которых нет блока на YouTube"
+           "" //inbounds, с которых нет блока на YouTube
         ],
         "outboundTag": "DIRECT"
       },
@@ -45,7 +45,7 @@
           "geosite:youtube"
         ],
         "inboundTag": [
-           "inbounds, с которых нет доступа в YouTube"
+           "" //inbounds, с которых нет доступа в YouTube
         ],
         "balancerTag": "BalancerYT"
       },
@@ -54,7 +54,7 @@
           "geosite:telegram"
         ],
         "inboundTag": [
-           "inbounds, с которых нет блока на Telegram"
+           "" //inbounds, с которых нет блока на Telegram
         ],
         "outboundTag": "DIRECT"
       },
@@ -63,7 +63,7 @@
           "geoip:telegram"
         ],
         "inboundTag": [
-           "inbounds, с которых нет блока на Telegram"
+           "" //inbounds, с которых нет блока на Telegram
         ],
         "outboundTag": "DIRECT"
       },
@@ -72,7 +72,7 @@
           "geosite:telegram"
         ],
         "inboundTag": [
-        "inbounds, с которых нет доступа в Telegram"
+        "" //inbounds, с которых нет доступа в Telegram
         ],
         "balancerTag": "BalancerTG"
       },
@@ -81,7 +81,7 @@
           "geoip:telegram"
         ],
         "inboundTag": [
-        "inbounds, с которых нет доступа в Telegram"
+        "" //inbounds, с которых нет доступа в Telegram
         ],
         "balancerTag": "BalancerTG"
       },
@@ -92,9 +92,7 @@
         "outboundTag": "DIRECT"
       },
       {
-        "inboundTag": [
-          "все inbounds, основное правило для каскада"  
-        ],
+        "network": "tcp,udp",
         "balancerTag": "Balancer"
       }
     ],
@@ -102,7 +100,7 @@
       {
         "tag": "Balancer",
         "selector": [
-         "все outbounds, кроме русских"
+         "" //все outbounds, кроме русских
         ],
         "strategy": {
           "type": "leastLoad",
@@ -114,12 +112,12 @@
             ]
           }
         },
-        "fallbackTag": "Наиболее стабильный из PROXY, если все остальные недоступны"
+            "fallbackTag": "" //Наиболее стабильный из PROXY, если все остальные недоступны
       },
       {
         "tag": "BalancerDS",
         "selector": [
-            "outbounds, с которых нет блока в Discord"
+            "" //outbounds, с которых нет блока в Discord
         ],
         "strategy": {
           "type": "leastLoad",
@@ -131,12 +129,12 @@
             ]
           }
         },
-        "fallbackTag": "Наиболее стабильный из PROXY, если все остальные недоступны"
+        "fallbackTag": "" //Наиболее стабильный из PROXY, если все остальные недоступны
       },
       {
         "tag": "BalancerTG",
         "selector": [
-            "outbounds, с которых нет блока в Telegram"
+            "" //outbounds, с которых нет блока в Telegram
         ],
         "strategy": {
           "type": "leastLoad",
@@ -148,12 +146,12 @@
             ]
           }
         },
-        "fallbackTag": "Наиболее стабильный из PROXY, если все остальные недоступны"
+        "fallbackTag": "" //Наиболее стабильный из PROXY, если все остальные недоступны
       },
       {
         "tag": "BalancerYT",
         "selector": [
-            "outbounds, с которых нет блока в YouTube"
+            "" //outbounds, с которых нет блока в YouTube
         ],
         "strategy": {
           "type": "leastLoad",
@@ -165,7 +163,7 @@
             ]
           }
         },
-        "fallbackTag": "Наиболее стабильный из PROXY, если все остальные недоступны"
+        "fallbackTag": "" //Наиболее стабильный из PROXY, если все остальные недоступны
       }
     ],
     "domainStrategy": "IPIfNonMatch"
