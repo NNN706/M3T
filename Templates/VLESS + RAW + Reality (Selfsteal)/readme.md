@@ -1,16 +1,16 @@
 # Базовая настройка протокола VLESS с конфигурацией транспорта RAW + Reality
 
-## 1. Аренда зарубежного VPS
+### 1. Аренда зарубежного VPS
 
-## 2. Домен
-Существует два способа завладеть своим собственным доменом
+### 2. Домен
+Существует два способа завладеть своим собственным доменом<br>
 Способ 1 - В сервисах регистрации, у хостеров. После регистрации рекомендую делегировать домен на ns-сервера Cloudflare или на другие популярные сервисы (предпочтительно)<br>
 Способ 2 - Взять бесплатно в [FreeDNS](https://freedns.afraid.org/) или [DuckDNS](https://www.duckdns.org)<br>
 
 Далее необходимо всего одно действие: добавить A-запись домена, а затем и поддомена (node.yourserver.com) на айпи вашего VPS<br>
 Итогом правильных действий этого пункта будет отображение вашего айпи в сервисе [nslookup](https://www.nslookup.io)<br>
 
-## 3. Сертификат
+### 3. Сертификат
 Далее выполнение действий будет происходит на нашей VPS<br>
 Необходимо выпустить сертификат, для вашего сайта, который будет отдавать Reality нечистям, кто сканирует вас<br>
 ```bash
@@ -20,7 +20,7 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 ```bash
 ls /etc/letsencrypt/live
 ```
-## 4. nginx.conf
+## #4. nginx.conf
 Директории с remnanode создадим файл nginx.conf в директории remnanode
 ```bash
 cat > /opt/remnanode/nginx.conf <<EOF
@@ -125,17 +125,17 @@ services:
 EOF
 echo "✅ Docker Compose файл создан!"
 ```
-### По итогу на VPS ваш домен (усл. yourdomain.com) используется всего в 3 местах и в 6 строках:
-1) Файл server.json: <br>
+## По итогу на VPS ваш домен (усл. yourdomain.com) используется всего в 3 местах и в 6 строках:
+#### 1) Файл server.json: <br>
 30 строка:   ("**yourdomain.com**" // Replace with your domain)<br>
 
-2) Файл nginx.conf:  <br>
+#### 2) Файл nginx.conf:  <br>
 12 строка:   server_name **yourdomain.com**;<br>
 14 строка:   ssl_certificate "/etc/letsencrypt/live/**yourdomain.com**/fullchain.pem";<br>
 15 строка:   ssl_certificate_key "/etc/letsencrypt/live/**yourdomain.com**/privkey.pem";<br>
 16 строка:   ssl_trusted_certificate "/etc/letsencrypt/live/**yourdomain.com**/chain.pem";<br>
 
-3) Команда для выдачи сертификатов: <br>
+#### 3) Команда для выдачи сертификатов: <br>
 ```bash
 certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m admin@example.com <br>
 ```
@@ -147,10 +147,10 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 ![При добавлении хоста](../../source/images/AddHost.png)
 
 ### Базовая терминология для дальнейшей успешной работы:
-Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в "protocol": "...",<br>
+#### Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в "protocol": "...",<br>
 - Имеет свои настройки: <br>"settings": {"...", "..."}<br>
 
-Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hysteia, - это то, что вы вводите в "network": "...",<br>
+#### Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hysteia, - это то, что вы вводите в "network": "...",<br>
 - Определяет, как именно переносится поток данных, например через RAW, WebSocket, gRPC, Hysteria и другие.<br>
 - Имеет свои настройки  <br>- "rawSettings": {"...", "..."} (в нашем примере пустой),<br>
                         - "xhttpSettings": {"...", "..."},<br>
@@ -160,10 +160,10 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
                         - "httpupgradeSettings": {"...", "..."},<br>
                         - "hysteriaSettings": {"...", "..."}<br>
 
-Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в "security": "...",<br>
+#### Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в "security": "...",<br>
 - Определяет механизм защиты, например TLS или REALITY.<br>
 - Имеет свои настройки: <br>- "realitySettings": {"...", "..."} (Выбор в нашем примере),<br>
                         - "tlsSettings": {"...", "..."}<br>
 
-Эти три группы относятся к разным уровням и в определенных пределах могут комбинироваться<br>
+#### Эти три группы относятся к разным уровням и в определенных пределах могут комбинироваться<br>
 
