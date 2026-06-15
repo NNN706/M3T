@@ -1,0 +1,182 @@
+{
+  "routing": {
+    "rules": [
+      {
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "BLOCK"
+      },
+      {
+        "protocol": [
+          "bittorrent"
+        ],
+        "outboundTag": "BLOCK"
+      },
+      {
+        "domain": [
+          "geosite:discord"
+        ],
+        "inboundTag": [
+           "inbounds, с которых нет блока на Discord"
+        ],
+        "outboundTag": "DIRECT"
+      },
+      {
+        "domain": [
+          "geosite:discord"
+        ],
+        "inboundTag": [
+           "inbounds, с которых нет доступа в Discord"
+        ],
+        "balancerTag": "BalancerDS"
+      },
+      {
+        "domain": [
+          "geosite:youtube"
+        ],
+        "inboundTag": [
+           "inbounds, с которых нет блока на YouTube"
+        ],
+        "outboundTag": "DIRECT"
+      },
+      {
+        "domain": [
+          "geosite:youtube"
+        ],
+        "inboundTag": [
+           "inbounds, с которых нет доступа в YouTube"
+        ],
+        "balancerTag": "BalancerYT"
+      },
+      {
+        "domain": [
+          "geosite:telegram"
+        ],
+        "inboundTag": [
+           "inbounds, с которых нет блока на Telegram"
+        ],
+        "outboundTag": "DIRECT"
+      },
+      {
+        "ip": [
+          "geoip:telegram"
+        ],
+        "inboundTag": [
+           "inbounds, с которых нет блока на Telegram"
+        ],
+        "outboundTag": "DIRECT"
+      },
+      {
+        "domain": [
+          "geosite:telegram"
+        ],
+        "inboundTag": [
+        "inbounds, с которых нет доступа в Telegram"
+        ],
+        "balancerTag": "BalancerTG"
+      },
+      {
+        "ip": [
+          "geoip:telegram"
+        ],
+        "inboundTag": [
+        "inbounds, с которых нет доступа в Telegram"
+        ],
+        "balancerTag": "BalancerTG"
+      },
+      {
+        "domain": [
+          "geosite:category-ru"
+        ],
+        "outboundTag": "DIRECT"
+      },
+      {
+        "inboundTag": [
+          "все inbounds, основное правило для каскада"  
+        ],
+        "balancerTag": "Balancer"
+      }
+    ],
+    "balancers": [
+      {
+        "tag": "Balancer",
+        "selector": [
+         "все outbounds, кроме русских"
+        ],
+        "strategy": {
+          "type": "leastLoad",
+          "settings": {
+            "maxRTT": "1s",
+            "expected": 2,
+            "baselines": [
+              "1s"
+            ]
+          }
+        },
+        "fallbackTag": "Наиболее стабильный из PROXY, если все остальные недоступны"
+      },
+      {
+        "tag": "BalancerDS",
+        "selector": [
+            "outbounds, с которых нет блока в Discord"
+        ],
+        "strategy": {
+          "type": "leastLoad",
+          "settings": {
+            "maxRTT": "1s",
+            "expected": 2,
+            "baselines": [
+              "1s"
+            ]
+          }
+        },
+        "fallbackTag": "Наиболее стабильный из PROXY, если все остальные недоступны"
+      },
+      {
+        "tag": "BalancerTG",
+        "selector": [
+            "outbounds, с которых нет блока в Telegram"
+        ],
+        "strategy": {
+          "type": "leastLoad",
+          "settings": {
+            "maxRTT": "1s",
+            "expected": 1,
+            "baselines": [
+              "1s"
+            ]
+          }
+        },
+        "fallbackTag": "Наиболее стабильный из PROXY, если все остальные недоступны"
+      },
+      {
+        "tag": "BalancerYT",
+        "selector": [
+            "outbounds, с которых нет блока в YouTube"
+        ],
+        "strategy": {
+          "type": "leastLoad",
+          "settings": {
+            "maxRTT": "2s",
+            "expected": 2,
+            "baselines": [
+              "1s"
+            ]
+          }
+        },
+        "fallbackTag": "Наиболее стабильный из PROXY, если все остальные недоступны"
+      }
+    ],
+    "domainStrategy": "IPIfNonMatch"
+  },
+
+  "observatory": {
+    "probeUrl": "https://www.google.com/generate_204",
+    "probeInterval": "10s",
+    "subjectSelector": [
+        "все outbounds"
+    ],
+    "enableConcurrency": true
+  }
+}
