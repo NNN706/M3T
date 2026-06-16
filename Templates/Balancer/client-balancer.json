@@ -1,0 +1,122 @@
+{
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "protocol": [
+          "bittorrent"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "network": "tcp,udp",
+        "balancerTag": "Balancer"
+      }
+    ],
+    "balancers": [
+      {
+        "tag": "Balancer",
+        "selector": [
+          "PROXY" // все outbounds (тег хоста из панели)
+        ],
+        "strategy": {
+          "type": "leastLoad",
+          "settings": {
+            "maxRTT": "1s",
+            "expected": 2,
+            "baselines": [
+              "1s"
+            ]
+          }
+        },
+        "fallbackTag": "RUMSK1_PROXY_VLESS" // Наиболее стабильный из PROXY, если все остальные недоступны (тег хоста из панели)
+      }
+    ],
+    "domainStrategy": "IPIfNonMatch"
+  },
+  "inbounds": [
+    {
+      "tag": "socks",
+      "port": 10808,
+      "listen": "127.0.0.1",
+      "protocol": "socks",
+      "settings": {
+        "udp": true,
+        "auth": "noauth",
+        "userLevel": 0
+      },
+      "sniffing": {
+        "enabled": true,
+        "routeOnly": false,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
+      }
+    },
+    {
+      "tag": "http",
+      "port": 10809,
+      "listen": "127.0.0.1",
+      "protocol": "http",
+      "settings": {
+        "allowTransparent": false
+      },
+      "sniffing": {
+        "enabled": true,
+        "routeOnly": false,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIP"
+      }
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      }
+    }
+  ],
+  "remnawave": {
+    "injectHosts": [
+      {
+        "selector": {
+          "type": "tagRegex",
+          "pattern": "^PROXY" // Поиск по PROXY..... outbound (тег хоста из панели)
+        },
+        "selectFrom": "ALL",
+        "useHostTagAsTag": true
+      },
+      {
+        "selector": {
+          "type": "tagRegex",
+          "pattern": "^RUSPB_PROXY_VLESS" // Поиск по RUSPB_PROXY_VLESS outbound - резерв, для fallback (тег хоста из панели)
+        },
+        "selectFrom": "ALL",
+        "useHostTagAsTag": true
+      }
+    ]
+  },
+  "observatory": {
+    "probeUrl": "https://www.google.com/generate_204",
+    "probeInterval": "30s",
+    "subjectSelector": [
+      "PROXY" // Поиск по PROXY..... outbound (тег хоста из панели)
+    ],
+    "enableConcurrency": true
+  }
+}
