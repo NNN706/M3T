@@ -1,0 +1,180 @@
+  "dns": {
+    "hosts": {
+      "dns.google": [
+        "8.8.8.8",
+        "8.8.4.4"
+      ],
+      "common.dot.dns.yandex.net": [
+        "77.88.8.8",
+        "77.88.8.1"
+      ],
+      "unfiltered.adguard-dns.com": [
+        "94.140.14.140",
+        "94.140.14.141"
+      ]
+    },
+    "servers": [
+      {
+        "address": "https://dns.google/dns-query",
+        "timeoutMs": 5000
+      },
+      {
+        "address": "https://unfiltered.adguard-dns.com/dns-query",
+        "timeoutMs": 5000
+      },
+      {
+        "address": "https://common.dot.dns.yandex.net/dns-query",
+        "timeoutMs": 5000,
+        "disableFallbackIfMatch": true
+      },
+      "localhost"
+    ],
+    "serveStale": true,
+    "queryStrategy": "UseIP",
+    "serveExpiredTTL": 43200,
+    "enableParallelQuery": true
+  },
+  "log": {
+    "loglevel": "warning"
+  },
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "protocol": [
+          "bittorrent"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "ip": [
+          "0.0.0.0/8",
+          "10.0.0.0/8",
+          "100.64.0.0/10",
+          "127.0.0.0/8",
+          "169.254.0.0/16",
+          "172.16.0.0/12",
+          "192.0.0.0/24",
+          "192.0.2.0/24",
+          "192.88.99.0/24",
+          "192.168.0.0/16",
+          "198.18.0.0/15",
+          "198.51.100.0/24",
+          "203.0.113.0/24",
+          "224.0.0.0/3",
+          "::/127",
+          "fc00::/7",
+          "fe80::/10",
+          "ff00::/8",
+          "1.1.1.1/32",
+          "1.0.0.1/32",
+          "8.8.8.8/32",
+          "8.8.4.4/32",
+          "94.140.14.140",
+          "94.140.14.141",
+          "77.88.8.8",
+          "77.88.8.1"
+        ],
+        "type": "field",
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "regexp:^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$",
+          "regexp:^(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\\.100\\.in-addr\\.arpa$",
+          "regexp:^(1[6-9]|2[0-9]|3[01])\\.172\\.in-addr\\.arpa$",
+          "regexp:^[89ab]\\.e\\.f\\.ip6\\.arpa$",
+          "regexp:^d\\.f\\.ip6\\.arpa$",
+          "root:10.in-addr.arpa",
+          "root:127.in-addr.arpa",
+          "root:168.192.in-addr.arpa",
+          "root:254.169.in-addr.arpa",
+          "root:255.255.255.255.in-addr.arpa",
+          "root:2.0.192.in-addr.arpa",
+          "root:113.0.203.in-addr.arpa",
+          "root:100.51.198.in-addr.arpa",
+          "root:8.b.d.0.1.0.0.2.ip6.arpa",
+          "root:1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa",
+          "full:asusrouter.com",
+          "full:instant.arubanetworks.com",
+          "full:miwifi.com",
+          "full:oasisauth.h3c.com",
+          "full:router.asus.com",
+          "full:routerlogin.com",
+          "full:setmeup.arubanetworks.com",
+          "full:tplogin.cn",
+          "full:www.asusrouter.com",
+          "full:www.miwifi.com",
+          "full:www.routerlogin.com",
+          "root:example",
+          "root:hiwifi.com",
+          "root:home.arpa",
+          "root:internal",
+          "root:invalid",
+          "root:lan",
+          "root:leike.cc",
+          "root:local",
+          "root:localdomain",
+          "root:localhost",
+          "root:localhost.ptlogin2.qq.com",
+          "root:localhost.sec.qq.com",
+          "root:my.router",
+          "root:peiluyou.com",
+          "root:phicomm.me",
+          "root:plex.direct",
+          "root:router.ctc",
+          "root:tendawifi.com",
+          "root:test",
+          "root:test.steampowered.com",
+          "root:tplinkwifi.net",
+          "root:ts.net",
+          "root:zte.home"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(vk\\.(com|ru)|userapi\\.com|okcdn\\.ru|mail\\.ru|vk-portal\\.net|vkuserphoto\\.ru|apptracer\\.ru)$",
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(ozon(usercontent)?\\.ru|ozone\\.ru)$",
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(max|oneme)\\.ru$",
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(wildberries\\.ru|wb(basket|pay|static)?\\.ru|geobasket\\.ru|wibes\\.ru|wildberries\\.by)$",
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(t(bank|inkoff)(-app)?\\.ru|cdn-tinkoff\\.ru|t-static\\.ru|tcsgroup\\.io|diginetica\\.net|tinsurance\\.ru|tmiaf\\.ru|dolyame\\.ru|t-tech\\.team)$",
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(gosuslugi\\.ru|gu-st\\.ru|rt\\.ru|gov\\.ru|government\\.ru|kremlin\\.ru|mos\\.ru|mosreg\\.ru|cikrf\\.ru|izbirkom\\.ru|xn--80aafgovrgbc7am\\.xn--p1ai|xn--80ajghhoc2aj1c8b\\.xn--p1ai|xn----8sbahiqzthbd0bn\\.xn--p1ai)$",
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(yandex\\.(ru|com|net)|yastatic\\.net|ya\\.ru|kinopoisk\\.ru|dzen\\.ru|dzeninfra\\.ru|auto\\.ru)$",
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(vtb\\.ru|alfabank\\.ru|alfadirect\\.ru|rzd\\.ru|pochta\\.ru|hh\\.ru|headhunter\\.ru|x5\\.ru|5ka\\.ru|beru\\.ru|digitalaccess\\.ru)$",
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(rbc\\.ru|kp\\.ru|ntv\\.ru|ivi\\.ru|kion\\.ru|litres\\.ru|magnit\\.ru|megamarket\\.ru|mts\\.(ru|tv)|okko\\.tv|ottplay\\.ru|perekrestok\\.ru|premier\\.one|pyaterochka\\.ru|res-nsdi\\.ru|rambler\\.ru|rutube\\.ru|t2\\.ru|tutu\\.ru|vseinstrumenty\\.ru|vi\\.ru|vkusvill\\.ru|wink\\.(ru|rt\\.ru)|yappy\\.ru|zarplata\\.ru|f6\\.security|gpmd\\.ru|o-courier\\.ru|ocourier\\.ru)$",
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(sber(bank)?\\.ru|sberpay\\.ru|sber\\.ru|2gis\\.(ru|com)|avito\\.(ru|st)|platiqr\\.ru|multiqr\\.ru|sbdv\\.ru|mysbertips\\.ru|hh\\.ru|headhunter\\.ru)$",
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(umschool\\.net|code-class\\.ru|summerstage\\.ru|my\\.games|cxhub\\.ru|appsmail\\.ru|odkl\\.ru|apiok\\.ru|sferum-dev\\.ru)$",
+          "regexp:^([a-zA-Z0-9.-]*\\.)?(bcs-(bank|broker)\\.ru|bcs\\.ru|be-broker\\.ru)$"
+        ],
+        "outboundTag": "direct"
+      },
+    //   {
+    //     "network": "tcp,udp",
+    //     "balancerTag": "Balancer" 
+    //   }
+
+    // ],
+    // "balancers": [
+    //   {
+    //     "tag": "Balancer",
+    //     "selector": [
+    //       "RU"
+    //     ],
+    //     "strategy": {
+    //       "type": "leastLoad",
+    //       "settings": {
+    //         "maxRTT": "1s",
+    //         "expected": 2,
+    //         "baselines": [
+    //           "1s"
+    //         ]
+    //       }
+    //     },
+    //     "fallbackTag": ""
+    //   }
+    // ],
+    "domainStrategy": "IPIfNonMatch"
+  },
