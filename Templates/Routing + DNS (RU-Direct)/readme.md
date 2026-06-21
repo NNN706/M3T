@@ -1,4 +1,4 @@
-**Параллельные запросы к трём провайдерам:**
+**Параллельные DNS запросы к трём провайдерам:**
 - Google DNS (`dns.google`)
 - AdGuard DNS Unfiltered (`unfiltered.adguard-dns.com`)
 - Яндекс DoT (`common.dot.dns.yandex.net`)
@@ -42,7 +42,7 @@ umschool.net, code-class.ru, summerstage.ru, my.games, cxhub.ru
 **БКС (Брокер / Банк):**
 bcs-bank.ru, bcs-broker.ru, bcs.ru, be-broker.ru  
 
-**Block
+**Block**
 
 - mradx.net
 - adriver.ru
