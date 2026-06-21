@@ -1,4 +1,4 @@
-**Параллельные DNS запросы к трём провайдерам:**
+**Параллельные DNS (DoH) запросы к трём провайдерам:**
 - Google DNS (`dns.google`)
 - AdGuard DNS Unfiltered (`unfiltered.adguard-dns.com`)
 - Яндекс DoT (`common.dot.dns.yandex.net`)
