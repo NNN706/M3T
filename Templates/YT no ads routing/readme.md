@@ -29,7 +29,7 @@
           "shortIds": [
             ""
           ],
-          "privateKey": "Генерация через docker exec -it remnanode xray x25519 или в окне редактирования "Config Profiles",
+          "privateKey": "Генерация через docker exec -it remnanode xray x25519 или в окне редактирования "Config Profiles"",
           "fingerprint": "randomized",
           "serverNames": [
             "yourdomain.com"
@@ -49,7 +49,7 @@
         "id": "User, имеющий доступ к этому inbound, можно специально создать в панели remnawave и привязать к соотвествующему inboundTag", // https://docs.rw/learn/server-routing
         "flow": "xtls-rprx-vision-udp443",
         "port": 443,
-        "address":   "yourdomain.com",
+        "address": "yourdomain.com",
         "encryption": "none"
       },
       "streamSettings": {
