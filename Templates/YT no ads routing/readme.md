@@ -76,6 +76,7 @@ bash wget -qO- censorcheck.tlab.pw | bash  <br>
     }
 ```
 <br>
+
 ### Обязательно изучите и закиньте в нейросеть как базу для дальнейшей помощи:
 https://xtls.github.io/ru/config/routing.html - основы Routing<br>
 https://xtls.github.io/ru/config/inbounds/vless.html - конфигурация протокола Vless для входящего подлючения<br>
