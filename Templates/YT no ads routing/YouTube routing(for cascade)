@@ -1,0 +1,54 @@
+ "routing": {
+    "rules": [
+      {
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "BLOCK"
+      },
+      {
+        "domain": [
+          "geosite:private"
+        ],
+        "outboundTag": "BLOCK"
+      },
+      {
+        "protocol": [
+          "bittorrent"
+        ],
+        "outboundTag": "BLOCK"
+      },
+      {
+        "domain": [
+          "geosite:youtube"
+        ],
+        "inboundTag": [
+            "" // inboundTag подключений, с которых нет рекламы
+        ],
+        "outboundTag": "DIRECT"
+      },
+    //   // Правило ниже можно опустить, если необязательно, чтобы каждое входящее подключение роутило на подключение без рекламы
+    //   // Например, можно оставить клиентам хосты обычные (условно с рекламой), и оставить один или несколько подключений без рекламы, для уменьшения хопов
+    //   // Однако, внутри одного города (например, если все РУ локации - в Москве), время хопа редко превышает 1 сек
+    //   {
+    //     "domain": [
+    //       "geosite:youtube"
+    //     ],
+    //     "inboundTag": [
+    //       "" // inboundTag подключений, с которых есть реклама, или не работает YouTube
+    //     ],
+    //      "outboundTag": "OutboundYT" // outboundTag подключения, где нет рекламы YouTube
+    //   },
+      {
+        "domain": [
+          "geosite:category-ru"
+        ],
+        "outboundTag": "DIRECT"
+      },
+      { 
+        "network": "tcp,udp",
+        "outboundTag": "" // outboundTag зарубеж, или каждому входящему соединению свой outbound
+      }
+    ],
+    "domainStrategy": "IPIfNonMatch"
+  },
