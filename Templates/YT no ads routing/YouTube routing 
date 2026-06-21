@@ -22,7 +22,7 @@
         "domain": [
           "geosite:youtube"
         ],
-        "outboundTag": "" // outboundTag подключения без рекалмы
+        "outboundTag": "" // outboundTag подключения без рекламы (см. readme.md)
       },
       {
         "domain": [

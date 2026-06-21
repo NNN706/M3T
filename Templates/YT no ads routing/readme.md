@@ -1,3 +1,7 @@
+# YouTube without ADS rotuing
+#### Если скрипт проверки локации <bash <(wget -qO- https://ipregion.vrnt.xyz)>, определил RU на YouTube, или с русской ноды <bash wget -qO- censorcheck.tlab.pw | bash> показал доступ к YouTube, то воспользуемся этим для устранения рекламы <br>
+Для этого нам необходимо пустить YouTube в ноду, с которой при проверке напрямую не показывает рекламу<br>
+Важно понимать, что метод не устраняет рекламу с ноды, на которой она изначально есть, она лишь пересылает подключение на ноду, где рекламы нет<br>
 ### При сопоставлении inboundTag к outboundTag важно, чтобы параметры подключения соответствовали друг другу
 #### Пример:<br>
 Входящее подключение, к которому изначально подключается наш клиент, или сервисный пользователь: см. https://docs.rw/learn/server-routing<br>
@@ -63,3 +67,8 @@
       }
     }
 ```
+### Обязательно изучите и закиньте в нейросеть как базу для дальнейшей помощи:
+https://xtls.github.io/ru/config/routing.html - основы Routing<br>
+https://xtls.github.io/ru/config/inbounds/vless.html - конфигурация протокола Vless для входящего подлючения<br>
+https://xtls.github.io/ru/config/outbounds/vless.html - конфигурация протокола Vless для исходящего подлючения<br>
+https://xtls.github.io/ru/config/routing.html#balancerobject - необязательный параметр!<br>
