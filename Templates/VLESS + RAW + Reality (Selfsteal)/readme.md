@@ -8,7 +8,7 @@
 - Способ 2 - Взять бесплатно в [FreeDNS](https://freedns.afraid.org/) или [DuckDNS](https://www.duckdns.org)  
 Далее необходимо всего одно действие: добавить A-запись домена, а затем и поддомена (node.yourserver.com) на IP вашего VPS  
 
-Итогом правильных действий этого пункта будет отображение вашего айпи в сервисе [nslookup](https://www.nslookup.io)
+Итогом правильного выполнения действий этого пункта будет отображение вашего айпи в сервисе [nslookup](https://www.nslookup.io)
 
 ---
 ### 3. Сертификат
@@ -148,8 +148,8 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 ```
 ---
 ### В панели Remnawave ваш домен используется в двух местах:
-При добавлении ноды (можно заменить на IP ноды)     
-При добавлении хоста     
+- При добавлении ноды (можно заменить на IP ноды)     
+- При добавлении хоста     
 ![При добавлении ноды (можно заменить на IP ноды)](../../source/images/AddNode.png)
 ![При добавлении хоста](../../source/images/AddHost.png)
 
@@ -160,18 +160,20 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 
 Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hystiria, - это то, что вы вводите в **"network": " "**,     
 - Определяет, как именно переносится поток данных, например через RAW, WebSocket, gRPC, Hysteria и другие.     
-- Имеет свои настройки       - "rawSettings": {   } (в нашем примере пустой),     
-                        - "xhttpSettings": {   },     
-                        - "kcpSettings": {   },     
-                        - "grpcSettings": {   },     
-                        - "wsSettings": {   },     
-                        - "httpupgradeSettings": {   },     
-                        - "hysteriaSettings": {   }     
+- Имеет свои настройки       
+>"rawSettings": {   } (в нашем примере пустой),     
+>"xhttpSettings": {   },     
+>"kcpSettings": {   },     
+>"grpcSettings": {   },     
+>"wsSettings": {   },     
+>"httpupgradeSettings": {   },     
+>"hysteriaSettings": {   }     
 
 Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в **"security": " "**,     
 - Определяет механизм защиты, например TLS или REALITY.     
-- Имеет свои настройки:      - "realitySettings": {   } (Выбор в нашем примере),     
-                        - "tlsSettings": {   }     
+- Имеет свои настройки:
+>"realitySettings": {   } (Выбор в нашем примере),     
+>"tlsSettings": {   }     
 
 Эти три группы относятся к разным уровням и в определенных пределах могут комбинироваться     
 
