@@ -1,27 +1,28 @@
 # Базовая настройка протокола VLESS с конфигурацией транспорта RAW + Reality
 
 ### 1. Аренда зарубежного VPS
-
+---
 ### 2. Домен
-Существует два способа завладеть своим собственным доменом<br>
-Способ 1 - В сервисах регистрации, у хостеров. После регистрации рекомендую делегировать домен на ns-сервера Cloudflare или на другие популярные сервисы (предпочтительно)<br>
-Способ 2 - Взять бесплатно в [FreeDNS](https://freedns.afraid.org/) или [DuckDNS](https://www.duckdns.org)<br>
+Существует два способа завладеть своим собственным доменом     
+Способ 1 - В сервисах регистрации, у хостеров. После регистрации рекомендую делегировать домен на ns-сервера Cloudflare или на другие популярные сервисы (предпочтительно)     
+Способ 2 - Взять бесплатно в [FreeDNS](https://freedns.afraid.org/) или [DuckDNS](https://www.duckdns.org)     
 
-Далее необходимо всего одно действие: добавить A-запись домена, а затем и поддомена (node.yourserver.com) на айпи вашего VPS<br>
-Итогом правильных действий этого пункта будет отображение вашего айпи в сервисе [nslookup](https://www.nslookup.io)<br>
-
+Далее необходимо всего одно действие: добавить A-запись домена, а затем и поддомена (node.yourserver.com) на айпи вашего VPS     
+Итогом правильных действий этого пункта будет отображение вашего айпи в сервисе [nslookup](https://www.nslookup.io)     
+---
 ### 3. Сертификат
-Далее выполнение действий будет происходит на нашей VPS<br>
-Необходимо выпустить сертификат, для вашего сайта, который будет отдавать Reality нечистям, кто сканирует вас<br>
+Далее выполнение действий будет происходить на нашей VPS     
+Необходимо выпустить сертификат, для вашего сайта, который будет отдавать Reality нечистям, кто сканирует вас     
 ```bash
 certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m admin@example.com
 ```
-Итогом правильных действий этого пункта будет отображение вашего домена в директории с сертификатами:<br>
+Итогом правильного выполнения действий этого пункта будет отображение вашего домена в директории с сертификатами:     
 ```bash
 ls /etc/letsencrypt/live
 ```
+---
 ### 4. nginx.conf
-Директории с remnanode создадим файл nginx.conf в директории remnanode
+Cоздадим файл nginx.conf в директории remnanode
 ```bash
 cat > /opt/remnanode/nginx.conf <<EOF
 server_names_hash_bucket_size 64;
@@ -70,7 +71,7 @@ server {
 EOF
 echo "✅ Конфигурация nginx создана!"
 ```
-Итогом правильных действий этого пункта будет отображение четырех строк при вызове команды:<br>
+Итогом правильных действий этого пункта будет отображение четырех строк при вызове команды:     
 ```bash
 # Замените yourdomain.com на ваш домен
 cat /opt/remnanode/nginx.conf | grep "yourdomain.com"
@@ -125,45 +126,46 @@ services:
 EOF
 echo "✅ Docker Compose файл создан!"
 ```
+---
 ### По итогу на VPS ваш домен (усл. yourdomain.com) используется всего в 3 местах и в 6 строках:
-#### 1) Файл **server.json**: <br>
-30 строка:   ("**yourdomain.com**" // Replace with your domain)<br>
+1) Файл **server.json**:      
+30 строка:   ("**yourdomain.com**" // Replace with your domain)     
 
-#### 2) Файл **nginx.conf**:  <br>
-12 строка:   server_name **yourdomain.com**;<br>
-14 строка:   ssl_certificate "/etc/letsencrypt/live/**yourdomain.com**/fullchain.pem";<br>
-15 строка:   ssl_certificate_key "/etc/letsencrypt/live/**yourdomain.com**/privkey.pem";<br>
-16 строка:   ssl_trusted_certificate "/etc/letsencrypt/live/**yourdomain.com**/chain.pem";<br>
+2) Файл **nginx.conf**:       
+12 строка:   server_name **yourdomain.com**;     
+14 строка:   ssl_certificate "/etc/letsencrypt/live/**yourdomain.com**/fullchain.pem";     
+15 строка:   ssl_certificate_key "/etc/letsencrypt/live/**yourdomain.com**/privkey.pem";     
+16 строка:   ssl_trusted_certificate "/etc/letsencrypt/live/**yourdomain.com**/chain.pem";     
 
-#### 3) Команда для выдачи сертификатов: <br>
+3) Команда для выдачи сертификатов:      
 ```bash
-certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m admin@example.com <br>
+certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m admin@example.com      
 ```
-
+---
 ### В панели Remnawave ваш домен используется в двух местах:
-При добавлении ноды (можно заменить на IP ноды)<br>
-При добавлении хоста<br>
+При добавлении ноды (можно заменить на IP ноды)     
+При добавлении хоста     
 ![При добавлении ноды (можно заменить на IP ноды)](../../source/images/AddNode.png)
 ![При добавлении хоста](../../source/images/AddHost.png)
-
+---
 ### Базовая терминология для дальнейшей успешной работы:
-#### Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в **"protocol": "..."**,<br>
-- Имеет свои настройки: <br>"settings": {"...", "..."}<br>
+Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в **"protocol": " "**,     
+- Имеет свои настройки:      "settings": {   }     
 
-####  Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hysteia, - это то, что вы вводите в **"network": "..."**,<br>
-- Определяет, как именно переносится поток данных, например через RAW, WebSocket, gRPC, Hysteria и другие.<br>
-- Имеет свои настройки  <br>- "rawSettings": {"...", "..."} (в нашем примере пустой),<br>
-                        - "xhttpSettings": {"...", "..."},<br>
-                        - "kcpSettings": {"...", "..."},<br>
-                        - "grpcSettings": {"...", "..."},<br>
-                        - "wsSettings": {"...", "..."},<br>
-                        - "httpupgradeSettings": {"...", "..."},<br>
-                        - "hysteriaSettings": {"...", "..."}<br>
+Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hystiria, - это то, что вы вводите в **"network": " "**,     
+- Определяет, как именно переносится поток данных, например через RAW, WebSocket, gRPC, Hysteria и другие.     
+- Имеет свои настройки       - "rawSettings": {   } (в нашем примере пустой),     
+                        - "xhttpSettings": {   },     
+                        - "kcpSettings": {   },     
+                        - "grpcSettings": {   },     
+                        - "wsSettings": {   },     
+                        - "httpupgradeSettings": {   },     
+                        - "hysteriaSettings": {   }     
 
-####  Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в **"security": "..."**,<br>
-- Определяет механизм защиты, например TLS или REALITY.<br>
-- Имеет свои настройки: <br>- "realitySettings": {"...", "..."} (Выбор в нашем примере),<br>
-                        - "tlsSettings": {"...", "..."}<br>
+Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в **"security": " "**,     
+- Определяет механизм защиты, например TLS или REALITY.     
+- Имеет свои настройки:      - "realitySettings": {   } (Выбор в нашем примере),     
+                        - "tlsSettings": {   }     
 
-#### Эти три группы относятся к разным уровням и в определенных пределах могут комбинироваться<br>
+Эти три группы относятся к разным уровням и в определенных пределах могут комбинироваться     
 
