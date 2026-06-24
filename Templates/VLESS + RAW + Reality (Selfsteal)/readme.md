@@ -1,5 +1,5 @@
 # Базовая настройка протокола VLESS с конфигурацией транспорта RAW + Reality
-
+---
 ### 1. Аренда зарубежного VPS
 ---
 ### 2. Домен
@@ -7,8 +7,8 @@
 - Способ 1 - В сервисах регистрации, у хостеров. После регистрации рекомендую делегировать домен на ns-сервера Cloudflare или на другие популярные сервисы (предпочтительно)  
 - Способ 2 - Взять бесплатно в [FreeDNS](https://freedns.afraid.org/) или [DuckDNS](https://www.duckdns.org)  
 Далее необходимо всего одно действие: добавить A-запись домена, а затем и поддомена (node.yourserver.com) на IP вашего VPS
+Итогом правильных действий этого пункта будет отображение вашего айпи в сервисе [nslookup](https://www.nslookup.io)
 
-Итогом правильных действий этого пункта будет отображение вашего айпи в сервисе [nslookup](https://www.nslookup.io)  
 ---
 ### 3. Сертификат
 Далее выполнение действий будет происходить на нашей VPS     
@@ -20,6 +20,7 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 ```bash
 ls /etc/letsencrypt/live
 ```
+
 ---
 ### 4. nginx.conf (создание)
 Создадим файл nginx.conf в директории remnanode
@@ -76,6 +77,8 @@ echo "✅ Конфигурация nginx создана!"
 # Замените yourdomain.com на ваш домен
 cat /opt/remnanode/nginx.conf | grep "yourdomain.com"
 ```
+
+---
 ### 5. docker-compose.yml
 ```bash
 cat > /opt/remnanode/docker-compose.yml <<'EOF'
@@ -126,6 +129,7 @@ services:
 EOF
 echo "✅ Docker Compose файл создан!"
 ```
+
 ---
 ### По итогу на VPS ваш домен (усл. yourdomain.com) используется всего в 3 местах и в 6 строках:
 1) Файл **server.json**:      
@@ -147,6 +151,7 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 При добавлении хоста     
 ![При добавлении ноды (можно заменить на IP ноды)](../../source/images/AddNode.png)
 ![При добавлении хоста](../../source/images/AddHost.png)
+
 ---
 ### Базовая терминология для дальнейшей успешной работы:
 Протокол (Protocol): VLESS, Trojan, Hysteria - это то, что вы вводите в **"protocol": " "**,     
