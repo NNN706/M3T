@@ -20,12 +20,9 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 ls /etc/letsencrypt/live
 ```
 ---
-
-
 ### 4. nginx.conf (создание)
 Создадим файл nginx.conf в директории remnanode
 ```bash
-
 cat > /opt/remnanode/nginx.conf <<'EOF'
 server_names_hash_bucket_size 64;
 
@@ -78,7 +75,7 @@ echo "✅ Конфигурация nginx создана!"
 # Замените yourdomain.com на ваш домен
 cat /opt/remnanode/nginx.conf | grep "yourdomain.com"
 ```
-### 4. docker-compose.yml
+### 5. docker-compose.yml
 ```bash
 cat > /opt/remnanode/docker-compose.yml <<'EOF'
 x-logging: &logging
