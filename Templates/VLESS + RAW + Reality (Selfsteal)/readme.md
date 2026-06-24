@@ -161,18 +161,25 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 Транспорт (Transport Methods): RAW (бывш. TCP), XHTTP, Hystiria, - это то, что вы вводите в **"network": " "**,     
 - Определяет, как именно переносится поток данных, например через RAW, WebSocket, gRPC, Hysteria и другие.     
 - Имеет свои настройки       
->"rawSettings": {   } (в нашем примере пустой),     
->"xhttpSettings": {   },     
->"kcpSettings": {   },     
->"grpcSettings": {   },     
->"wsSettings": {   },     
->"httpupgradeSettings": {   },     
+>"rawSettings": {   } (в нашем примере пустой)   
+
+>"xhttpSettings": {   }     
+
+>"kcpSettings": {   }     
+
+>"grpcSettings": {   }     
+
+>"wsSettings": {   }     
+
+>"httpupgradeSettings": {   }     
+
 >"hysteriaSettings": {   }     
 
 Безопасность транспорта (Transport Security): TLS, Reality - это то, что вы вводите в **"security": " "**,     
 - Определяет механизм защиты, например TLS или REALITY.     
 - Имеет свои настройки:
->"realitySettings": {   } (Выбор в нашем примере),     
+>"realitySettings": {   } (Выбор в нашем примере)     
+
 >"tlsSettings": {   }     
 
 Эти три группы относятся к разным уровням и в определенных пределах могут комбинироваться     
