@@ -4,8 +4,8 @@
 ---
 ### 2. Домен
 Существует два способа завладеть своим собственным доменом     
->Способ 1 - В сервисах регистрации, у хостеров. После регистрации рекомендую делегировать домен на ns-сервера Cloudflare или на другие популярные сервисы (предпочтительно)     
->Способ 2 - Взять бесплатно в [FreeDNS](https://freedns.afraid.org/) или [DuckDNS](https://www.duckdns.org)     
+Способ 1 - В сервисах регистрации, у хостеров. После регистрации рекомендую делегировать домен на ns-сервера Cloudflare или на другие популярные сервисы (предпочтительно)     
+Способ 2 - Взять бесплатно в [FreeDNS](https://freedns.afraid.org/) или [DuckDNS](https://www.duckdns.org)     
 Далее необходимо всего одно действие: добавить A-запись домена, а затем и поддомена (node.yourserver.com) на айпи вашего VPS     
 Итогом правильных действий этого пункта будет отображение вашего айпи в сервисе [nslookup](https://www.nslookup.io)     
 ---
@@ -20,12 +20,9 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 ls /etc/letsencrypt/live
 ```
 ---
-
-
 ### 4. nginx.conf (создание)
 Создадим файл nginx.conf в директории remnanode
 ```bash
-
 cat > /opt/remnanode/nginx.conf <<'EOF'
 server_names_hash_bucket_size 64;
 
@@ -78,7 +75,7 @@ echo "✅ Конфигурация nginx создана!"
 # Замените yourdomain.com на ваш домен
 cat /opt/remnanode/nginx.conf | grep "yourdomain.com"
 ```
-### 4. docker-compose.yml
+### 5. docker-compose.yml
 ```bash
 cat > /opt/remnanode/docker-compose.yml <<'EOF'
 x-logging: &logging
