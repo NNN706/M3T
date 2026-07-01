@@ -1,0 +1,95 @@
+  "routing": {
+    "rules": [
+      {
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "BLOCK"
+      },
+      {
+        "protocol": [
+          "bittorrent"
+        ],
+        "outboundTag": "BLOCK"
+      },
+      {
+        "domain": [
+          "geosite:discord"
+        ],
+        "inboundTag": [
+"inbounds без блокировок Disord"
+        ],
+        "outboundTag": "DIRECT"
+      },
+//       {
+//         "domain": [
+//           "geosite:discord"
+//         ],
+//         "inboundTag": [
+// "inbounds с блокировой Discord"
+//         ],
+//         "balancerTag": "BalancerDS"
+//       },
+      {
+        "domain": [
+          "geosite:youtube"
+        ],
+        "inboundTag": [
+"inbounds без блокировок YouTube"
+        ],
+        "outboundTag": "DIRECT"
+      },
+//       {
+//         "domain": [
+//           "geosite:youtube"
+//         ],
+//         "inboundTag": [
+// "inbounds с блокировкой YouTube"
+//         ],
+//         "balancerTag": "BalancerYT"
+//       },
+      {
+        "domain": [
+          "geosite:telegram"
+        ],
+        "inboundTag": [
+"inbounds без блокировок Telegram"
+        ],
+        "outboundTag": "DIRECT"
+      },
+      {
+        "ip": [
+          "geoip:telegram"
+        ],
+        "inboundTag": [
+"inbounds без блокировок Telegram"
+        ],
+        "outboundTag": "DIRECT"
+      },
+//       {
+//         "domain": [
+//           "geosite:telegram"
+//         ],
+//         "inboundTag": [
+// "inbounds с блокировкой Telegram"
+//         ],
+//         "balancerTag": "BalancerTG"
+//       },
+//       {
+//         "ip": [
+//           "geoip:telegram"
+//         ],
+//         "inboundTag": [
+// "inbounds с блокировкой Telegram"
+//         ],
+//         "balancerTag": "BalancerTG"
+//       },
+      {
+        "domain": [
+          "geosite:category-ru"
+        ],
+        "outboundTag": "DIRECT"
+      }
+    ],
+  "domainStrategy": "IPIfNonMatch"
+  },
