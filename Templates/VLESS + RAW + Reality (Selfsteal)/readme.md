@@ -73,7 +73,7 @@ server {
 EOF
 echo "✅ Конфигурация nginx создана!"
 ```
-Итогом правильных действий этого пункта будет отображение четырех строк при вызове команды:     
+Итогом правильного выполнения действий этого пункта будет отображение четырех строк при вызове команды:     
 ```bash
 # Замените yourdomain.com на ваш домен
 cat /opt/remnanode/nginx.conf | grep "yourdomain.com"
@@ -185,3 +185,8 @@ certbot certonly --standalone -d yourdomain.com --non-interactive --agree-tos -m
 
 Эти три группы относятся к разным уровням и в определенных пределах могут комбинироваться     
 
+###  Обязательно изучите и закиньте в нейросеть как базу для дальнейшей помощи:
+- https://xtls.github.io/ru/config/routing.html - основы Routing
+- https://xtls.github.io/ru/config/inbounds/vless.html - конфигурация протокола Vless для входящего подлючения
+- https://xtls.github.io/ru/config/outbounds/vless.html - конфигурация протокола Vless для исходящего подлючения
+- https://xtls.github.io/ru/config/routing.html#balancerobject - необязательный параметр!
