@@ -29,7 +29,7 @@ ls /etc/letsencrypt/live
 cat > /opt/remnanode/nginx.conf <<'EOF'
 server_names_hash_bucket_size 64;
 
-map \$http_upgrade \$connection_upgrade {
+map $http_upgrade $connection_upgrade {
     default upgrade;
     ""      close;
 }
