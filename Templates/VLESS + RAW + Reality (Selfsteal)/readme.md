@@ -91,11 +91,13 @@ x-logging: &logging
       max-file: 5
 
 x-common: &common
+  restart: always
+  network_mode: host
   ulimits:
     nofile:
       soft: 1048576
       hard: 1048576
-  restart: always
+
 
 services:
   remnanode-nginx:
@@ -103,7 +105,6 @@ services:
     container_name: remnawave-nginx
     hostname: remnawave-nginx
     <<: [*common, *logging]
-    network_mode: host
     volumes:
       - /opt/remnanode/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - /dev/shm:/dev/shm:rw
@@ -121,12 +122,10 @@ services:
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
       - '/var/log/remnanode:/var/log/remnanode'
-      - ./geosite.dat:/usr/local/share/xray/roscomgeosite.dat:ro
-      - ./geoip.dat:/usr/local/share/xray/roscomgeoip.dat:ro
       - /dev/shm:/dev/shm:rw
     environment:
       - NODE_PORT=2222
-      - SECRET_KEY="Your Secret Key"
+      - SECRET_KEY="Your secrey key from Remnawave - Nodes - Management - Create new node - Secret Key (SECRET_KEY)"
 EOF
 echo "✅ Docker Compose файл создан!"
 ```
