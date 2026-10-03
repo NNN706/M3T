@@ -252,7 +252,7 @@
                 ],
                 "outboundTag": "direct"
             },
-            /// Блок домена ниже не будет работать без sniffing в inbounds, так как домен будет определяться по IP из блока выше, а не по домену
+            /// Блок доменов ниже не будет работать без sniffing в inbounds, так как домен будет определяться по IP из блока выше, а не по домену
             // {
             //     "type": "field",
             //     "domain": [
@@ -287,6 +287,14 @@
                     "auth": "noauth",
                     "userLevel": 0
                 }
+                // ,"sniffing": {
+                //     "enabled": true,
+                //     "routeOnly": false,
+                //     "destOverride": [
+                //         "http",
+                //         "tls"
+                //     ]
+                // }
             },
             {
                 "tag": "http",
@@ -296,6 +304,14 @@
                 "settings": {
                     "allowTransparent": false
                 }
+                // ,"sniffing": {
+                //     "enabled": true,
+                //     "routeOnly": false,
+                //     "destOverride": [
+                //         "http",
+                //         "tls"
+                //     ]
+                // }
             }
         ],
         "outbounds": [
