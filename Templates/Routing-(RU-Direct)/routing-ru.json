@@ -40,7 +40,7 @@
       "localhost"
     ],
     "serveStale": true,
-    "queryStrategy": "UseIP",
+    "queryStrategy": "UseIPv4",
     "serveExpiredTTL": 43200,
     "enableParallelQuery": true
   },
@@ -719,7 +719,8 @@
         "port": "21,22,23,25,587,465,143,993,110,995",
         "outboundTag": "direct"
       }
-    ]
+    ],
+    "domainStrategy": "IPOnDemand"
   },
   "inbounds": [
     {
@@ -748,14 +749,14 @@
       "protocol": "http",
       "settings": {
         "allowTransparent": false
-      }
-      ,"sniffing": {
-          "enabled": true,
-          "routeOnly": true,
-          "destOverride": [
-              "http",
-              "tls"
-          ]
+      },
+      "sniffing": {
+        "enabled": true,
+        "routeOnly": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
       }
     }
   ],
@@ -777,5 +778,4 @@
       }
     }
   ]
-}
 }
