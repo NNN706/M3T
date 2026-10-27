@@ -26,15 +26,15 @@
     "servers": [
       {
         "address": "https://dns.google/dns-query",
-        "timeoutMs": 5000
+        "timeoutMs": 2000
       },
       {
         "address": "https://unfiltered.adguard-dns.com/dns-query",
-        "timeoutMs": 5000
+        "timeoutMs": 2000
       },
       {
         "address": "https://common.dot.dns.yandex.net/dns-query",
-        "timeoutMs": 5000,
+        "timeoutMs": 2000,
         "disableFallbackIfMatch": true
       },
       "localhost"
