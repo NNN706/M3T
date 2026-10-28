@@ -1,147 +1,214 @@
 #!/usr/bin/env bash
+# Bash 3.2+, curl, jq 1.6+, nc. DNS A records (IPv4).
 set -euo pipefail
-
-verbose=0
-
-while getopts ":v" opt; do
+export LC_ALL=C
+usage() {
+  cat <<'HELP'
+Usage: SubnetResolve.sh [-v] [-4] [-s] [domain]
+  No domain: ask interactively (ASCII / punycode hostname).
+  -v  Include complete Check-Host node metadata.
+  -4  Output only unique IPv4 BGP prefixes: {"ip":[...]}.
+  -s  Never ask to save and never save resolved.json.
+  -h  Show help.
+Default: DNS A records; group by (ASN, prefix), ask to save (default no).
+JSON goes to stdout; prompts, diagnostics and report URL go to stderr.
+Exit: 0 complete, 1 fatal error, 2 usage, 3 partial DNS/BGP coverage.
+HELP
+}
+die() { printf 'Ошибка: %s\n' "$*" >&2; exit 1; }
+verbose=0; prefixes=0; silent=0
+while getopts ':v4sh' opt; do
   case "$opt" in
-    v) verbose=1 ;;
-    *) printf 'Usage: %s [-v] [domain]\n' "$0" >&2; exit 1 ;;
+    v) verbose=1 ;; 4) prefixes=1 ;; s) silent=1 ;; h) usage; exit 0 ;;
+    *) usage >&2; exit 2 ;;
   esac
 done
-
 shift $((OPTIND - 1))
-
-domain="${1:-samokat.ru}"
-
-if (( $# > 1 )); then
-  printf 'Usage: %s [-v] [domain]\n' "$0" >&2
-  exit 1
+[ "$#" -le 1 ] || { usage >&2; exit 2; }
+# Install only missing tools. Package-manager output must not contaminate JSON.
+ensure_dependencies() {
+  local dependency manager package seen existing
+  local missing=() packages=() elevate=()
+  for dependency in curl jq nc mktemp mkfifo cat cp mv rm sleep wc tr; do
+    if ! command -v "$dependency" >/dev/null 2>&1; then
+      missing+=("$dependency")
+    fi
+  done
+  [ "${#missing[@]}" -gt 0 ] || return 0
+  printf 'Отсутствуют зависимости: %s. Начинаем установку...\n' "${missing[*]}" >&2
+  manager=''
+  case "${OSTYPE:-}" in
+    darwin*)
+      # Homebrew may be installed but absent from a non-login shell PATH.
+      if ! command -v brew >/dev/null 2>&1; then
+        for existing in /opt/homebrew/bin /usr/local/bin; do
+          if [ -x "$existing/brew" ]; then export PATH="$existing:$PATH"; break; fi
+        done
+      fi
+      command -v brew >/dev/null 2>&1 && manager=brew
+      ;;
+    *)
+      for existing in apt-get dnf yum pacman apk; do
+        if command -v "$existing" >/dev/null 2>&1; then manager=$existing; break; fi
+      done ;;
+  esac
+  [ -n "$manager" ] || die 'Нет поддерживаемого пакетного менеджера. macOS: установите Homebrew (https://brew.sh); Linux: нужны apt-get, dnf, yum, pacman или apk.'
+  for dependency in "${missing[@]}"; do
+    case "$dependency" in
+      curl|jq) package=$dependency ;;
+      nc)
+        case "$manager" in
+          apt-get|apk) package=netcat-openbsd ;;
+          dnf|yum) package=nmap-ncat ;;
+          pacman) package=openbsd-netcat ;;
+          brew) package=netcat ;;
+        esac ;;
+      *) package=coreutils ;;
+    esac
+    seen=0
+    if [ "${#packages[@]}" -gt 0 ]; then
+      for existing in "${packages[@]}"; do [ "$existing" != "$package" ] || seen=1; done
+    fi
+    [ "$seen" -eq 1 ] || packages+=("$package")
+  done
+  if [ "$manager" != brew ] && [ "$EUID" -ne 0 ]; then
+    command -v sudo >/dev/null 2>&1 || die 'Для установки нужны права root или sudo.'
+    elevate=(sudo)
+  fi
+  # Empty arrays require special handling under Bash 3.2 + nounset.
+  case "$manager" in
+    apt-get)
+      ${elevate[@]+"${elevate[@]}"} apt-get update </dev/null >&2 || die 'Не удалось обновить список пакетов.'
+      ${elevate[@]+"${elevate[@]}"} apt-get install -y "${packages[@]}" </dev/null >&2 || die 'Не удалось установить зависимости.' ;;
+    dnf|yum) ${elevate[@]+"${elevate[@]}"} "$manager" install -y "${packages[@]}" </dev/null >&2 || die 'Не удалось установить зависимости.' ;;
+    pacman) ${elevate[@]+"${elevate[@]}"} pacman -S --needed --noconfirm "${packages[@]}" </dev/null >&2 || die 'Не удалось установить зависимости (проверьте актуальность системы).' ;;
+    apk) ${elevate[@]+"${elevate[@]}"} apk add "${packages[@]}" </dev/null >&2 || die 'Не удалось установить зависимости.' ;;
+    brew) brew install "${packages[@]}" </dev/null >&2 || die 'Не удалось установить зависимости через Homebrew.' ;;
+  esac
+  hash -r
+  for dependency in "${missing[@]}"; do
+    command -v "$dependency" >/dev/null 2>&1 || die "После установки команда $dependency недоступна в PATH."
+  done
+}
+ensure_dependencies
+domain=${1-}
+if [ "$#" -eq 0 ]; then
+  printf 'Введите домен: ' >&2
+  IFS= read -r domain || die 'Домен не введён.'
 fi
-
-# Check-Host API
-
-printf 'Получаем узлы Check-Host для %s...\n' "$domain" >&2
-
-check_host_response=$(
-  curl -fsSG \
-    --connect-timeout 5 \
-    --max-time 20 \
-    -H "Accept: application/json" \
-    --data-urlencode "host=$domain" \
-    'https://check-host.net/check-dns'
-)
-
-jq -e '
-  .ok == 1
-  and (.nodes | type == "object" and length > 0)
-  and (.permanent_link | type == "string")
-' <<< "$check_host_response" > /dev/null
-
-mapfile -t ips < <(
-  jq -r '.nodes | to_entries[].value[3]' <<< "$check_host_response"
-)
-
-total=${#ips[@]}
-
-printf '[0/%d] IP получены. Запрашиваем BGP.tools...\n' "$total" >&2
-
-# BGP.tools Bulk WHOIS
-
-bgp_response=$(
-  {
-    printf 'begin\n'
-    printf '%s\n' "${ips[@]}"
-    printf 'end\n'
-  } | nc -w 20 bgp.tools 43
-)
-
-printf '[%d/%d] Ответ получен. Формируем JSON...\n' "$total" "$total" >&2
-
-# JSON
-
-jq -n \
-  --argjson check "$check_host_response" \
-  --arg raw "$bgp_response" \
-  --argjson verbose "$verbose" '
-  
-  (
-    $raw
-    | split("\n")
-    | map(
-        select(length > 0)
-        | split("|")
-        | map(gsub("^\\s+|\\s+$"; ""))
-      )
-    | map(
-        select(
-          length >= 7
-          and (.[1] | test("^([0-9]{1,3}\\.){3}[0-9]{1,3}$"))
-        )
-      )
-    | map({
-        key: .[1],
-        value: {
-          prefix: .[2],
-          asn: ("AS" + .[0]),
-          as_name: .[6],
-          country: .[3],
-          registry: .[4],
-          allocated: .[5]
-        }
-      })
-    | from_entries
-  ) as $bgp
-
-  | {
-      results: (
-        $check.nodes
-        | to_entries
-        | to_entries
-        | map(
-            .key as $index
-            | .value.key as $node
-            | .value.value as $details
-            | $details[3] as $ip
-            | $bgp[$ip] as $route
-
-            | if $route == null then
-                error("BGP result missing for " + $ip)
-              else
-                {
-                  id: ($index + 1),
-                  ip: $ip,
-                  prefix: $route.prefix,
-                  asn: $route.asn,
-                  as_name: $route.as_name,
-                  country: $route.country,
-                  registry: $route.registry,
-                  allocated: $route.allocated,
-                  check_host: $node
-                }
-                +
-                (
-                  if $verbose == 1 then
-                    {
-                      check_host_details: {
-                        ($node): $details
-                      }
-                    }
-                  else
-                    {}
-                  end
-                )
-              end
-          )
-      ),
-
-      permanent_link: $check.permanent_link
-    }
-' > results.json
-
-received=$(jq '.results | length' results.json)
-
-printf 'Готово: %d/%d. Результаты сохранены в results.json\n' \
-  "$received" "$total" >&2
-
-jq . results.json
+domain=${domain%.}
+[ -n "$domain" ] && [ "${#domain}" -le 253 ] || die 'Некорректный домен.'
+jq -en --arg d "$domain" '$d | split(".") | length >= 2 and all(.[]; length <= 63 and test("^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?$"))' >/dev/null || die 'Введите домен без URL/порта; IDN — в punycode.'
+tmp=$(mktemp -d "${TMPDIR:-/tmp}/SubnetResolve.XXXXXXXX")
+ncpid=''
+cleanup() {
+  if [ -n "$ncpid" ]; then kill "$ncpid" 2>/dev/null || :; wait "$ncpid" 2>/dev/null || :; fi
+  rm -rf "$tmp"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+get_json() { curl -fsS --connect-timeout 5 --max-time 20 -H 'Accept: application/json' "$@"; }
+printf 'Запрашиваем DNS A для %s...\n' "$domain" >&2
+get_json -G --data-urlencode "host=$domain" https://check-host.net/check-dns > "$tmp/check.json" || die 'Check-Host: запрос не выполнен.'
+jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$tmp/check.json" >/dev/null || die 'Check-Host: некорректный ответ.'
+request_id=$(jq -r .request_id "$tmp/check.json")
+printf 'Отчёт: %s\n' "$(jq -r .permanent_link "$tmp/check.json")" >&2
+printf '{}\n' > "$tmp/dns.json"
+# Bound polling even if some nodes never finish. Keep last successful snapshot.
+for ((attempt=0; attempt<20; attempt++)); do
+  if get_json "https://check-host.net/check-result/$request_id" > "$tmp/next.json" && jq -e 'type == "object"' "$tmp/next.json" >/dev/null; then
+    mv "$tmp/next.json" "$tmp/dns.json"
+    if jq -e --slurpfile c "$tmp/check.json" '. as $r | all($c[0].nodes | keys[]; $r[.] != null)' "$tmp/dns.json" >/dev/null; then break; fi
+  fi
+  if [ "$attempt" -lt 19 ]; then sleep 2; fi
+done
+jq -n --slurpfile c "$tmp/check.json" --slurpfile r "$tmp/dns.json" '
+  def ipv4: if type != "string" then false else
+    test("^([0-9]{1,3}\\.){3}[0-9]{1,3}$") and (split(".") | all(.[]; tonumber <= 255)) end;
+  [$c[0].nodes | keys[] as $node | $r[0][$node] as $answer |
+    {node: $node, ips: ([$answer | .. | objects | .A? | arrays | .[] | select(ipv4)] | unique),
+     response: $answer}]
+' > "$tmp/nodes.json"
+jq '[.[] | .node as $node | .ips[] | {ip: ., node: $node}] | unique' "$tmp/nodes.json" > "$tmp/observations.json"
+jq -r '[.[].ip] | unique[]' "$tmp/observations.json" > "$tmp/ips"
+[ -s "$tmp/ips" ] || die 'Нет DNS A-адресов: пустые ответы, ошибки или тайм-аут узлов.'
+printf 'Запрашиваем BGP.tools для %s уникальных IP...\n' "$(wc -l < "$tmp/ips" | tr -d ' ')" >&2
+# Keep stdin open until the server closes: macOS nc can exit too early at EOF.
+mkfifo "$tmp/input"
+exec 3<> "$tmp/input"
+nc -w 20 bgp.tools 43 < "$tmp/input" > "$tmp/bgp.txt" &
+ncpid=$!
+{ printf 'begin\nverbose\n'; cat "$tmp/ips"; printf 'end\n'; } >&3
+for ((second=0; second<25; second++)); do
+  kill -0 "$ncpid" 2>/dev/null || break
+  sleep 1
+done
+if kill -0 "$ncpid" 2>/dev/null; then
+  kill "$ncpid" 2>/dev/null || :
+  wait "$ncpid" 2>/dev/null || :
+  die 'BGP.tools: превышено время ожидания.'
+fi
+wait "$ncpid" || die 'BGP.tools: соединение TCP/43 завершилось ошибкой.'
+ncpid=''
+exec 3>&-
+[ -s "$tmp/bgp.txt" ] || die 'BGP.tools: пустой ответ.'
+jq -Rn '
+  [inputs | split("|") | map(gsub("^\\s+|\\s+$"; "")) |
+   select(length >= 7) | select(.[0] | test("^[0-9]+$")) |
+   select(.[2] | test("^([0-9]{1,3}\\.){3}[0-9]{1,3}/([0-9]|[12][0-9]|3[0-2])$")) |
+   {ip: .[1], asn: ("AS" + .[0]), prefix: .[2], country: .[3], registry: .[4],
+    allocated: (if .[5] == "0001-01-01" or .[5] == "" then null else .[5] end),
+    as_name: (.[6:] | join(" | "))}] | unique
+' < "$tmp/bgp.txt" > "$tmp/routes.json"
+jq -n --arg domain "$domain" --argjson verbose "$verbose" \
+  --slurpfile c "$tmp/check.json" --slurpfile n "$tmp/nodes.json" \
+  --slurpfile o "$tmp/observations.json" --slurpfile b "$tmp/routes.json" '
+  # Reject unrelated/malformed ranges, including a prefix not containing its IP.
+  def ipnum: split(".") | map(tonumber) | if length == 4 and all(.[]; . >= 0 and . <= 255) then reduce .[] as $v (0; . * 256 + $v) else error("Invalid IPv4") end;
+  [$b[0][] | . as $route | select(any($o[0][]; .ip == $route.ip)) |
+   (.prefix | split("/")) as $p | pow(2; 32 - ($p[1]|tonumber)) as $size |
+   select(try (((.ip|ipnum) / $size | floor) == (($p[0]|ipnum) / $size) ) catch false)] as $routes |
+  [$o[0][] | . as $obs | $routes[] | select(.ip == $obs.ip) | . + {node: $obs.node}] as $joined |
+  {domain: $domain, record_type: "A",
+   results: ($joined | group_by([.asn, .prefix]) | map(
+     . as $group | .[0] | {asn, as_name, prefix, country, registry, allocated} +
+     {ips: ([$group[].ip] | unique), check_host: ([$group[].node] | unique),
+      resolutions: ($group | group_by(.ip) | map({ip: .[0].ip, check_host: ([.[].node] | unique)}))} +
+     (if $verbose == 1 then {check_host_details: ([$group[].node] | unique | map(. as $node | {key: $node, value: $c[0].nodes[$node]}) | from_entries)} else {} end))),
+   errors: ([$n[0][] | select(.ips | length == 0) |
+       {check_host: .node, error: (if .response == null then "DNS timeout / no response" else "No valid A records" end), response: .response}] +
+     ([$o[0][].ip] | unique | map(. as $ip | select(all($routes[]; .ip != $ip)) | {ip: ., error: "No valid BGP route returned"}))),
+   permanent_link: $c[0].permanent_link} |
+  . + {complete: (.errors | length == 0)}
+' > "$tmp/full.json"
+jq -e '.results | length > 0' "$tmp/full.json" >/dev/null || die 'Нет пригодных BGP-результатов.'
+status=0
+if ! jq -e .complete "$tmp/full.json" >/dev/null; then
+  status=3
+  printf 'Внимание: результат неполный (код выхода 3).\n' >&2
+  jq -c '.errors[]' "$tmp/full.json" >&2
+fi
+if [ "$prefixes" -eq 1 ]; then
+  jq '{ip: ([.results[].prefix] | unique | sort_by(split("/") | (.[0] | split(".") | map(tonumber)) + [.[1]|tonumber]))}' "$tmp/full.json" > "$tmp/output.json"
+else
+  cp "$tmp/full.json" "$tmp/output.json"
+fi
+cat "$tmp/output.json"
+if [ "$silent" -eq 0 ]; then
+  printf 'Сохранить результат в resolved.json (существующий файл будет заменён)? [y/N]: ' >&2
+  answer=''
+  IFS= read -r answer || :
+  case "$answer" in
+    y|Y|yes|YES|да|Да)
+      # Stage in the destination directory; replace only after explicit consent.
+      save_tmp=$(mktemp './.resolved.json.XXXXXXXX') || die 'Не удалось создать файл.'
+      if cp "$tmp/output.json" "$save_tmp" && mv -f "$save_tmp" resolved.json; then
+        printf 'Сохранено: resolved.json\n' >&2
+      else
+        rm -f "$save_tmp"; die 'Не удалось сохранить resolved.json.'
+      fi ;;
+    *) printf 'Файл не сохранён.\n' >&2 ;;
+  esac
+fi
+exit "$status"
