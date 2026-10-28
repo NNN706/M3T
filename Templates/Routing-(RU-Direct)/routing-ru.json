@@ -18,18 +18,18 @@
         "77.88.8.8",
         "77.88.8.1"
       ],
-      "unfiltered.adguard-dns.com": [
-        "94.140.14.140",
-        "94.140.14.141"
+      "cloudflare-dns.com": [
+        "1.1.1.1",
+        "1.0.0.1"
       ]
     },
     "servers": [
       {
-        "address": "https://dns.google/dns-query",
+        "address": "https://cloudflare-dns.com/dns-query",
         "timeoutMs": 2000
       },
       {
-        "address": "https://unfiltered.adguard-dns.com/dns-query",
+        "address": "https://dns.google/dns-query",
         "timeoutMs": 2000
       },
       {
