@@ -189,7 +189,7 @@ ncpid=$!
 { printf 'begin\nverbose\n'; cat "$tmp/ips"; printf 'end\n'; } >&3
 for ((second=0; second<25; second++)); do
   kill -0 "$ncpid" 2>/dev/null || break
-  if [ "$((second % 2))" -eq 0 ]; then progress "BGP.tools: ожидание ответа ($second/25 с)"; fi
+  if [ "$((second % 2))" -eq 0 ]; then progress "BGP.tools: ожидание ответа"; fi
   sleep 1
 done
 if kill -0 "$ncpid" 2>/dev/null; then
@@ -243,7 +243,11 @@ if [ "$prefixes" -eq 1 ]; then
 else
   cp "$tmp/full.json" "$tmp/output.json"
 fi
-progress "Готово; групп ASN/prefix: $(jq '.results | length' "$tmp/full.json"); код результата $status"
+if [ "$status" -eq 0 ]; then
+  progress "Готово; групп ASN/prefix: $(jq '.results | length' "$tmp/full.json")"
+else
+  progress "Получен неполный результат; групп ASN/prefix: $(jq '.results | length' "$tmp/full.json")"
+fi
 finish_progress
 if [ "$verbose" -eq 0 ]; then
   printf 'Отчёт: %s\n' "$(jq -r .permanent_link "$tmp/check.json")" >&2
