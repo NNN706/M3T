@@ -101,28 +101,61 @@ domain=${domain%.}
 jq -en --arg d "$domain" '$d | split(".") | length >= 2 and all(.[]; length <= 63 and test("^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?$"))' >/dev/null || die 'Введите домен без URL/порта; IDN — в punycode.'
 tmp=$(mktemp -d "${TMPDIR:-/tmp}/SubnetResolve.XXXXXXXX")
 ncpid=''
+http_pid=''
+started=$SECONDS
+stage='Check-Host: создание проверки'
+progress() { printf '[%3ds] %s\n' "$((SECONDS - started))" "$*" >&2; }
 cleanup() {
+  if [ -n "$http_pid" ]; then kill "$http_pid" 2>/dev/null || :; wait "$http_pid" 2>/dev/null || :; fi
   if [ -n "$ncpid" ]; then kill "$ncpid" 2>/dev/null || :; wait "$ncpid" 2>/dev/null || :; fi
   rm -rf "$tmp"
 }
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
-get_json() { curl -fsS --connect-timeout 5 --max-time 20 -H 'Accept: application/json' "$@"; }
+get_json() {
+  local rc=0 tick=0
+  curl -fsS --connect-timeout 5 --max-time "${http_timeout:-20}" -H 'Accept: application/json' "$@" &
+  http_pid=$!
+  while kill -0 "$http_pid" 2>/dev/null; do
+    if [ "$((tick % 2))" -eq 0 ]; then progress "$stage — ожидание HTTP"; fi
+    sleep 1
+    tick=$((tick + 1))
+  done
+  wait "$http_pid" || rc=$?
+  http_pid=''
+  return "$rc"
+}
 printf 'Запрашиваем DNS A для %s...\n' "$domain" >&2
 get_json -G --data-urlencode "host=$domain" https://check-host.net/check-dns > "$tmp/check.json" || die 'Check-Host: запрос не выполнен.'
 jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$tmp/check.json" >/dev/null || die 'Check-Host: некорректный ответ.'
 request_id=$(jq -r .request_id "$tmp/check.json")
 printf 'Отчёт: %s\n' "$(jq -r .permanent_link "$tmp/check.json")" >&2
 printf '{}\n' > "$tmp/dns.json"
-# Bound polling even if some nodes never finish. Keep last successful snapshot.
+# Bound the whole DNS polling phase, including slow HTTP calls.
+dns_started=$SECONDS
+node_total=$(jq '.nodes | length' "$tmp/check.json")
+answered=0
 for ((attempt=0; attempt<20; attempt++)); do
+  remaining=$((60 - (SECONDS - dns_started)))
+  [ "$remaining" -gt 0 ] || break
+  http_timeout=$remaining
+  [ "$http_timeout" -le 10 ] || http_timeout=10
+  stage="DNS: ответили $answered/$node_total узлов; попытка $((attempt + 1))/20"
   if get_json "https://check-host.net/check-result/$request_id" > "$tmp/next.json" && jq -e 'type == "object"' "$tmp/next.json" >/dev/null; then
     mv "$tmp/next.json" "$tmp/dns.json"
-    if jq -e --slurpfile c "$tmp/check.json" '. as $r | all($c[0].nodes | keys[]; $r[.] != null)' "$tmp/dns.json" >/dev/null; then break; fi
+    answered=$(jq --slurpfile c "$tmp/check.json" '. as $r | [$c[0].nodes | keys[] | select($r[.] != null)] | length' "$tmp/dns.json")
+    found=$(jq '[.. | objects | .A? | arrays | .[] | strings] | unique | length' "$tmp/dns.json")
+    progress "DNS: ответили $answered/$node_total узлов; уникальных A-адресов: $found"
+    [ "$answered" -lt "$node_total" ] || break
+  else
+    progress 'DNS: ошибка запроса; повторяем до истечения лимита'
   fi
-  if [ "$attempt" -lt 19 ]; then sleep 2; fi
+  if [ "$attempt" -lt 19 ] && [ "$((SECONDS - dns_started))" -lt 58 ]; then sleep 2; fi
 done
+if [ "$answered" -lt "$node_total" ]; then
+  progress "DNS: ожидание завершено, ответили $answered/$node_total; продолжаем с доступными результатами"
+fi
 jq -n --slurpfile c "$tmp/check.json" --slurpfile r "$tmp/dns.json" '
   def ipv4: if type != "string" then false else
     test("^([0-9]{1,3}\\.){3}[0-9]{1,3}$") and (split(".") | all(.[]; tonumber <= 255)) end;
@@ -133,7 +166,7 @@ jq -n --slurpfile c "$tmp/check.json" --slurpfile r "$tmp/dns.json" '
 jq '[.[] | .node as $node | .ips[] | {ip: ., node: $node}] | unique' "$tmp/nodes.json" > "$tmp/observations.json"
 jq -r '[.[].ip] | unique[]' "$tmp/observations.json" > "$tmp/ips"
 [ -s "$tmp/ips" ] || die 'Нет DNS A-адресов: пустые ответы, ошибки или тайм-аут узлов.'
-printf 'Запрашиваем BGP.tools для %s уникальных IP...\n' "$(wc -l < "$tmp/ips" | tr -d ' ')" >&2
+printf 'Запрашиваем BGP.tools; уникальных IP: %s...\n' "$(wc -l < "$tmp/ips" | tr -d ' ')" >&2
 # Keep stdin open until the server closes: macOS nc can exit too early at EOF.
 mkfifo "$tmp/input"
 exec 3<> "$tmp/input"
@@ -142,6 +175,7 @@ ncpid=$!
 { printf 'begin\nverbose\n'; cat "$tmp/ips"; printf 'end\n'; } >&3
 for ((second=0; second<25; second++)); do
   kill -0 "$ncpid" 2>/dev/null || break
+  if [ "$((second % 2))" -eq 0 ]; then progress "BGP.tools: ожидание ответа ($second/25 с)"; fi
   sleep 1
 done
 if kill -0 "$ncpid" 2>/dev/null; then
@@ -194,6 +228,7 @@ if [ "$prefixes" -eq 1 ]; then
 else
   cp "$tmp/full.json" "$tmp/output.json"
 fi
+progress "Готово; групп ASN/prefix: $(jq '.results | length' "$tmp/full.json"); код результата $status"
 cat "$tmp/output.json"
 if [ "$silent" -eq 0 ]; then
   printf 'Сохранить результат в resolved.json (существующий файл будет заменён)? [y/N]: ' >&2
