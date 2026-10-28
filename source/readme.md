@@ -6,7 +6,7 @@
 bash <(curl -fsSL https://raw.githubusercontent.com/NNN706/M3T/main/source/SubnetResolve.sh)
 ```
 
-Прогресс и время ожидания отображаются в stderr, JSON — в stdout.
+Прогресс обновляется одной строкой в терминале; `-v` включает подробный журнал. JSON — в stdout, прогресс и ссылка отчёта — в stderr.
 
 Введите домен. Сохранение в `resolved.json` — по запросу, по умолчанию **нет**.
 
@@ -16,6 +16,6 @@ bash <(curl -fsSL https://raw.githubusercontent.com/NNN706/M3T/main/source/Subne
 bash <(curl -fsSL https://raw.githubusercontent.com/NNN706/M3T/main/source/SubnetResolve.sh) -4s example.com
 ```
 
-Флаги: `-v` — полные данные узлов; `-4` — только подсети; `-s` — без вопроса и сохранения.
+Флаги: `-v` — подробный журнал и полные данные узлов; `-4` — только подсети; `-s` — без вопроса и сохранения.
 
 Для загрузки нужны Bash и curl; остальные зависимости устанавливаются автоматически через доступный пакетный менеджер.
