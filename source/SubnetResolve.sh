@@ -4,8 +4,8 @@ set -euo pipefail
 export LC_ALL=C
 usage() {
   cat <<'HELP'
-Usage: SubnetResolve.sh [-v] [-4] [-s] [domain]
-  No domain: ask interactively (ASCII / punycode hostname).
+Usage: SubnetResolve.sh [-v] [-4] [-s] [domain-or-URL ...]
+  No arguments: enter domains or HTTP(S) URLs separated by spaces.
   -v  Detailed progress log and complete Check-Host node metadata.
   -4  Output only unique IPv4 BGP prefixes: {"ip":[...]}.
   -s  Never ask to save and never save resolved.json.
@@ -28,12 +28,11 @@ while getopts ':v4sh' opt; do
   esac
 done
 shift $((OPTIND - 1))
-[ "$#" -le 1 ] || { usage >&2; exit 2; }
 # Install only missing tools. Package-manager output must not contaminate JSON.
 ensure_dependencies() {
   local dependency manager package seen existing
   local missing=() packages=() elevate=()
-  for dependency in curl jq nc mktemp mkfifo cat cp mv rm sleep wc tr; do
+  for dependency in curl jq nc mktemp mkfifo mkdir cat cp mv rm sleep wc tr; do
     if ! command -v "$dependency" >/dev/null 2>&1; then
       missing+=("$dependency")
     fi
@@ -95,15 +94,53 @@ ensure_dependencies() {
   done
 }
 ensure_dependencies
-domain=${1-}
 if [ "$#" -eq 0 ]; then
-  printf 'Введите домен: ' >&2
-  IFS= read -r domain || die 'Домен не введён.'
+  printf 'Введите домены или URL через пробел: ' >&2
+  input_line=''
+  IFS= read -r input_line || die 'Домены не введены.'
+  inputs=()
+  IFS=$' \t' read -r -a inputs <<< "$input_line"
+  [ "${#inputs[@]}" -gt 0 ] || die 'Домены не введены.'
+else
+  inputs=("$@")
 fi
-domain=${domain%.}
-[ -n "$domain" ] && [ "${#domain}" -le 253 ] || die 'Некорректный домен.'
-jq -en --arg d "$domain" '$d | split(".") | length >= 2 and all(.[]; length <= 63 and test("^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?$"))' >/dev/null || die 'Введите домен без URL/порта; IDN — в punycode.'
-tmp=$(mktemp -d "${TMPDIR:-/tmp}/SubnetResolve.XXXXXXXX")
+# Parse all inputs before making requests. Strip only HTTP(S) URL components.
+normalize_domain() {
+  local value authority port
+  value=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
+  case "$value" in
+    http://*|https://*)
+      authority=${value#*://}
+      authority=${authority%%[/?#]*}
+      # Credentials are not needed for DNS and must never be logged.
+      authority=${authority##*@}
+      case "$authority" in
+        *:*)
+          port=${authority##*:}
+          [[ "$port" =~ ^[0-9]{1,5}$ ]] || die 'Некорректный порт в URL.'
+          [ "$((10#$port))" -ge 1 ] && [ "$((10#$port))" -le 65535 ] || die 'Некорректный порт в URL.'
+          authority=${authority%:*} ;;
+      esac
+      value=$authority ;;
+    *://*) die 'Поддерживаются только HTTP(S) URL или доменные имена.' ;;
+  esac
+  value=${value%.}
+  [ -n "$value" ] && [ "${#value}" -le 253 ] || die 'Некорректный домен или URL.'
+  jq -en --arg d "$value" '$d | split(".") | length >= 2 and all(.[]; length <= 63 and test("^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"))' >/dev/null || die 'Некорректный домен; IDN вводите в punycode.'
+  printf '%s\n' "$value"
+}
+domains=()
+for input in "${inputs[@]}"; do
+  domain=$(normalize_domain "$input") || exit 1
+  duplicate=0
+  if [ "${#domains[@]}" -gt 0 ]; then
+    for existing in "${domains[@]}"; do [ "$existing" != "$domain" ] || duplicate=1; done
+  fi
+  [ "$duplicate" -eq 1 ] || domains+=("$domain")
+done
+unset input inputs input_line
+batch=$(mktemp -d "${TMPDIR:-/tmp}/SubnetResolve.XXXXXXXX")
+tmp=$batch
 ncpid=''
 http_pid=''
 started=$SECONDS
@@ -120,14 +157,14 @@ cleanup() {
   finish_progress
   if [ -n "$http_pid" ]; then kill "$http_pid" 2>/dev/null || :; wait "$http_pid" 2>/dev/null || :; fi
   if [ -n "$ncpid" ]; then kill "$ncpid" 2>/dev/null || :; wait "$ncpid" 2>/dev/null || :; fi
-  rm -rf "$tmp"
+  rm -rf "$batch"
 }
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 get_json() {
   local rc=0 tick=0
-  curl -fsS --connect-timeout 5 --max-time "${http_timeout:-20}" -H 'Accept: application/json' "$@" &
+  curl -fsS --connect-timeout 2 --max-time 2 -H 'Accept: application/json' "$@" &
   http_pid=$!
   while kill -0 "$http_pid" 2>/dev/null; do
     if [ "$((tick % 2))" -eq 0 ]; then progress "$stage — ожидание HTTP"; fi
@@ -138,9 +175,23 @@ get_json() {
   http_pid=''
   return "$rc"
 }
+index=0
+observation_files=()
+for domain in "${domains[@]}"; do
+  index=$((index + 1))
+  tmp="$batch/domain-$index"
+  mkdir "$tmp"
+  http_timeout=20
+  stage="[$index/${#domains[@]}] $domain: создание проверки"
 progress "Запрашиваем DNS A для $domain..."
-get_json -G --data-urlencode "host=$domain" https://check-host.net/check-dns > "$tmp/check.json" || die 'Check-Host: запрос не выполнен.'
-jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$tmp/check.json" >/dev/null || die 'Check-Host: некорректный ответ.'
+if ! get_json -G --data-urlencode "host=$domain" https://check-host.net/check-dns > "$tmp/check.json" ||
+   ! jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$tmp/check.json" >/dev/null; then
+  printf '{"nodes":{},"permanent_link":null,"request_error":"Check-Host: ошибка создания проверки (HTTP/JSON/API; сетевой тайм-аут 2 с)"}\n' > "$tmp/check.json"
+  printf '[]\n' > "$tmp/nodes.json"
+  printf '[]\n' > "$tmp/observations.json"
+  observation_files+=("$tmp/observations.json")
+  continue
+fi
 request_id=$(jq -r .request_id "$tmp/check.json")
 if [ "$verbose" -eq 1 ]; then
   printf 'Отчёт: %s\n' "$(jq -r .permanent_link "$tmp/check.json")" >&2
@@ -155,12 +206,12 @@ for ((attempt=0; attempt<20; attempt++)); do
   [ "$remaining" -gt 0 ] || break
   http_timeout=$remaining
   [ "$http_timeout" -le 10 ] || http_timeout=10
-  stage="DNS: ответили $answered/$node_total узлов; попытка $((attempt + 1))/20"
+  stage="[$index/${#domains[@]}] $domain: ответили $answered/$node_total узлов; попытка $((attempt + 1))/20"
   if get_json "https://check-host.net/check-result/$request_id" > "$tmp/next.json" && jq -e 'type == "object"' "$tmp/next.json" >/dev/null; then
     mv "$tmp/next.json" "$tmp/dns.json"
     answered=$(jq --slurpfile c "$tmp/check.json" '. as $r | [$c[0].nodes | keys[] | select($r[.] != null)] | length' "$tmp/dns.json")
     found=$(jq '[.. | objects | .A? | arrays | .[] | strings] | unique | length' "$tmp/dns.json")
-    progress "DNS: ответили $answered/$node_total узлов; уникальных A-адресов: $found"
+    progress "[$index/${#domains[@]}] $domain: ответили $answered/$node_total узлов; уникальных A-адресов: $found"
     [ "$answered" -lt "$node_total" ] || break
   else
     progress 'DNS: ошибка запроса; повторяем до истечения лимита'
@@ -178,16 +229,21 @@ jq -n --slurpfile c "$tmp/check.json" --slurpfile r "$tmp/dns.json" '
      response: $answer}]
 ' > "$tmp/nodes.json"
 jq '[.[] | .node as $node | .ips[] | {ip: ., node: $node}] | unique' "$tmp/nodes.json" > "$tmp/observations.json"
+  observation_files+=("$tmp/observations.json")
+done
+tmp=$batch
+jq -s 'add | unique' "${observation_files[@]}" > "$tmp/observations.json"
+# Deduplicate across ALL domains before the single Bulk WHOIS request.
 jq -r '[.[].ip] | unique[]' "$tmp/observations.json" > "$tmp/ips"
-[ -s "$tmp/ips" ] || die 'Нет DNS A-адресов: пустые ответы, ошибки или тайм-аут узлов.'
+if [ -s "$tmp/ips" ]; then
 progress "Запрашиваем BGP.tools; уникальных IP: $(wc -l < "$tmp/ips" | tr -d ' ')..."
 # Keep stdin open until the server closes: macOS nc can exit too early at EOF.
 mkfifo "$tmp/input"
 exec 3<> "$tmp/input"
-nc -w 20 bgp.tools 43 < "$tmp/input" > "$tmp/bgp.txt" &
+nc -w 2 bgp.tools 43 < "$tmp/input" > "$tmp/bgp.txt" &
 ncpid=$!
 { printf 'begin\nverbose\n'; cat "$tmp/ips"; printf 'end\n'; } >&3
-for ((second=0; second<25; second++)); do
+for ((second=0; second<2; second++)); do
   kill -0 "$ncpid" 2>/dev/null || break
   if [ "$((second % 2))" -eq 0 ]; then progress "BGP.tools: ожидание ответа"; fi
   sleep 1
@@ -195,12 +251,16 @@ done
 if kill -0 "$ncpid" 2>/dev/null; then
   kill "$ncpid" 2>/dev/null || :
   wait "$ncpid" 2>/dev/null || :
-  die 'BGP.tools: превышено время ожидания.'
+  finish_progress
+  printf 'BGP.tools: время ожидания истекло; проверяем полученные записи.\n' >&2
+else
+  wait "$ncpid" || { finish_progress; printf 'BGP.tools: ошибка соединения; проверяем полученные записи.\n' >&2; }
 fi
-wait "$ncpid" || die 'BGP.tools: соединение TCP/43 завершилось ошибкой.'
 ncpid=''
 exec 3>&-
-[ -s "$tmp/bgp.txt" ] || die 'BGP.tools: пустой ответ.'
+else
+  : > "$tmp/bgp.txt"
+fi
 jq -Rn '
   [inputs | split("|") | map(gsub("^\\s+|\\s+$"; "")) |
    select(length >= 7) | select(.[0] | test("^[0-9]+$")) |
@@ -209,9 +269,14 @@ jq -Rn '
     allocated: (if .[5] == "0001-01-01" or .[5] == "" then null else .[5] end),
     as_name: (.[6:] | join(" | "))}] | unique
 ' < "$tmp/bgp.txt" > "$tmp/routes.json"
+index=0
+full_files=()
+for domain in "${domains[@]}"; do
+  index=$((index + 1))
+  tmp="$batch/domain-$index"
 jq -n --arg domain "$domain" --argjson verbose "$verbose" \
   --slurpfile c "$tmp/check.json" --slurpfile n "$tmp/nodes.json" \
-  --slurpfile o "$tmp/observations.json" --slurpfile b "$tmp/routes.json" '
+  --slurpfile o "$tmp/observations.json" --slurpfile b "$batch/routes.json" '
   # Reject unrelated/malformed ranges, including a prefix not containing its IP.
   def ipnum: split(".") | map(tonumber) | if length == 4 and all(.[]; . >= 0 and . <= 255) then reduce .[] as $v (0; . * 256 + $v) else error("Invalid IPv4") end;
   [$b[0][] | . as $route | select(any($o[0][]; .ip == $route.ip)) |
@@ -224,33 +289,54 @@ jq -n --arg domain "$domain" --argjson verbose "$verbose" \
      {ips: ([$group[].ip] | unique), check_host: ([$group[].node] | unique),
       resolutions: ($group | group_by(.ip) | map({ip: .[0].ip, check_host: ([.[].node] | unique)}))} +
      (if $verbose == 1 then {check_host_details: ([$group[].node] | unique | map(. as $node | {key: $node, value: $c[0].nodes[$node]}) | from_entries)} else {} end))),
-   errors: ([$n[0][] | select(.ips | length == 0) |
-       {check_host: .node, error: (if .response == null then "DNS timeout / no response" else "No valid A records" end), response: .response}] +
+   errors: ((if $c[0].request_error then [{error: "check_request_failed", message: $c[0].request_error}] else [] end) + [$n[0][] | select(.ips | length == 0) |
+       . as $n | ($c[0].nodes[.node]) as $details |
+       ([.response | .. | objects | (.message?, .error?) | strings] | unique) as $messages |
+       {check_host: .node, country: $details[1], city: $details[2],
+        error: (if .response == null then "no_response"
+                elif ($messages | join(" ") | test("timeout|timed out"; "i")) then "node_timeout"
+                elif ($messages | length > 0) then "node_error" else "no_A_records" end),
+        message: (if .response == null then "Узел не предоставил результат до завершения опроса"
+                  elif ($messages | length > 0) then ($messages | join("; "))
+                  else "Узел ответил, но не вернул IPv4 A-записи" end), response: .response}] +
      ([$o[0][].ip] | unique | map(. as $ip | select(all($routes[]; .ip != $ip)) | {ip: ., error: "No valid BGP route returned"}))),
    permanent_link: $c[0].permanent_link} |
   . + {complete: (.errors | length == 0)}
 ' > "$tmp/full.json"
-jq -e '.results | length > 0' "$tmp/full.json" >/dev/null || die 'Нет пригодных BGP-результатов.'
+  full_files+=("$tmp/full.json")
+done
+tmp=$batch
+jq -s '{domains: ., complete: all(.[]; .complete)}' "${full_files[@]}" > "$tmp/batch.json"
+
 status=0
-if ! jq -e .complete "$tmp/full.json" >/dev/null; then
+if ! jq -e .complete "$tmp/batch.json" >/dev/null; then
   status=3
   finish_progress
   printf 'Внимание: результат неполный (код выхода 3).\n' >&2
-  jq -c '.errors[]' "$tmp/full.json" >&2
+  jq -r '.domains[] | .domain as $d | .errors[] |
+    "[\($d)] \(.check_host // .ip // "Check-Host") [\(.country // "—"), \(.city // "—")]: \(.error) — \(.message // "BGP.tools не вернул пригодный маршрут")"' "$tmp/batch.json" >&2
+  if [ "$verbose" -eq 1 ]; then
+    jq -c '.domains[] | .domain as $d | .errors[] | {domain: $d} + .' "$tmp/batch.json" >&2
+  fi
+fi
+if [ "${#domains[@]}" -eq 1 ]; then
+  jq '.domains[0]' "$tmp/batch.json" > "$tmp/full.json"
+else
+  cp "$tmp/batch.json" "$tmp/full.json"
 fi
 if [ "$prefixes" -eq 1 ]; then
-  jq '{ip: ([.results[].prefix] | unique | sort_by(split("/") | (.[0] | split(".") | map(tonumber)) + [.[1]|tonumber]))}' "$tmp/full.json" > "$tmp/output.json"
+  jq '{ip: ([.domains[].results[].prefix] | unique | sort_by(split("/") | (.[0] | split(".") | map(tonumber)) + [.[1]|tonumber]))}' "$tmp/batch.json" > "$tmp/output.json"
 else
   cp "$tmp/full.json" "$tmp/output.json"
 fi
 if [ "$status" -eq 0 ]; then
-  progress "Готово; групп ASN/prefix: $(jq '.results | length' "$tmp/full.json")"
+  progress "Готово; групп ASN/prefix: $(jq '[.domains[].results[]] | length' "$tmp/batch.json")"
 else
-  progress "Получен неполный результат; групп ASN/prefix: $(jq '.results | length' "$tmp/full.json")"
+  progress "Получен неполный результат; групп ASN/prefix: $(jq '[.domains[].results[]] | length' "$tmp/batch.json")"
 fi
 finish_progress
 if [ "$verbose" -eq 0 ]; then
-  printf 'Отчёт: %s\n' "$(jq -r .permanent_link "$tmp/check.json")" >&2
+  jq -r '.domains[] | select(.permanent_link != null) | "Отчёт (\(.domain)): \(.permanent_link)"' "$tmp/batch.json" >&2
 fi
 cat "$tmp/output.json"
 if [ "$silent" -eq 0 ]; then
