@@ -36,8 +36,7 @@
         "address": "https://common.dot.dns.yandex.net/dns-query",
         "timeoutMs": 2000,
         "disableFallbackIfMatch": true
-      },
-      "localhost"
+      }
     ],
     "serveStale": true,
     "queryStrategy": "UseIPv4",
