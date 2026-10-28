@@ -6,7 +6,7 @@ usage() {
   cat <<'HELP'
 Usage: SubnetResolve.sh [-v] [-4] [-s] [domain]
   No domain: ask interactively (ASCII / punycode hostname).
-  -v  Include complete Check-Host node metadata.
+  -v  Detailed progress log and complete Check-Host node metadata.
   -4  Output only unique IPv4 BGP prefixes: {"ip":[...]}.
   -s  Never ask to save and never save resolved.json.
   -h  Show help.
@@ -15,7 +15,11 @@ JSON goes to stdout; prompts, diagnostics and report URL go to stderr.
 Exit: 0 complete, 1 fatal error, 2 usage, 3 partial DNS/BGP coverage.
 HELP
 }
-die() { printf 'Ошибка: %s\n' "$*" >&2; exit 1; }
+progress_active=0
+finish_progress() {
+  if [ "$progress_active" -eq 1 ]; then printf '\n' >&2; progress_active=0; fi
+}
+die() { finish_progress; printf 'Ошибка: %s\n' "$*" >&2; exit 1; }
 verbose=0; prefixes=0; silent=0
 while getopts ':v4sh' opt; do
   case "$opt" in
@@ -104,8 +108,16 @@ ncpid=''
 http_pid=''
 started=$SECONDS
 stage='Check-Host: создание проверки'
-progress() { printf '[%3ds] %s\n' "$((SECONDS - started))" "$*" >&2; }
+progress() {
+  if [ "$verbose" -eq 1 ]; then
+    printf '[%3ds] %s\n' "$((SECONDS - started))" "$*" >&2
+  elif [ -t 2 ]; then
+    printf '\r\033[2K[%3ds] %s' "$((SECONDS - started))" "$*" >&2
+    progress_active=1
+  fi
+}
 cleanup() {
+  finish_progress
   if [ -n "$http_pid" ]; then kill "$http_pid" 2>/dev/null || :; wait "$http_pid" 2>/dev/null || :; fi
   if [ -n "$ncpid" ]; then kill "$ncpid" 2>/dev/null || :; wait "$ncpid" 2>/dev/null || :; fi
   rm -rf "$tmp"
@@ -126,11 +138,13 @@ get_json() {
   http_pid=''
   return "$rc"
 }
-printf 'Запрашиваем DNS A для %s...\n' "$domain" >&2
+progress "Запрашиваем DNS A для $domain..."
 get_json -G --data-urlencode "host=$domain" https://check-host.net/check-dns > "$tmp/check.json" || die 'Check-Host: запрос не выполнен.'
 jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$tmp/check.json" >/dev/null || die 'Check-Host: некорректный ответ.'
 request_id=$(jq -r .request_id "$tmp/check.json")
-printf 'Отчёт: %s\n' "$(jq -r .permanent_link "$tmp/check.json")" >&2
+if [ "$verbose" -eq 1 ]; then
+  printf 'Отчёт: %s\n' "$(jq -r .permanent_link "$tmp/check.json")" >&2
+fi
 printf '{}\n' > "$tmp/dns.json"
 # Bound the whole DNS polling phase, including slow HTTP calls.
 dns_started=$SECONDS
@@ -166,7 +180,7 @@ jq -n --slurpfile c "$tmp/check.json" --slurpfile r "$tmp/dns.json" '
 jq '[.[] | .node as $node | .ips[] | {ip: ., node: $node}] | unique' "$tmp/nodes.json" > "$tmp/observations.json"
 jq -r '[.[].ip] | unique[]' "$tmp/observations.json" > "$tmp/ips"
 [ -s "$tmp/ips" ] || die 'Нет DNS A-адресов: пустые ответы, ошибки или тайм-аут узлов.'
-printf 'Запрашиваем BGP.tools; уникальных IP: %s...\n' "$(wc -l < "$tmp/ips" | tr -d ' ')" >&2
+progress "Запрашиваем BGP.tools; уникальных IP: $(wc -l < "$tmp/ips" | tr -d ' ')..."
 # Keep stdin open until the server closes: macOS nc can exit too early at EOF.
 mkfifo "$tmp/input"
 exec 3<> "$tmp/input"
@@ -220,6 +234,7 @@ jq -e '.results | length > 0' "$tmp/full.json" >/dev/null || die 'Нет при�
 status=0
 if ! jq -e .complete "$tmp/full.json" >/dev/null; then
   status=3
+  finish_progress
   printf 'Внимание: результат неполный (код выхода 3).\n' >&2
   jq -c '.errors[]' "$tmp/full.json" >&2
 fi
@@ -229,6 +244,10 @@ else
   cp "$tmp/full.json" "$tmp/output.json"
 fi
 progress "Готово; групп ASN/prefix: $(jq '.results | length' "$tmp/full.json"); код результата $status"
+finish_progress
+if [ "$verbose" -eq 0 ]; then
+  printf 'Отчёт: %s\n' "$(jq -r .permanent_link "$tmp/check.json")" >&2
+fi
 cat "$tmp/output.json"
 if [ "$silent" -eq 0 ]; then
   printf 'Сохранить результат в resolved.json (существующий файл будет заменён)? [y/N]: ' >&2
