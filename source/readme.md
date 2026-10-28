@@ -6,6 +6,8 @@
 bash <(curl -fsSL https://raw.githubusercontent.com/NNN706/M3T/main/source/SubnetResolve.sh)
 ```
 
+Прогресс и время ожидания отображаются в stderr, JSON — в stdout.
+
 Введите домен. Сохранение в `resolved.json` — по запросу, по умолчанию **нет**.
 
 Только уникальные IPv4-подсети, без сохранения:
