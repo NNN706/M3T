@@ -13,7 +13,7 @@ Usage: SubnetResolve.sh [-parse] [-v] [-4] [-s] [domain-or-URL ...]
   -h  Show help.
 Default: DNS A records; group by (ASN, prefix), ask to save (default no).
 JSON goes to stdout; prompts, diagnostics and report URL go to stderr.
-Exit: 0 complete, 1 fatal error, 2 usage, 3 partial DNS/BGP coverage.
+Failures are explained on stderr; incomplete results return a non-zero exit status for automation.
 HELP
 }
 progress_active=0
@@ -243,8 +243,15 @@ async function main() {
     const run = async () => {
       try {
         const response = await page.goto(seed.href, {waitUntil:'domcontentloaded',timeout:30000});
-        if(response && response.status() >= 400) errors.add(`HTTP ${response.status()}`);
-      } catch(e) { errors.add(e.name === 'TimeoutError' ? 'navigation_timeout' : 'navigation_failed'); }
+        if(response && response.status() >= 400) {
+          const status=response.status();
+          errors.add(status === 403 ? 'Сайт отказал автоматическому браузеру в доступе. Ресурсы страницы не загружены; список доменов может содержать только адрес самого сайта.' :
+            status === 401 ? 'Сайт требует авторизацию. Ресурсы закрытой страницы недоступны.' :
+            status === 429 ? 'Сайт временно ограничил частоту запросов. Повторите проверку позже.' :
+            status >= 500 ? 'Сервер сайта не смог загрузить страницу. Повторите проверку позже.' :
+            'Не удалось загрузить страницу: сервер вернул ошибку. Проверьте адрес сайта.');
+        }
+      } catch(e) { errors.add(e.name === 'TimeoutError' ? 'Страница не загрузилась за 30 секунд. Собраны только запросы, появившиеся до завершения ожидания.' : 'Браузер не смог открыть страницу. Проверьте доступность сайта, сеть и сертификат HTTPS.'); }
       for(let step=0;step<10;step++) {
         await page.evaluate(() => window.scrollBy(0, Math.max(600, innerHeight))).catch(() => {});
         await sleep(1000);
@@ -253,7 +260,7 @@ async function main() {
     };
     try {
       await Promise.race([run(), new Promise((_,reject) => {timeout=setTimeout(()=>reject(new Error('capture_timeout')),45000);})]);
-    } catch { errors.add('capture_timeout'); }
+    } catch { errors.add('Сбор запросов не завершился за 45 секунд. Список доменов неполный.'); }
     finally { clearTimeout(timeout); await context.close(); }
     pages.push({site:origin, domains:[...seen].sort(), errors:[...errors]});
   }
@@ -404,17 +411,17 @@ jq -n --arg domain "$domain" --argjson verbose "$verbose" \
      {ips: ([$group[].ip] | unique), check_host: ([$group[].node] | unique),
       resolutions: ($group | group_by(.ip) | map({ip: .[0].ip, check_host: ([.[].node] | unique)}))} +
      (if $verbose == 1 then {check_host_details: ([$group[].node] | unique | map(. as $node | {key: $node, value: $c[0].nodes[$node]}) | from_entries)} else {} end))),
-   errors: ((if $c[0].request_error then [{error: "check_request_failed", message: $c[0].request_error}] else [] end) + [$n[0][] | select(.ips | length == 0) |
+   errors: ((if $c[0].request_error then [{error: "Не удалось запустить DNS-проверку", message: $c[0].request_error}] else [] end) + [$n[0][] | select(.ips | length == 0) |
        . as $n | ($c[0].nodes[.node]) as $details |
        ([.response | .. | objects | (.message?, .error?) | strings] | unique) as $messages |
        {check_host: .node, country: $details[1], city: $details[2],
-        error: (if .response == null then "no_response"
-                elif ($messages | join(" ") | test("timeout|timed out"; "i")) then "node_timeout"
-                elif ($messages | length > 0) then "node_error" else "no_A_records" end),
+        error: (if .response == null then "Узел не предоставил DNS-результат"
+                elif ($messages | join(" ") | test("timeout|timed out"; "i")) then "Узел сообщил о превышении времени ожидания"
+                elif ($messages | length > 0) then "Узел сообщил об ошибке DNS" else "Узел ответил без IPv4-адресов" end),
         message: (if .response == null then "Узел не предоставил результат до завершения опроса"
                   elif ($messages | length > 0) then ($messages | join("; "))
                   else "Узел ответил, но не вернул IPv4 A-записи" end), response: .response}] +
-     ([$o[0][].ip] | unique | map(. as $ip | select(all($routes[]; .ip != $ip)) | {ip: ., error: "No valid BGP route returned"}))),
+     ([$o[0][].ip] | unique | map(. as $ip | select(all($routes[]; .ip != $ip)) | {ip: ., error: "BGP.tools не вернул пригодный маршрут для IP-адреса"}))),
    permanent_link: $c[0].permanent_link} |
   . + {complete: (.errors | length == 0)}
 ' > "$tmp/full.json"
@@ -427,13 +434,13 @@ status=0
 if [ "$parse" -eq 1 ] && ! jq -e .complete "$batch/discovery.json" >/dev/null; then
   status=3
   finish_progress
-  printf 'Браузер: сбор неполный (код выхода 3).\n' >&2
+  printf 'Не удалось собрать полный список доменов сайта:\n' >&2
   jq -r '.pages[] | select(.errors|length>0) | "[\(.site)] \(.errors|join("; "))"' "$batch/discovery.json" >&2
 fi
 if ! jq -e .complete "$tmp/batch.json" >/dev/null; then
   status=3
   finish_progress
-  printf 'Внимание: результат неполный (код выхода 3).\n' >&2
+  printf 'Для части доменов, узлов или IP не удалось получить DNS/BGP-данные:\n' >&2
   jq -r '.domains[] | .domain as $d | .errors[] |
     "[\($d)] \(.check_host // .ip // "Check-Host") [\(.country // "—"), \(.city // "—")]: \(.error) — \(.message // "BGP.tools не вернул пригодный маршрут")"' "$tmp/batch.json" >&2
   if [ "$verbose" -eq 1 ]; then
@@ -461,7 +468,9 @@ fi
 if [ "$status" -eq 0 ]; then
   progress "Готово; групп ASN/prefix: $(jq '[.domains[].results[]] | length' "$tmp/batch.json")"
 else
-  progress "Получен неполный результат; групп ASN/prefix: $(jq '[.domains[].results[]] | length' "$tmp/batch.json")"
+  progress "Проверка завершена с ограничениями"
+  finish_progress
+  printf 'Выведены только доступные данные: уникальных подсетей — %s. Полный список доменов или подсетей получить не удалось; причины указаны выше.\n' "$(jq '[.domains[].results[].prefix] | unique | length' "$tmp/batch.json")" >&2
 fi
 finish_progress
 if [ "$verbose" -eq 0 ]; then

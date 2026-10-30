@@ -1,5 +1,5 @@
 import os,json,subprocess,pathlib,threading,http.server,tempfile
-import argparse
+import argparse,base64,hashlib
 parser=argparse.ArgumentParser()
 parser.add_argument('--script', type=pathlib.Path, default=pathlib.Path(__file__).resolve().parents[1]/'SubnetResolve.sh')
 args=parser.parse_args()
@@ -14,6 +14,10 @@ runtime=os.environ.get('SUBNET_PLAYWRIGHT',str(cache/'SubnetResolve/playwright-1
 class Handler(http.server.BaseHTTPRequestHandler):
  def log_message(self,*args):pass
  def do_GET(self):
+  if self.headers.get('Upgrade','').lower()=='websocket':
+   key=self.headers['Sec-WebSocket-Key']+'258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
+   accept=base64.b64encode(hashlib.sha1(key.encode()).digest()).decode()
+   self.send_response(101);self.send_header('Upgrade','websocket');self.send_header('Connection','Upgrade');self.send_header('Sec-WebSocket-Accept',accept);self.end_headers();return
   port=self.server.server_port
   if self.path.startswith('/Start'):
    body=f'''<html><body style="height:8000px"><script>
@@ -57,8 +61,14 @@ assert (root/'parse-sent').read_text().splitlines().count('1.1.1.1')==1
 print('PASS full -parse -4s: one JSON, unique domain: entries, one unique IP sent to BGP for six domains',flush=True)
 p=subprocess.run(['/bin/bash',str(script),'-parse','-vs',seed.replace('/Start?Case=YES','/Denied')],env=env,text=True,capture_output=True,timeout=65)
 assert p.returncode==3,p.stderr
-r=json.loads(p.stdout);assert r['domain']==['domain:site.localhost'] and not r['complete'] and r['discovery']['pages'][0]['errors']==['HTTP 403'] and 'domains' in r,r
-assert 'HTTP 403' in p.stderr
+r=json.loads(p.stdout);assert r['domain']==['domain:site.localhost'] and not r['complete'] and 'отказал' in r['discovery']['pages'][0]['errors'][0] and 'domains' in r,r
+assert 'отказал' in p.stderr and 'Ресурсы страницы не загружены' in p.stderr and 'код выхода' not in p.stderr and 'код результата' not in p.stderr
 print('PASS HTTP 403: partial status 3, discovery diagnostics, domain array and detailed DNS results coexist',flush=True)
 server.shutdown()
+if os.environ.get('TEST_ARTIFACTS'):
+ destination=pathlib.Path(os.environ['TEST_ARTIFACTS']);destination.mkdir(parents=True,exist_ok=True)
+ (destination/'discovery.json').write_text(json.dumps(d,ensure_ascii=False,indent=2))
+ (destination/'denied-result.json').write_text(json.dumps(r,ensure_ascii=False,indent=2))
+ (destination/'denied-stderr.txt').write_text(p.stderr)
+ (destination/'bgp-request.txt').write_text((root/'parse-sent').read_text())
 workspace.cleanup()
