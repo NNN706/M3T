@@ -16,15 +16,14 @@ jobs:
   browser-integration:
     runs-on: [self-hosted, Linux, X64]
     timeout-minutes: 15
-    env:
-      XDG_CACHE_HOME: ${{ runner.temp }}/subnetresolve-cache
-      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/subnetresolve-browsers
-      TEST_ARTIFACTS: ${{ runner.temp }}/subnetresolve-evidence-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - name: Verify target runner
         shell: bash
         run: |
           test "$RUNNER_NAME" = Admiralteskiy || { echo 'This job must run on Admiralteskiy.'; exit 1; }
+          echo "XDG_CACHE_HOME=$RUNNER_TEMP/subnetresolve-cache" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/subnetresolve-browsers" >> "$GITHUB_ENV"
+          echo "TEST_ARTIFACTS=$RUNNER_TEMP/subnetresolve-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
