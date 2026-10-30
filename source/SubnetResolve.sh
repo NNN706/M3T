@@ -4,8 +4,9 @@ set -euo pipefail
 export LC_ALL=C
 usage() {
   cat <<'HELP'
-Usage: SubnetResolve.sh [-v] [-4] [-s] [domain-or-URL ...]
+Usage: SubnetResolve.sh [-parse] [-v] [-4] [-s] [domain-or-URL ...]
   No arguments: enter domains or HTTP(S) URLs separated by spaces.
+  -parse  Discover site request domains with headless Chromium, then DNS/BGP.
   -v  Detailed progress log and complete Check-Host node metadata.
   -4  Output only unique IPv4 BGP prefixes: {"ip":[...]}.
   -s  Never ask to save and never save resolved.json.
@@ -20,19 +21,33 @@ finish_progress() {
   if [ "$progress_active" -eq 1 ]; then printf '\n' >&2; progress_active=0; fi
 }
 die() { finish_progress; printf 'Ошибка: %s\n' "$*" >&2; exit 1; }
-verbose=0; prefixes=0; silent=0
-while getopts ':v4sh' opt; do
-  case "$opt" in
-    v) verbose=1 ;; 4) prefixes=1 ;; s) silent=1 ;; h) usage; exit 0 ;;
-    *) usage >&2; exit 2 ;;
+verbose=0; prefixes=0; silent=0; parse=0
+args=()
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -parse|--parse) parse=1 ;;
+    --) shift; while [ "$#" -gt 0 ]; do args+=("$1"); shift; done; break ;;
+    -*)
+      flags=${1#-}
+      [ -n "$flags" ] || { usage >&2; exit 2; }
+      while [ -n "$flags" ]; do
+        flag=${flags:0:1}; flags=${flags:1}
+        case "$flag" in
+          v) verbose=1 ;; 4) prefixes=1 ;; s) silent=1 ;; h) usage; exit 0 ;;
+          *) usage >&2; exit 2 ;;
+        esac
+      done ;;
+    *) args+=("$1") ;;
   esac
+  shift
 done
-shift $((OPTIND - 1))
+set -- ${args[@]+"${args[@]}"}
 # Install only missing tools. Package-manager output must not contaminate JSON.
 ensure_dependencies() {
   local dependency manager package seen existing
-  local missing=() packages=() elevate=()
-  for dependency in curl jq nc mktemp mkfifo mkdir cat cp mv rm sleep wc tr; do
+  local missing=() packages=() elevate=() required=(curl jq nc mktemp mkfifo mkdir cat cp mv rm sleep wc tr)
+  if [ "$parse" -eq 1 ]; then required+=(node npm); fi
+  for dependency in "${required[@]}"; do
     if ! command -v "$dependency" >/dev/null 2>&1; then
       missing+=("$dependency")
     fi
@@ -59,6 +74,10 @@ ensure_dependencies() {
   for dependency in "${missing[@]}"; do
     case "$dependency" in
       curl|jq) package=$dependency ;;
+      node|npm)
+        if [ "$manager" = brew ]; then package=node
+        elif [ "$dependency" = node ]; then package=nodejs
+        else package=npm; fi ;;
       nc)
         case "$manager" in
           apt-get|apk) package=netcat-openbsd ;;
@@ -138,11 +157,12 @@ for input in "${inputs[@]}"; do
   fi
   [ "$duplicate" -eq 1 ] || domains+=("$domain")
 done
-unset input inputs input_line
+unset input input_line
 batch=$(mktemp -d "${TMPDIR:-/tmp}/SubnetResolve.XXXXXXXX")
 tmp=$batch
 ncpid=''
 http_pid=''
+parse_pid=''
 started=$SECONDS
 stage='Check-Host: создание проверки'
 progress() {
@@ -154,6 +174,7 @@ progress() {
   fi
 }
 cleanup() {
+  if [ -n "$parse_pid" ]; then kill "$parse_pid" 2>/dev/null || :; wait "$parse_pid" 2>/dev/null || :; fi
   finish_progress
   if [ -n "$http_pid" ]; then kill "$http_pid" 2>/dev/null || :; wait "$http_pid" 2>/dev/null || :; fi
   if [ -n "$ncpid" ]; then kill "$ncpid" 2>/dev/null || :; wait "$ncpid" 2>/dev/null || :; fi
@@ -175,6 +196,100 @@ get_json() {
   http_pid=''
   return "$rc"
 }
+# Optional browser capture; runtime is reused, never installed for ordinary DNS mode.
+if [ "$parse" -eq 1 ]; then
+  node -e 'if(Number(process.versions.node.split(".")[0]) < 20) process.exit(1)' || die '-parse требует Node.js 20 или новее.'
+  runtime="${XDG_CACHE_HOME:-$HOME/.cache}/SubnetResolve/playwright-1.64.1"
+  mkdir -p "$runtime" || die 'Не удалось создать кеш Playwright.'
+  export SUBNET_PLAYWRIGHT="$runtime/node_modules/playwright"
+  if ! node -e 'if(require(process.env.SUBNET_PLAYWRIGHT + "/package.json").version !== "1.64.1") process.exit(1)' 2>/dev/null; then
+    finish_progress
+    printf 'Устанавливаем Playwright для -parse...\n' >&2
+    npm install --prefix "$runtime" --no-audit --no-fund --ignore-scripts playwright@1.64.1 >&2 || die 'Не удалось установить Playwright.'
+  fi
+  cat > "$batch/parse.cjs" <<'SUBNET_PARSE_JS'
+const fs = require('node:fs');
+const { chromium } = require(process.env.SUBNET_PLAYWRIGHT);
+const [inputPath, outputPath, progressPath] = process.argv.slice(2);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const domains = new Set(), pages = [];
+const hostname = raw => {
+  try {
+    const u = new URL(raw);
+    if (!['http:', 'https:', 'ws:', 'wss:'].includes(u.protocol)) return;
+    const h = u.hostname.toLowerCase().replace(/\.$/, '');
+    if (/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(h) && !/^\d+(\.\d+){3}$/.test(h)) return h;
+  } catch {}
+};
+let browser;
+async function main() {
+  browser = await chromium.launch({headless: true});
+  if (process.env.SUBNET_PROBE === '1') { await browser.close(); return; }
+  const seeds = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
+  for (let i = 0; i < seeds.length; i++) {
+    const seed = new URL(seeds[i]);
+    // Do not use or persist URL credentials; paths and queries are needed to load the page.
+    seed.username = ''; seed.password = '';
+    const origin = hostname(seed.href);
+    if (origin) domains.add(origin);
+    const seen = new Set(), errors = new Set();
+    const context = await browser.newContext({viewport:{width:1365,height:900},acceptDownloads:false});
+    const record = raw => { const h = hostname(raw); if(h) { domains.add(h); seen.add(h); } };
+    context.on('request', req => record(req.url()));
+    context.on('page', p => p.on('websocket', ws => record(ws.url())));
+    const page = await context.newPage();
+    fs.writeFileSync(progressPath, `${i+1}/${seeds.length}: ${origin}; загрузка и прокрутка`);
+    let timeout;
+    const run = async () => {
+      try {
+        const response = await page.goto(seed.href, {waitUntil:'domcontentloaded',timeout:30000});
+        if(response && response.status() >= 400) errors.add(`HTTP ${response.status()}`);
+      } catch(e) { errors.add(e.name === 'TimeoutError' ? 'navigation_timeout' : 'navigation_failed'); }
+      for(let step=0;step<10;step++) {
+        await page.evaluate(() => window.scrollBy(0, Math.max(600, innerHeight))).catch(() => {});
+        await sleep(1000);
+        fs.writeFileSync(progressPath, `${i+1}/${seeds.length}: ${origin}; найдено доменов: ${seen.size}`);
+      }
+    };
+    try {
+      await Promise.race([run(), new Promise((_,reject) => {timeout=setTimeout(()=>reject(new Error('capture_timeout')),45000);})]);
+    } catch { errors.add('capture_timeout'); }
+    finally { clearTimeout(timeout); await context.close(); }
+    pages.push({site:origin, domains:[...seen].sort(), errors:[...errors]});
+  }
+  await browser.close();
+  fs.writeFileSync(outputPath, JSON.stringify({domains:[...domains].sort(),pages,complete:pages.every(p=>!p.errors.length)}));
+}
+process.on('SIGTERM',()=>{ if(browser) browser.close().finally(()=>process.exit(143)); else process.exit(143); setTimeout(()=>process.exit(143),2000).unref(); });
+main().catch(e => {console.error('Chromium: ' + (process.env.SUBNET_PROBE === '1' ? e.message : 'не удалось завершить сбор')); process.exitCode=1; if(browser) browser.close();});
+SUBNET_PARSE_JS
+  if ! SUBNET_PROBE=1 node "$batch/parse.cjs" 2> "$batch/browser-error"; then
+    finish_progress
+    printf 'Устанавливаем Chromium и необходимые библиотеки...\n' >&2
+    if command -v apt-get >/dev/null 2>&1; then
+      node "$runtime/node_modules/playwright/cli.js" install --with-deps --only-shell chromium >&2 || die 'Не удалось установить Chromium; проверьте доступ к sudo и пакетному менеджеру.'
+    else
+      node "$runtime/node_modules/playwright/cli.js" install --only-shell chromium >&2 || die 'Не удалось установить Chromium.'
+    fi
+    SUBNET_PROBE=1 node "$batch/parse.cjs" 2> "$batch/browser-error" || { cat "$batch/browser-error" >&2; die 'Chromium не запускается: проверьте системные библиотеки и поддержку ОС.'; }
+  fi
+  printf '%s\n' "${inputs[@]}" | jq -Rs 'split("\n") | map(select(length>0) | if test("^https?://"; "i") then . else "https://" + . end) | unique' > "$batch/seeds.json"
+  node "$batch/parse.cjs" "$batch/seeds.json" "$batch/discovery.json" "$batch/parse-progress" &
+  parse_pid=$!
+  while kill -0 "$parse_pid" 2>/dev/null; do
+    detail='запуск браузера'
+    if [ -s "$batch/parse-progress" ]; then detail=$(cat "$batch/parse-progress"); fi
+    progress "Сбор доменов: $detail"
+    sleep 1
+  done
+  wait "$parse_pid" || die 'Не удалось собрать домены сайта.'
+  parse_pid=''
+  jq -e '.domains | length > 0' "$batch/discovery.json" >/dev/null || die 'Браузер не обнаружил домены.'
+  domains=()
+  while IFS= read -r domain; do domains+=("$domain"); done < <(jq -r '.domains[]' "$batch/discovery.json")
+  progress "Сбор завершён; уникальных доменов: ${#domains[@]}"
+fi
+unset inputs
 index=0
 observation_files=()
 for domain in "${domains[@]}"; do
@@ -309,6 +424,12 @@ tmp=$batch
 jq -s '{domains: ., complete: all(.[]; .complete)}' "${full_files[@]}" > "$tmp/batch.json"
 
 status=0
+if [ "$parse" -eq 1 ] && ! jq -e .complete "$batch/discovery.json" >/dev/null; then
+  status=3
+  finish_progress
+  printf 'Браузер: сбор неполный (код выхода 3).\n' >&2
+  jq -r '.pages[] | select(.errors|length>0) | "[\(.site)] \(.errors|join("; "))"' "$batch/discovery.json" >&2
+fi
 if ! jq -e .complete "$tmp/batch.json" >/dev/null; then
   status=3
   finish_progress
@@ -328,6 +449,14 @@ if [ "$prefixes" -eq 1 ]; then
   jq '{ip: ([.domains[].results[].prefix] | unique | sort_by(split("/") | (.[0] | split(".") | map(tonumber)) + [.[1]|tonumber]))}' "$tmp/batch.json" > "$tmp/output.json"
 else
   cp "$tmp/full.json" "$tmp/output.json"
+fi
+if [ "$parse" -eq 1 ]; then
+  if [ "$prefixes" -eq 1 ]; then
+    jq --slurpfile d "$batch/discovery.json" '. + {domain: ($d[0].domains | map("domain:" + .))}' "$tmp/output.json" > "$tmp/parsed-output.json"
+  else
+    jq --slurpfile d "$batch/discovery.json" '. + {domain: ($d[0].domains | map("domain:" + .)), discovery: $d[0], complete: (.complete and $d[0].complete)}' "$tmp/batch.json" > "$tmp/parsed-output.json"
+  fi
+  mv "$tmp/parsed-output.json" "$tmp/output.json"
 fi
 if [ "$status" -eq 0 ]; then
   progress "Готово; групп ASN/prefix: $(jq '[.domains[].results[]] | length' "$tmp/batch.json")"

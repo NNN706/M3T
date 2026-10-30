@@ -3,11 +3,12 @@
 Запуск (Bash и curl):
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/NNN706/M3T/main/source/SubnetResolve.sh) -4s https://visor.sberbank.ru/get api-web.samokat.ru
+bash <(curl -fsSL https://raw.githubusercontent.com/NNN706/M3T/test/source/SubnetResolve.sh) -4s https://visor.sberbank.ru/get api-web.samokat.ru
 ```
 
 Домены и HTTP(S) URL указываются через пробел. Без аргументов скрипт спросит их. Из URL автоматически извлекается домен.
 
+- `-parse` — открыть сайты в фоновом Chromium, собрать домены запросов (включая сторонние) и выполнить DNS → BGP. С `-4` вывод: `{"domain":["domain:example.com"],"ip":[...]}`.
 - `-4` — один JSON `{"ip":[...]}` с уникальными IPv4-подсетями всех доменов.
 - `-s` — без вопроса о сохранении и без файла.
 - `-v` — подробный журнал и полные данные узлов.
@@ -17,3 +18,11 @@ bash <(curl -fsSL https://raw.githubusercontent.com/NNN706/M3T/main/source/Subne
 JSON — в stdout; ссылки отчётов и ошибки с доменом, узлом, страной и причиной — в stderr. Код `3` означает неполный результат; успешные данные сохраняются. В полном формате несколько доменов находятся в массиве `domains`, каждый со своим `permanent_link`.
 
 Сетевые тайм-ауты скрипта — 2 секунды; опрос готовности DNS-отчёта — до 60 секунд на домен. Внутренний DNS-тайм-аут удалённых узлов задаётся самим Check-Host.
+
+Пример сбора доменов сайта:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/NNN706/M3T/test/source/SubnetResolve.sh) -parse -4s samokat.ru
+```
+
+Первый `-parse` устанавливает Node.js/npm при отсутствии, Playwright 1.64.1 и Chromium; нужен Node.js ≥20. Повторные запуски используют кеш. Браузер ждёт загрузку до 30 секунд и прокручивает страницу 10 секунд; это отдельные лимиты от DNS/BGP. Вход, выбор города и переходы по ссылкам не выполняются. Список отражает наблюдаемые запросы, включая неудачные, а не все возможные домены сайта. HTTP 403/ошибки загрузки дают код 3 и доступные результаты. В полном `-parse` JSON массив `domain` содержит правила, `domains` — результаты DNS/BGP, `discovery` — данные сбора.
