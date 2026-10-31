@@ -161,6 +161,7 @@ unset input input_line
 batch=$(mktemp -d "${TMPDIR:-/tmp}/SubnetResolve.XXXXXXXX")
 tmp=$batch
 ncpid=''
+bgp_writer_pid=''
 http_pid=''
 parse_pid=''
 started=$SECONDS
@@ -179,6 +180,7 @@ cleanup() {
   finish_progress
   if [ -n "$http_pid" ]; then kill "$http_pid" 2>/dev/null || :; wait "$http_pid" 2>/dev/null || :; fi
   if [ -n "$ncpid" ]; then kill "$ncpid" 2>/dev/null || :; wait "$ncpid" 2>/dev/null || :; fi
+  if [ -n "$bgp_writer_pid" ]; then kill "$bgp_writer_pid" 2>/dev/null || :; wait "$bgp_writer_pid" 2>/dev/null || :; fi
   rm -rf "$batch"
 }
 trap cleanup EXIT
@@ -350,38 +352,92 @@ check_service() {
   stage=$previous_stage
   http_reason=$previous_reason; http_transport_failed=$previous_transport
 }
+bgp_state() {
+  local ip_file=$1 table=$2 state=$3
+  jq -n --rawfile wanted "$ip_file" --rawfile raw "$table" '
+    def ipnum: split(".") | map(tonumber) | if length == 4 and all(.[]; . >= 0 and . <= 255 and floor == .) then reduce .[] as $v (0; . * 256 + $v) else error("Invalid IPv4") end;
+    def valid:
+      length >= 7 and (.[0]|test("^[1-9][0-9]*$")) and
+      (.[2]|test("^[0-9.]+/([0-9]|[12][0-9]|3[0-2])$")) and
+      (try ((.[2]|split("/")) as $p | pow(2;32-($p[1]|tonumber)) as $size |
+        ((.[1]|ipnum)/$size|floor) == (($p[0]|ipnum)/$size)) catch false);
+    ($wanted|split("\n")|map(select(length>0))|unique) as $ips |
+    ($raw|split("\n")|map(split("|")|map(gsub("^\\s+|\\s+$";"")))|
+      map(select(length>=7) | select(.[1] as $ip | $ips|index($ip)!=null))) as $rows |
+    ($rows|map(select(valid))) as $valid |
+    {routes: ($valid|map({ip:.[1],asn:("AS"+.[0]),prefix:.[2],country:.[3],registry:.[4],
+      allocated:(if .[5]=="0001-01-01" or .[5]=="" then null else .[5] end),as_name:(.[6:]|join(" | "))})|unique),
+     pending: ($ips-[$rows[][1]]),
+     errors: [$ips[] as $ip | select(all($valid[]; .[1]!=$ip)) |
+       ([$rows[]|select(.[1]==$ip)]|last) as $row |
+       {ip:$ip,error:"Не получены BGP-префикс и ASN",message:
+         (if $row==null then "В ответе WHOIS нет записи для этого IP"
+          elif ($row[0]=="NA" or $row[0]=="N/A" or $row[0]=="0" or $row[0]=="") and ($row[2]=="NA" or $row[2]=="N/A" or $row[2]=="") then "BGP.tools ответил, но не указал анонсируемую подсеть и ASN для этого IP"
+          elif ($row[0]|test("^[1-9][0-9]*$")|not) then "BGP.tools вернул запись без корректного ASN"
+          else "BGP.tools вернул некорректный BGP-префикс либо подсеть, не содержащую этот IP" end)}]}
+  ' > "$state"
+}
 bgp_exchange() {
-  local ip_file=$1 target=$2 attempt tick
+  local ip_file=$1 target=$2 attempt tick rc timed_out cycle_timeout wait_delay=5 wait_left recovering=0 cycle_remaining
   : > "$target"
-  for attempt in 1 2; do
-    progress "$stage; попытка $attempt/2"
-    rm -f "$batch/bgp-input"
-    mkfifo "$batch/bgp-input"
-    exec 3<> "$batch/bgp-input"
-    nc -w 2 bgp.tools 43 < "$batch/bgp-input" > "$batch/bgp-attempt" 2> "$batch/bgp-error" &
-    ncpid=$!
-    { printf 'begin\nverbose\n'; cat "$ip_file"; printf 'end\n'; } >&3
-    # nc implementations differ in fractional timeout support; the watchdog
-    # limits each whole exchange to approximately 1.5 seconds on all platforms.
-    for ((tick=0; tick<15; tick++)); do
-      kill -0 "$ncpid" 2>/dev/null || break
-      sleep 0.1
+  cp "$ip_file" "$batch/bgp-pending"
+  bgp_state "$ip_file" "$target" "$batch/bgp-state.json"
+  while :; do
+    cycle_timeout=0
+    cycle_remaining=$(wc -l < "$batch/bgp-pending" | tr -d ' ')
+    for attempt in 1 2; do
+      progress "$stage; не получено IP: $(wc -l < "$batch/bgp-pending" | tr -d ' '); попытка $attempt/2"
+      rm -f "$batch/bgp-input"
+      mkfifo "$batch/bgp-input"
+      exec 3<> "$batch/bgp-input"
+      rc=0; timed_out=0
+      { printf 'begin\nverbose\n'; cat "$batch/bgp-pending"; printf 'end\n'; } > "$batch/bgp-payload"
+      nc -w 2 bgp.tools 43 < "$batch/bgp-input" > "$batch/bgp-attempt" 2> "$batch/bgp-error" &
+      ncpid=$!
+      # Write asynchronously: a large input must not block the watchdog.
+      cat "$batch/bgp-payload" >&3 &
+      bgp_writer_pid=$!
+      for ((tick=0; tick<15; tick++)); do
+        kill -0 "$ncpid" 2>/dev/null || break
+        sleep 0.1
+      done
+      if kill -0 "$ncpid" 2>/dev/null; then timed_out=1; kill "$ncpid" 2>/dev/null || :; fi
+      wait "$ncpid" 2>/dev/null || rc=$?
+      ncpid=''
+      if kill -0 "$bgp_writer_pid" 2>/dev/null; then kill "$bgp_writer_pid" 2>/dev/null || :; fi
+      wait "$bgp_writer_pid" 2>/dev/null || :
+      bgp_writer_pid=''; exec 3>&-
+      # Do not join a truncated last line with the next response.
+      jq -Rrs --argjson truncated "$timed_out" '
+        if $truncated==1 and (endswith("\n")|not) then split("\n")|.[:-1][] else split("\n")[] end | select(length>0)
+      ' "$batch/bgp-attempt" >> "$target"
+      bgp_state "$ip_file" "$target" "$batch/bgp-state.json"
+      jq -r '.pending[]' "$batch/bgp-state.json" > "$batch/bgp-pending"
+      if [ ! -s "$batch/bgp-pending" ]; then
+        if [ "$recovering" -eq 1 ]; then
+          finish_progress
+          printf '[%s] BGP.tools снова отвечает; полученные записи сохранены.\n' "$stage_name" >&2
+        fi
+        jq -e '.errors|length==0' "$batch/bgp-state.json" >/dev/null
+        return $?
+      fi
+      if [ "$timed_out" -eq 1 ] || [ "$rc" -ne 0 ]; then cycle_timeout=1; fi
     done
-    if kill -0 "$ncpid" 2>/dev/null; then kill "$ncpid" 2>/dev/null || :; fi
-    wait "$ncpid" 2>/dev/null || :
-    ncpid=''; exec 3>&-
-    cat "$batch/bgp-attempt" >> "$target"
-    # Retry missing/invalid rows; never discard successfully received routes.
-    if jq -Rne --rawfile wanted "$ip_file" --rawfile raw "$target" '
-      def ipnum: split(".") | map(tonumber) | if length == 4 and all(.[]; . >= 0 and . <= 255 and floor == .) then reduce .[] as $v (0; . * 256 + $v) else error("Invalid IPv4") end;
-      ($raw | split("\n") | map(split("|") | map(gsub("^\\s+|\\s+$"; ""))) |
-       map(select(length >= 7 and (.[0]|test("^[0-9]+$")) and (.[2]|test("^[0-9.]+/([0-9]|[12][0-9]|3[0-2])$"))) |
-         select(try ((.[2]|split("/")) as $p | pow(2;32-($p[1]|tonumber)) as $size |
-           ((.[1]|ipnum)/$size|floor) == (($p[0]|ipnum)/$size)) catch false) | .[1])) as $got |
-      ($wanted | split("\n") | map(select(length > 0))) | all(.[]; . as $ip | $got | index($ip) != null)
-    ' >/dev/null; then return 0; fi
+    if [ "$cycle_timeout" -eq 0 ]; then
+      # Completed TCP responses with missing/invalid data are not timeouts.
+      return 1
+    fi
+    # Keep pauses short while partial responses are making progress.
+    if [ "$(wc -l < "$batch/bgp-pending" | tr -d ' ')" -lt "$cycle_remaining" ]; then wait_delay=5; fi
+    recovering=1
+    finish_progress
+    printf '[%s] BGP.tools: тайм-аут или ошибка TCP-соединения; ждём %s с. Повторяем только недостающие IP: %s; остановить — Ctrl+C.\n' "$stage_name" "$wait_delay" "$(wc -l < "$batch/bgp-pending" | tr -d ' ')" >&2
+    for ((wait_left=wait_delay; wait_left>0; wait_left--)); do
+      if [ "$verbose" -eq 0 ] || [ "$((wait_left % 5))" -eq 0 ]; then progress "BGP.tools: ожидание связи — повтор через $wait_left с"; fi
+      sleep 1
+    done
+    wait_delay=$((wait_delay * 2)); [ "$wait_delay" -le 30 ] || wait_delay=30
   done
-  return 1
 }
 
 # Optional browser capture; runtime is reused, never installed for ordinary DNS mode.
@@ -606,24 +662,19 @@ jq -r '[.[].ip] | unique[]' "$tmp/observations.json" > "$tmp/ips"
 stage_name='Этап 4/4: BGP'
 if [ -s "$tmp/ips" ]; then
   printf '1.1.1.1\n' > "$batch/probe-ip"
-  stage='проверка доступности BGP.tools: запрос маршрута для 1.1.1.1'
-  bgp_exchange "$batch/probe-ip" "$batch/probe-bgp" || die 'BGP.tools недоступен или не вернул корректный ответ после двух попыток. Массовый запрос не запускается.'
-  stage="маршруты для уникальных IP: $(wc -l < "$tmp/ips" | tr -d ' ')"
+  stage='проверка BGP.tools: BGP-префикс и ASN для 1.1.1.1'
+  bgp_exchange "$batch/probe-ip" "$batch/probe-bgp" || die 'BGP.tools завершил ответ, но не прислал корректные BGP-префикс и ASN для проверочного IP 1.1.1.1. Массовый запрос не запускается.'
+  stage="BGP-префиксы и ASN для уникальных IP: $(wc -l < "$tmp/ips" | tr -d ' ')"
   if ! bgp_exchange "$tmp/ips" "$tmp/bgp.txt"; then
     finish_progress
-    printf 'BGP.tools не вернул маршруты для части IP после двух попыток. Доступные записи будут сохранены.\n' >&2
+    printf 'Не для всех IP получены BGP-префикс и ASN. Полученные записи сохранены; причины будут указаны ниже.\n' >&2
   fi
 else
   : > "$tmp/bgp.txt"
 fi
-jq -Rn '
-  [inputs | split("|") | map(gsub("^\\s+|\\s+$"; "")) |
-   select(length >= 7) | select(.[0] | test("^[0-9]+$")) |
-   select(.[2] | test("^([0-9]{1,3}\\.){3}[0-9]{1,3}/([0-9]|[12][0-9]|3[0-2])$")) |
-   {ip: .[1], asn: ("AS" + .[0]), prefix: .[2], country: .[3], registry: .[4],
-    allocated: (if .[5] == "0001-01-01" or .[5] == "" then null else .[5] end),
-    as_name: (.[6:] | join(" | "))}] | unique
-' < "$tmp/bgp.txt" > "$tmp/routes.json"
+bgp_state "$tmp/ips" "$tmp/bgp.txt" "$tmp/final-bgp-state.json"
+jq '.routes' "$tmp/final-bgp-state.json" > "$tmp/routes.json"
+jq '.errors' "$tmp/final-bgp-state.json" > "$tmp/bgp-errors.json"
 index=0
 full_files=()
 for domain in "${domains[@]}"; do
@@ -631,7 +682,7 @@ for domain in "${domains[@]}"; do
   tmp="$batch/domain-$index"
 jq -n --arg domain "$domain" --argjson verbose "$verbose" \
   --slurpfile c "$tmp/check.json" --slurpfile n "$tmp/nodes.json" \
-  --slurpfile o "$tmp/observations.json" --slurpfile b "$batch/routes.json" '
+  --slurpfile o "$tmp/observations.json" --slurpfile b "$batch/routes.json" --slurpfile be "$batch/bgp-errors.json" '
   # Reject unrelated/malformed ranges, including a prefix not containing its IP.
   def ipnum: split(".") | map(tonumber) | if length == 4 and all(.[]; . >= 0 and . <= 255) then reduce .[] as $v (0; . * 256 + $v) else error("Invalid IPv4") end;
   [$b[0][] | . as $route | select(any($o[0][]; .ip == $route.ip)) |
@@ -654,7 +705,7 @@ jq -n --arg domain "$domain" --argjson verbose "$verbose" \
         message: (if .response == null then ($c[0].poll_error // "Узел не предоставил результат до завершения опроса")
                   elif ($messages | length > 0) then ($messages | join("; "))
                   else "Узел ответил, но не вернул IPv4 A-записи" end), response: .response}] +
-     ([$o[0][].ip] | unique | map(. as $ip | select(all($routes[]; .ip != $ip)) | {ip: ., error: "BGP.tools не вернул пригодный маршрут для IP-адреса"}))),
+     ([$o[0][].ip] | unique | map(. as $ip | select(all($routes[]; .ip != $ip)) | ([$be[0][] | select(.ip==$ip)] | first // {ip:$ip,error:"Не получены BGP-префикс и ASN",message:"BGP.tools не прислал данные для этого IP"})))),
    permanent_link: $c[0].permanent_link} |
   . + {complete: (.errors | length == 0)}
 ' > "$tmp/full.json"
@@ -675,7 +726,9 @@ if ! jq -e .complete "$tmp/batch.json" >/dev/null; then
   finish_progress
   printf 'Для части доменов, узлов или IP не удалось получить DNS/BGP-данные:\n' >&2
   jq -r '.domains[] | .domain as $d | .errors[] |
-    "[\($d)] \(.check_host // .ip // "Check-Host") [\(.country // "—"), \(.city // "—")]: \(.error) — \(.message // "BGP.tools не вернул пригодный маршрут")"' "$tmp/batch.json" >&2
+    "[\($d)] \(.check_host // .ip // "Check-Host")" +
+    (if .country != null or .city != null then " [\(.country // "—"), \(.city // "—")]" else "" end) +
+    ": \(.error)" + (if .message != null and .message != .error then " — \(.message)" else "" end)' "$tmp/batch.json" >&2
   if [ "$verbose" -eq 1 ]; then
     jq -c '.domains[] | .domain as $d | .errors[] | {domain: $d} + .' "$tmp/batch.json" >&2
   fi

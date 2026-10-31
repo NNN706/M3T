@@ -57,6 +57,7 @@ with tempfile.TemporaryDirectory(prefix='subnet-pipeline-') as directory:
   env={**os.environ,'PATH':str(bin)+':'+os.environ['PATH'],'CASE':mode,'TRACE':str(trace),'XDG_CACHE_HOME':str(root/'cache')}
   result=subprocess.run(['bash',str(script),*(['-parse'] if parse else []),'-4sv',*hosts],capture_output=True,text=True,env=env,timeout=30)
   events=[json.loads(s) for s in trace.read_text().splitlines()];phases=[e[0] for e in events]
+  assert 'пригодный маршрут' not in result.stderr
   assert 'HTTPcurl' not in result.stderr and 'curl: (' not in result.stderr,result.stderr
   assert 'код выхода' not in result.stderr and 'код результата' not in result.stderr
   assert '[Этап ' in result.stderr
