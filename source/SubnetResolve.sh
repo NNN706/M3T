@@ -171,7 +171,23 @@ progress() {
   if [ "$verbose" -eq 1 ]; then
     printf '[%3ds] [%s] %s\n' "$((SECONDS - started))" "$stage_name" "$*" >&2
   elif [ -t 2 ]; then
-    printf '\r\033[2K[%3ds] %s' "$((SECONDS - started))" "[$stage_name] $*" >&2
+    local rendered term_size term_cols count row
+    if [ "$progress_active" -eq 1 ] && [ "${progress_rows:-1}" -gt 1 ]; then
+      printf '\r' >&2
+      for ((row=1; row<progress_rows; row++)); do printf '\033[1A' >&2; done
+      printf '\033[J' >&2
+    else
+      printf '\r\033[2K' >&2
+    fi
+    printf -v rendered '[%3ds] [%s] %s' "$((SECONDS - started))" "$stage_name" "$*"
+    term_size=$(stty size <&2 2>/dev/null || :)
+    term_cols=${term_size##* }
+    if ! [[ "$term_cols" =~ ^[1-9][0-9]*$ ]]; then term_cols=${COLUMNS:-80}; fi
+    if ! [[ "$term_cols" =~ ^[1-9][0-9]*$ ]]; then term_cols=80; fi
+    count=$(jq -nr --arg text "$rendered" '$text|length')
+    progress_rows=$(((count + term_cols - 1) / term_cols))
+    [ "$progress_rows" -gt 0 ] || progress_rows=1
+    printf '%s' "$rendered" >&2
     progress_active=1
   fi
 }
@@ -186,8 +202,15 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
+site_progress() {
+  if [ "$verbose" -eq 1 ] || [ -t 2 ]; then
+    progress "$*"
+  else
+    printf '[%3ds] [%s] %s\n' "$((SECONDS - ${started:-$SECONDS}))" "$stage_name" "$*" >&2
+  fi
+}
 fetch_http() {
-  local expected=$1 attempt rc tls_mode=default meta status effective redirects tcp tls first challenge locations redirect_note request_url effective_host wait_delay=5 wait_left wait_started=-1
+  local expected=$1 attempt rc tls_mode=default meta status effective redirects tcp tls first challenge locations request_url wait_delay=5 wait_left wait_started=-1
   local tls_args=()
   shift
   for request_url do :; done
@@ -197,13 +220,13 @@ fetch_http() {
   if [ "$expected" != site ]; then tls_mode=tls12; fi
   http_reason=''; http_transport_failed=0
   for attempt in 1 2; do
-    rc=0; redirect_note=''
+    rc=0
     tls_args=()
     if [ "$tls_mode" = tls12 ]; then tls_args=(--tlsv1.2 --tls-max 1.2); fi
     if [ "$verbose" -eq 1 ] && [ "$expected" != site ]; then
       if [ "$tls_mode" = tls12 ]; then progress "$stage; попытка $attempt/2; TLS 1.2"
       else progress "$stage; попытка $attempt/2; обычное согласование TLS"; fi
-    else
+    elif [ "$expected" != site ] || [ "$verbose" -eq 0 ]; then
       progress "$stage; попытка $attempt/2"
     fi
     : > "$batch/http-headers"
@@ -240,11 +263,6 @@ fetch_http() {
             ($url|host) as $next | .current = (if $next == "" then .current else $next end) | .chain += [.current]) |
           .chain | join(" → ") end
       ' "$batch/http-headers")
-      effective_host=$(jq -nr --arg url "$effective" 'try ($url | capture("^(?:https?:)?//(?:[^/?#@]*@)?(?<h>\\[[^]]+\\]|[^/:?#]+)"; "i").h | ascii_downcase) catch ""')
-      if [ -n "$locations" ]; then
-        finish_progress
-        printf '[%s] Редирект: %s\n' "$stage_name" "$locations" >&2
-      fi
       challenge=0
       if jq -Rrse 'test("(?im)^cf-mitigated: *challenge\r?$")' "$batch/http-headers" >/dev/null; then challenge=1; fi
       if [ "$rc" -eq 0 ]; then
@@ -256,6 +274,9 @@ fetch_http() {
       if [ "$expected" = site ] ||
          { [ "$expected" = object ] && jq -e 'type == "object"' "$batch/http-response" >/dev/null 2>&1; } ||
          { [ "$expected" = check ] && jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$batch/http-response" >/dev/null 2>&1; }; then
+        if [ "$expected" = site ]; then
+          site_progress "$stage; попытка $attempt/2${locations:+; Редирект: $locations}; HTTP $status"
+        fi
         if [ "$wait_started" -ge 0 ]; then
           http_wait_seconds=$((http_wait_seconds + SECONDS - wait_started))
           finish_progress
@@ -302,15 +323,11 @@ fetch_http() {
           else http_reason='Не завершена загрузка страницы за 1,5 секунды'; fi ;;
       esac
       if [ -n "$locations" ]; then
-        redirect_note="; ошибка после редиректа, конечный домен: $effective_host"
         if [ "$rc" -eq 28 ]; then
           http_reason='Истёк общий лимит 1,5 секунды на переходы и загрузку страницы'
         fi
       fi
-      if [ "$rc" -ne 0 ] && [ -n "$effective" ]; then
-        finish_progress
-        printf '[%s] %s: %s%s (попытка %s/2)\n' "$stage_name" "$effective_host" "$http_reason" "$redirect_note" "$attempt" >&2
-      fi
+      site_progress "$stage; попытка $attempt/2${locations:+; Редирект: $locations}; $http_reason"
     fi
     if [ "$attempt" -eq 1 ]; then
       if [ "$expected" != site ]; then
@@ -318,7 +335,7 @@ fetch_http() {
           28|35|60) tls_mode=default ;;
         esac
       fi
-      if [ "$verbose" -eq 1 ]; then progress "Причина повторной попытки: $http_reason"; fi
+      if [ "$verbose" -eq 1 ] && [ "$expected" != site ]; then progress "Причина повторной попытки: $http_reason"; fi
     fi
   done
   if [ "$expected" != site ] && [ "$rc" -eq 28 ]; then
@@ -338,6 +355,7 @@ fetch_http() {
   fi
   done
   if [ "$wait_started" -ge 0 ]; then http_wait_seconds=$((http_wait_seconds + SECONDS - wait_started)); fi
+  [ "$expected" != site ] || return 1
   finish_progress
   printf '[%s] %s: %s; обе попытки не удались.\n' "$stage_name" "$stage" "$http_reason" >&2
   return 1

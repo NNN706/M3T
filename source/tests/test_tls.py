@@ -1,7 +1,7 @@
 """Test production HTTP helpers with controlled failures; --live probes real API."""
 import argparse,json,os,pathlib,subprocess,tempfile,time
 p=argparse.ArgumentParser();p.add_argument('--script',type=pathlib.Path,default=pathlib.Path(__file__).resolve().parents[1]/'SubnetResolve.sh');p.add_argument('--live',action='store_true');args=p.parse_args()
-s=args.script.read_text();helpers=s[s.index('fetch_http() {'):s.index('\nbgp_exchange()')]
+s=args.script.read_text();helpers=s[s.index('site_progress() {'):s.index('\nbgp_exchange()')]
 setup='''set -euo pipefail
 batch=$1; stage=probe; stage_name=DNS; verbose=1; http_pid=''
 progress(){ printf '%s\\n' "$*" >&2; }
@@ -52,7 +52,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert modes==wanted,(expected,code,modes,wanted)
     for a in calls:
      if '--tlsv1.2' in a:assert a[a.index('--tls-max')+1]=='1.2'
-    if retries:assert 'Причина повторной попытки:' in r.stderr
+    if retries and expected!='site':assert 'Причина повторной попытки:' in r.stderr
     print('PASS TLS',expected,'failure',code,'modes',','.join(modes),flush=True)
   for code in (35,60,22,-1):
    trace.write_text('');env.update(TLS_ALWAYS='1',TLS_FAILURE=str(code))

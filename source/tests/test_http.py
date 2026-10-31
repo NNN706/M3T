@@ -1,7 +1,7 @@
 """Actual curl: redirects, final HTTP failures and bounded retry behavior."""
-import argparse,collections,http.server,pathlib,subprocess,tempfile,threading,time
+import argparse,collections,http.server,pathlib,subprocess,tempfile,threading,time,pty,select,os,fcntl,termios,struct
 p=argparse.ArgumentParser();p.add_argument('--script',type=pathlib.Path,default=pathlib.Path(__file__).resolve().parents[1]/'SubnetResolve.sh');p.add_argument('--live-sites',action='store_true');args=p.parse_args()
-source=args.script.read_text();functions=source[source.index('fetch_http() {'):source.index('\nget_json()')]
+source=args.script.read_text();functions=source[source.index('site_progress() {'):source.index('\nget_json()')]
 if args.live_sites:
  with tempfile.TemporaryDirectory() as root:
   for site in ('https://cloud.vk.com/','https://fornex.com/'):
@@ -46,10 +46,28 @@ with tempfile.TemporaryDirectory() as root:
   assert counts[route]-before==(1 if success else (102 if route=='/loop' else 2)),(route,counts)
   assert 'curl:' not in r.stderr and '\x1b' not in r.stderr
   if reason:assert reason in r.stderr,(route,r.stderr)
-  if route.startswith('/to/'):assert 'конечный домен:' in r.stderr,(route,r.stderr)
   if 'Редирект:' in r.stderr:
    for line in r.stderr.splitlines():
     if 'Редирект:' in line:assert 'http://' not in line and '/ok' not in line and '/chain/' not in line,line
   if 'slow' in route:assert 2.9<=elapsed<6,(elapsed,r.stderr)
   print('PASS real curl',route,'elapsed',round(elapsed,2),flush=True)
+# Verify terminal behavior using the production progress/finish functions.
+finish=source[source.index('finish_progress() {'):source.index('\ndie()')]
+progress=source[source.index('\nprogress() {'):source.index('\ncleanup() {')]
+with tempfile.TemporaryDirectory() as root:
+ ui='set -euo pipefail\nbatch=$1; verbose=$2; started=$SECONDS; stage=site; stage_name=HTTP; progress_active=0\n'+finish+progress+'\n'+functions+'\nrc=0\nfetch_http site "$3" || rc=$?\nfinish_progress\nexit "$rc"\n'
+ for verbose in (0,1):
+  master,slave=pty.openpty();fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',20,80,0,0));proc=subprocess.Popen(['bash','-c',ui,'test',root,str(verbose),f'http://127.0.0.1:{server.server_port}/to/status/403'],stdout=subprocess.PIPE,stderr=slave);out=proc.communicate(timeout=9)[0];data=b''
+  while select.select([master],[],[],0.2)[0]:
+   try:part=os.read(master,4096)
+   except OSError:break
+   if not part:break
+   data+=part
+  os.close(slave);os.close(master);text=data.decode()
+  assert proc.returncode==1 and not out,text
+  assert text.count('\n')==(2 if verbose else 1),repr(text)
+  assert text.count('Редирект:')==2 and 'попытка 2/2; Редирект:' in text and 'HTTP 403' in text,text
+  if not verbose:assert '\x1b[1A' in text,repr(text)
+  assert 'обе попытки' not in text and 'Причина повторной' not in text,text
+  print('PASS compact site progress: verbose='+str(verbose),flush=True)
 server.shutdown()
