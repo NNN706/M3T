@@ -51,6 +51,11 @@ jobs:
           set -euo pipefail
           bash -n source/SubnetResolve.sh
           python3 source/tests/test_parse.py 2>&1 | tee "$TEST_ARTIFACTS/test.log"
+      - name: Failure matrix and stage ordering
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 source/tests/test_pipeline.py 2>&1 | tee "$TEST_ARTIFACTS/pipeline.log"
       - name: Save test results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

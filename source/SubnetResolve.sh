@@ -164,12 +164,13 @@ ncpid=''
 http_pid=''
 parse_pid=''
 started=$SECONDS
-stage='Check-Host: создание проверки'
+stage_name='Подготовка'
+stage='подготовка запроса'
 progress() {
   if [ "$verbose" -eq 1 ]; then
-    printf '[%3ds] %s\n' "$((SECONDS - started))" "$*" >&2
+    printf '[%3ds] [%s] %s\n' "$((SECONDS - started))" "$stage_name" "$*" >&2
   elif [ -t 2 ]; then
-    printf '\r\033[2K[%3ds] %s' "$((SECONDS - started))" "$*" >&2
+    printf '\r\033[2K[%3ds] %s' "$((SECONDS - started))" "[$stage_name] $*" >&2
     progress_active=1
   fi
 }
@@ -183,21 +184,108 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
-get_json() {
-  local rc=0 tick=0
-  curl -fsS --connect-timeout 2 --max-time 2 -H 'Accept: application/json' "$@" &
-  http_pid=$!
-  while kill -0 "$http_pid" 2>/dev/null; do
-    if [ "$((tick % 2))" -eq 0 ]; then progress "$stage — ожидание HTTP"; fi
-    sleep 1
-    tick=$((tick + 1))
+fetch_http() {
+  local expected=$1 attempt rc
+  shift
+  http_reason=''; http_transport_failed=0
+  for attempt in 1 2; do
+    rc=0
+    progress "$stage; попытка $attempt/2"
+    curl -fsS --connect-timeout 1.5 --max-time 1.5 "$@" > "$batch/http-response" 2> "$batch/http-error" &
+    http_pid=$!
+    while kill -0 "$http_pid" 2>/dev/null; do
+      sleep 0.1
+    done
+    wait "$http_pid" || rc=$?
+    http_pid=''
+    if [ "$rc" -eq 0 ]; then
+      if [ "$expected" = site ] ||
+         { [ "$expected" = object ] && jq -e 'type == "object"' "$batch/http-response" >/dev/null 2>&1; } ||
+         { [ "$expected" = check ] && jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$batch/http-response" >/dev/null 2>&1; }; then
+        cat "$batch/http-response"
+        return 0
+      fi
+      http_reason='API вернул некорректный ответ или отклонил запрос'
+    else
+      http_transport_failed=1
+      case "$rc" in
+        28) http_reason='Нет ответа за 1,5 секунды' ;;
+        6) http_reason='Не удалось определить IP-адрес сервера' ;;
+        7) http_reason='Не удалось подключиться к серверу' ;;
+        22) http_reason='Сервер вернул HTTP-ошибку'; http_transport_failed=0
+            case "$(cat "$batch/http-error")" in
+              *403*) http_reason='Сайт отказал в доступе. Ресурсы страницы не загружены' ;;
+              *404*) http_reason='Страница не найдена' ;;
+              *429*) http_reason='Сервер ограничил частоту запросов' ;;
+            esac ;;
+        60) http_reason='Не удалось проверить сертификат HTTPS' ;;
+        *) http_reason='Сетевой запрос завершился ошибкой' ;;
+      esac
+    fi
   done
-  wait "$http_pid" || rc=$?
-  http_pid=''
-  return "$rc"
+  finish_progress
+  printf '[%s] %s: %s; обе попытки не удались.\n' "$stage_name" "$stage" "$http_reason" >&2
+  return 1
 }
+get_json() { fetch_http object -H 'Accept: application/json' "$@"; }
+check_service() {
+  local previous_stage=$stage previous_reason=${http_reason:-} previous_transport=${http_transport_failed:-0}
+  stage='проверка доступности API Check-Host (3 узла)'
+  if ! fetch_http check -H 'Accept: application/json' -G --data-urlencode 'host=https://check-host.net' --data-urlencode 'max_nodes=3' https://check-host.net/check-dns > "$batch/service-check.json"; then
+    die 'API Check-Host недоступен. DNS-проверки доменов и запросы BGP.tools не запускаются.'
+  fi
+  stage=$previous_stage
+  http_reason=$previous_reason; http_transport_failed=$previous_transport
+}
+bgp_exchange() {
+  local ip_file=$1 target=$2 attempt tick
+  : > "$target"
+  for attempt in 1 2; do
+    progress "$stage; попытка $attempt/2"
+    rm -f "$batch/bgp-input"
+    mkfifo "$batch/bgp-input"
+    exec 3<> "$batch/bgp-input"
+    nc -w 2 bgp.tools 43 < "$batch/bgp-input" > "$batch/bgp-attempt" 2> "$batch/bgp-error" &
+    ncpid=$!
+    { printf 'begin\nverbose\n'; cat "$ip_file"; printf 'end\n'; } >&3
+    # nc implementations differ in fractional timeout support; the watchdog
+    # limits each whole exchange to approximately 1.5 seconds on all platforms.
+    for ((tick=0; tick<15; tick++)); do
+      kill -0 "$ncpid" 2>/dev/null || break
+      sleep 0.1
+    done
+    if kill -0 "$ncpid" 2>/dev/null; then kill "$ncpid" 2>/dev/null || :; fi
+    wait "$ncpid" 2>/dev/null || :
+    ncpid=''; exec 3>&-
+    cat "$batch/bgp-attempt" >> "$target"
+    # Retry missing/invalid rows; never discard successfully received routes.
+    if jq -Rne --rawfile wanted "$ip_file" --rawfile raw "$target" '
+      ($raw | split("\n") | map(split("|") | map(gsub("^\\s+|\\s+$"; ""))) |
+       map(select(length >= 7 and (.[0]|test("^[0-9]+$")) and (.[2]|test("^[0-9.]+/[0-9]+$"))) | .[1])) as $got |
+      ($wanted | split("\n") | map(select(length > 0))) | all(.[]; . as $ip | $got | index($ip) != null)
+    ' >/dev/null; then return 0; fi
+  done
+  return 1
+}
+
 # Optional browser capture; runtime is reused, never installed for ordinary DNS mode.
 if [ "$parse" -eq 1 ]; then
+  stage_name='Этап 1/4: доступность сайтов'
+  printf '%s\n' "${inputs[@]}" | jq -Rs 'split("\n") | map(select(length>0) | if test("^https?://"; "i") then . else "https://" + . end) | unique' > "$batch/all-seeds.json"
+  : > "$batch/accepted-seeds"
+  : > "$batch/skipped-pages"
+  while IFS= read -r seed; do
+    site=$(normalize_domain "$seed")
+    stage="$site: открытие страницы через curl"
+    if fetch_http site -L --max-redirs 5 --proto '=http,https' "$seed" > /dev/null; then
+      printf '%s\n' "$seed" >> "$batch/accepted-seeds"
+    else
+      jq -nc --arg site "$site" --arg message "$http_reason" '{site:$site, domains:[], skipped:true, errors:[$message + "; сайт пропущен до запуска Chromium"]}' >> "$batch/skipped-pages"
+    fi
+  done < <(jq -r '.[]' "$batch/all-seeds.json")
+  jq -Rs 'split("\n") | map(select(length>0))' "$batch/accepted-seeds" > "$batch/seeds.json"
+  if [ -s "$batch/accepted-seeds" ]; then
+  stage_name='Этап 2/4: браузер'
   node -e 'if(Number(process.versions.node.split(".")[0]) < 20) process.exit(1)' || die '-parse требует Node.js 20 или новее.'
   runtime="${XDG_CACHE_HOME:-$HOME/.cache}/SubnetResolve/playwright-1.64.1"
   mkdir -p "$runtime" || die 'Не удалось создать кеш Playwright.'
@@ -280,7 +368,6 @@ SUBNET_PARSE_JS
     fi
     SUBNET_PROBE=1 node "$batch/parse.cjs" 2> "$batch/browser-error" || { cat "$batch/browser-error" >&2; die 'Chromium не запускается: проверьте системные библиотеки и поддержку ОС.'; }
   fi
-  printf '%s\n' "${inputs[@]}" | jq -Rs 'split("\n") | map(select(length>0) | if test("^https?://"; "i") then . else "https://" + . end) | unique' > "$batch/seeds.json"
   node "$batch/parse.cjs" "$batch/seeds.json" "$batch/discovery.json" "$batch/parse-progress" &
   parse_pid=$!
   while kill -0 "$parse_pid" 2>/dev/null; do
@@ -291,24 +378,39 @@ SUBNET_PARSE_JS
   done
   wait "$parse_pid" || die 'Не удалось собрать домены сайта.'
   parse_pid=''
-  jq -e '.domains | length > 0' "$batch/discovery.json" >/dev/null || die 'Браузер не обнаружил домены.'
+  else
+    printf '{"domains":[],"pages":[],"complete":true}\n' > "$batch/discovery.json"
+  fi
+  jq --slurpfile skipped "$batch/skipped-pages" '.pages += $skipped | .complete = (.complete and ($skipped|length == 0))' "$batch/discovery.json" > "$batch/discovery-next.json"
+  mv "$batch/discovery-next.json" "$batch/discovery.json"
   domains=()
-  while IFS= read -r domain; do domains+=("$domain"); done < <(jq -r '.domains[]' "$batch/discovery.json")
+  while IFS= read -r domain; do domains+=("$domain"); done < <(jq -r '(.domains + [.pages[] | select(.skipped == true) | .site]) | unique[]' "$batch/discovery.json")
   progress "Сбор завершён; уникальных доменов: ${#domains[@]}"
 fi
 unset inputs
+stage_name='Этап 3/4: DNS'
+active_count=${#domains[@]}
+if [ "$parse" -eq 1 ]; then active_count=$(jq '.domains|length' "$batch/discovery.json"); fi
+if [ "$active_count" -gt 0 ]; then check_service; fi
 index=0
 observation_files=()
 for domain in "${domains[@]}"; do
   index=$((index + 1))
   tmp="$batch/domain-$index"
   mkdir "$tmp"
-  http_timeout=20
-  stage="[$index/${#domains[@]}] $domain: создание проверки"
+  if [ "$parse" -eq 1 ] && ! jq -e --arg d "$domain" '.domains | index($d) != null' "$batch/discovery.json" >/dev/null; then
+    printf '{"nodes":{},"permanent_link":null,"request_error":"Сайт недоступен через curl; Chromium и DNS для него не запускались"}\n' > "$tmp/check.json"
+    printf '[]\n' > "$tmp/nodes.json"
+    printf '[]\n' > "$tmp/observations.json"
+    observation_files+=("$tmp/observations.json")
+    continue
+  fi
+  stage="Домен $index/${#domains[@]}: $domain — отправка задания DNS в Check-Host"
 progress "Запрашиваем DNS A для $domain..."
-if ! get_json -G --data-urlencode "host=$domain" https://check-host.net/check-dns > "$tmp/check.json" ||
+if ! fetch_http check -H 'Accept: application/json' -G --data-urlencode "host=$domain" https://check-host.net/check-dns > "$tmp/check.json" ||
    ! jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$tmp/check.json" >/dev/null; then
-  printf '{"nodes":{},"permanent_link":null,"request_error":"Check-Host: ошибка создания проверки (HTTP/JSON/API; сетевой тайм-аут 2 с)"}\n' > "$tmp/check.json"
+  if [ "$http_transport_failed" -eq 1 ]; then check_service; fi
+  jq -n --arg message "$http_reason" '{nodes:{},permanent_link:null,request_error:("Check-Host: не удалось отправить задание DNS после двух попыток; " + $message)}' > "$tmp/check.json"
   printf '[]\n' > "$tmp/nodes.json"
   printf '[]\n' > "$tmp/observations.json"
   observation_files+=("$tmp/observations.json")
@@ -326,17 +428,19 @@ answered=0
 for ((attempt=0; attempt<20; attempt++)); do
   remaining=$((60 - (SECONDS - dns_started)))
   [ "$remaining" -gt 0 ] || break
-  http_timeout=$remaining
-  [ "$http_timeout" -le 10 ] || http_timeout=10
-  stage="[$index/${#domains[@]}] $domain: ответили $answered/$node_total узлов; попытка $((attempt + 1))/20"
+  stage="Домен $index/${#domains[@]}: $domain — ожидание DNS-ответов; ответили $answered/$node_total узлов; опрос $((attempt + 1))/20"
   if get_json "https://check-host.net/check-result/$request_id" > "$tmp/next.json" && jq -e 'type == "object"' "$tmp/next.json" >/dev/null; then
     mv "$tmp/next.json" "$tmp/dns.json"
     answered=$(jq --slurpfile c "$tmp/check.json" '. as $r | [$c[0].nodes | keys[] | select($r[.] != null)] | length' "$tmp/dns.json")
     found=$(jq '[.. | objects | .A? | arrays | .[] | strings] | unique | length' "$tmp/dns.json")
-    progress "[$index/${#domains[@]}] $domain: ответили $answered/$node_total узлов; уникальных A-адресов: $found"
+    progress "Домен $index/${#domains[@]}: $domain — ответили $answered/$node_total узлов; уникальных A-адресов: $found"
     [ "$answered" -lt "$node_total" ] || break
   else
-    progress 'DNS: ошибка запроса; повторяем до истечения лимита'
+    if [ "$http_transport_failed" -eq 1 ]; then check_service; fi
+    jq --arg reason "$http_reason" '.poll_error = ($reason + "; не удалось получить отчёт Check-Host после двух попыток")' "$tmp/check.json" > "$tmp/check-next.json"
+    mv "$tmp/check-next.json" "$tmp/check.json"
+    progress 'Не удалось получить DNS-результат после двух попыток; переходим к следующему домену'
+    break
   fi
   if [ "$attempt" -lt 19 ] && [ "$((SECONDS - dns_started))" -lt 58 ]; then sleep 2; fi
 done
@@ -357,29 +461,16 @@ tmp=$batch
 jq -s 'add | unique' "${observation_files[@]}" > "$tmp/observations.json"
 # Deduplicate across ALL domains before the single Bulk WHOIS request.
 jq -r '[.[].ip] | unique[]' "$tmp/observations.json" > "$tmp/ips"
+stage_name='Этап 4/4: BGP'
 if [ -s "$tmp/ips" ]; then
-progress "Запрашиваем BGP.tools; уникальных IP: $(wc -l < "$tmp/ips" | tr -d ' ')..."
-# Keep stdin open until the server closes: macOS nc can exit too early at EOF.
-mkfifo "$tmp/input"
-exec 3<> "$tmp/input"
-nc -w 2 bgp.tools 43 < "$tmp/input" > "$tmp/bgp.txt" &
-ncpid=$!
-{ printf 'begin\nverbose\n'; cat "$tmp/ips"; printf 'end\n'; } >&3
-for ((second=0; second<2; second++)); do
-  kill -0 "$ncpid" 2>/dev/null || break
-  if [ "$((second % 2))" -eq 0 ]; then progress "BGP.tools: ожидание ответа"; fi
-  sleep 1
-done
-if kill -0 "$ncpid" 2>/dev/null; then
-  kill "$ncpid" 2>/dev/null || :
-  wait "$ncpid" 2>/dev/null || :
-  finish_progress
-  printf 'BGP.tools: время ожидания истекло; проверяем полученные записи.\n' >&2
-else
-  wait "$ncpid" || { finish_progress; printf 'BGP.tools: ошибка соединения; проверяем полученные записи.\n' >&2; }
-fi
-ncpid=''
-exec 3>&-
+  printf '1.1.1.1\n' > "$batch/probe-ip"
+  stage='проверка доступности BGP.tools: запрос маршрута для 1.1.1.1'
+  bgp_exchange "$batch/probe-ip" "$batch/probe-bgp" || die 'BGP.tools недоступен или не вернул корректный ответ после двух попыток. Массовый запрос не запускается.'
+  stage="маршруты для уникальных IP: $(wc -l < "$tmp/ips" | tr -d ' ')"
+  if ! bgp_exchange "$tmp/ips" "$tmp/bgp.txt"; then
+    finish_progress
+    printf 'BGP.tools не вернул маршруты для части IP после двух попыток. Доступные записи будут сохранены.\n' >&2
+  fi
 else
   : > "$tmp/bgp.txt"
 fi
@@ -418,7 +509,7 @@ jq -n --arg domain "$domain" --argjson verbose "$verbose" \
         error: (if .response == null then "Узел не предоставил DNS-результат"
                 elif ($messages | join(" ") | test("timeout|timed out"; "i")) then "Узел сообщил о превышении времени ожидания"
                 elif ($messages | length > 0) then "Узел сообщил об ошибке DNS" else "Узел ответил без IPv4-адресов" end),
-        message: (if .response == null then "Узел не предоставил результат до завершения опроса"
+        message: (if .response == null then ($c[0].poll_error // "Узел не предоставил результат до завершения опроса")
                   elif ($messages | length > 0) then ($messages | join("; "))
                   else "Узел ответил, но не вернул IPv4 A-записи" end), response: .response}] +
      ([$o[0][].ip] | unique | map(. as $ip | select(all($routes[]; .ip != $ip)) | {ip: ., error: "BGP.tools не вернул пригодный маршрут для IP-адреса"}))),
@@ -465,6 +556,7 @@ if [ "$parse" -eq 1 ]; then
   fi
   mv "$tmp/parsed-output.json" "$tmp/output.json"
 fi
+stage_name='Результат'
 if [ "$status" -eq 0 ]; then
   progress "Готово; групп ASN/prefix: $(jq '[.domains[].results[]] | length' "$tmp/batch.json")"
 else

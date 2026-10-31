@@ -1,5 +1,5 @@
 import os,json,subprocess,pathlib,threading,http.server,tempfile
-import argparse,base64,hashlib
+import argparse,base64,hashlib,shutil
 parser=argparse.ArgumentParser()
 parser.add_argument('--script', type=pathlib.Path, default=pathlib.Path(__file__).resolve().parents[1]/'SubnetResolve.sh')
 args=parser.parse_args()
@@ -41,12 +41,14 @@ assert d['complete'] and not p.stdout
 print('PASS real Chromium: JS, delayed fetch, dedup, iframe, WebSocket, scroll, URL path/case preserved',flush=True)
 # Same browser through the full Bash entrypoint, with DNS/BGP mock executables.
 bin=root/'parse-bin';bin.mkdir(exist_ok=True)
+real_curl=shutil.which('curl')
 (bin/'curl').write_text('''#!/bin/bash
+case "$*" in *check-host.net*) ;; *) exec REAL_CURL "$@" ;; esac
 case "$*" in
  *check-dns*) printf '%s\\n' '{"ok":1,"request_id":"abc","permanent_link":"https://check-host.net/check-report/abc","nodes":{"n":["xx","Country","City","9.9.9.9","AS9"]}}';;
  *) printf '%s\\n' '{"n":[{"A":["1.1.1.1"]}]}';;
 esac
-''')
+'''.replace('REAL_CURL',__import__('shlex').quote(real_curl)))
 (bin/'nc').write_text('''#!/bin/bash
 while IFS= read -r line; do printf '%s\\n' "$line" >> "$SENT"; [ "$line" = end ] && break; done
 printf '%s\\n' '13335 | 1.1.1.1 | 1.1.1.0/24 | US | ARIN | 2020-01-01 | Cloudflare'
@@ -57,13 +59,13 @@ env.update(PATH=str(bin)+':'+env['PATH'],SENT=str(root/'parse-sent'))
 p=subprocess.run(['/bin/bash',str(script),'-parse','-4s',seed],env=env,text=True,capture_output=True,timeout=90)
 assert p.returncode==0,p.stderr
 r=json.loads(p.stdout);assert set(r)=={'ip','domain'} and r['domain']==['domain:'+h for h in sorted(expected)] and r['ip']==['1.1.1.0/24'],r
-assert (root/'parse-sent').read_text().splitlines().count('1.1.1.1')==1
+transactions=(root/'parse-sent').read_text().split('end\n');assert transactions[0].splitlines().count('1.1.1.1')==1 and transactions[1].splitlines().count('1.1.1.1')==1 and len(transactions)==3
 print('PASS full -parse -4s: one JSON, unique domain: entries, one unique IP sent to BGP for six domains',flush=True)
 p=subprocess.run(['/bin/bash',str(script),'-parse','-vs',seed.replace('/Start?Case=YES','/Denied')],env=env,text=True,capture_output=True,timeout=65)
 assert p.returncode==3,p.stderr
-r=json.loads(p.stdout);assert r['domain']==['domain:site.localhost'] and not r['complete'] and 'отказал' in r['discovery']['pages'][0]['errors'][0] and 'domains' in r,r
+r=json.loads(p.stdout);assert r['domain']==[] and not r['complete'] and 'отказал' in r['discovery']['pages'][0]['errors'][0] and 'domains' in r,r
 assert 'отказал' in p.stderr and 'Ресурсы страницы не загружены' in p.stderr and 'код выхода' not in p.stderr and 'код результата' not in p.stderr
-print('PASS HTTP 403: partial status 3, discovery diagnostics, domain array and detailed DNS results coexist',flush=True)
+print('PASS HTTP 403: curl rejects site before Chromium/DNS/BGP, clear explanation, empty domain/IP output',flush=True)
 server.shutdown()
 if os.environ.get('TEST_ARTIFACTS'):
  destination=pathlib.Path(os.environ['TEST_ARTIFACTS']);destination.mkdir(parents=True,exist_ok=True)
