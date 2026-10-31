@@ -185,9 +185,10 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 fetch_http() {
-  local expected=$1 attempt rc tls_mode=default meta status effective redirects tcp tls first challenge locations redirect_note
+  local expected=$1 attempt rc tls_mode=default meta status effective redirects tcp tls first challenge locations redirect_note request_url effective_host
   local tls_args=()
   shift
+  for request_url do :; done
   # check/object are Check-Host API requests; site preflight keeps its TLS defaults.
   if [ "$expected" != site ]; then tls_mode=tls12; fi
   http_reason=''; http_transport_failed=0
@@ -225,10 +226,20 @@ fetch_http() {
       status=000; effective=''; redirects=0; tcp=0; tls=0; first=0
       IFS=$'\t' read -r status effective redirects tcp tls first <<< "$meta" || :
       # Header values are untrusted: remove control characters before diagnostics.
-      locations=$(jq -Rrs 'split("\n") | map(gsub("[\u0000-\u001f\u007f]"; "")) | map(select(test("^location:"; "i")) | sub("^[^:]+: *"; "")) | join(" → ")' "$batch/http-headers")
+      locations=$(jq -Rrs --arg start "$request_url" '
+        def host: ((try (capture("^(?:https?:)?//(?:[^/?#@]*@)?(?<h>\\[[^]]+\\]|[^/:?#]+)"; "i").h | ascii_downcase) catch "") // "");
+        ($start | host) as $initial |
+        split("\n") | map(gsub("[\u0000-\u001f\u007f]"; "")) |
+        map(select(test("^location:"; "i")) | sub("^[^:]+: *"; "")) |
+        if length == 0 then "" else
+          reduce .[] as $url ({current:$initial,chain:[$initial]};
+            ($url|host) as $next | .current = (if $next == "" then .current else $next end) | .chain += [.current]) |
+          .chain | join(" → ") end
+      ' "$batch/http-headers")
+      effective_host=$(jq -nr --arg url "$effective" 'try ($url | capture("^(?:https?:)?//(?:[^/?#@]*@)?(?<h>\\[[^]]+\\]|[^/:?#]+)"; "i").h | ascii_downcase) catch ""')
       if [ -n "$locations" ]; then
         finish_progress
-        printf '[%s] Редирект (%s): %s; конечный URL: %s\n' "$stage_name" "$stage" "$locations" "$effective" >&2
+        printf '[%s] Редирект: %s\n' "$stage_name" "$locations" >&2
       fi
       challenge=0
       if jq -Rrse 'test("(?im)^cf-mitigated: *challenge\r?$")' "$batch/http-headers" >/dev/null; then challenge=1; fi
@@ -282,14 +293,14 @@ fetch_http() {
           else http_reason='Не завершена загрузка страницы за 1,5 секунды'; fi ;;
       esac
       if [ -n "$locations" ]; then
-        redirect_note="; ошибка после редиректа, конечный URL: $effective"
+        redirect_note="; ошибка после редиректа, конечный домен: $effective_host"
         if [ "$rc" -eq 28 ]; then
           http_reason='Истёк общий лимит 1,5 секунды на переходы и загрузку страницы'
         fi
       fi
       if [ "$rc" -ne 0 ] && [ -n "$effective" ]; then
         finish_progress
-        printf '[%s] %s: %s%s (попытка %s/2)\n' "$stage_name" "$effective" "$http_reason" "$redirect_note" "$attempt" >&2
+        printf '[%s] %s: %s%s (попытка %s/2)\n' "$stage_name" "$effective_host" "$http_reason" "$redirect_note" "$attempt" >&2
       fi
     fi
     if [ "$attempt" -eq 1 ]; then
@@ -407,7 +418,7 @@ async function main() {
     context.on('request', req => {
       record(req.url());
       const previous = req.redirectedFrom();
-      if (previous) console.error(`[Этап 2/4: браузер] Редирект: ${previous.url()} → ${req.url()}`);
+      if (previous) console.error(`[Этап 2/4: браузер] Редирект: ${hostname(previous.url()) || "неизвестный домен"} → ${hostname(req.url()) || "неизвестный домен"}`);
     });
     context.on('page', p => p.on('websocket', ws => record(ws.url())));
     const page = await context.newPage();
@@ -453,16 +464,30 @@ SUBNET_PARSE_JS
     fi
     SUBNET_PROBE=1 node "$batch/parse.cjs" 2> "$batch/browser-error" || { cat "$batch/browser-error" >&2; die 'Chromium не запускается: проверьте системные библиотеки и поддержку ОС.'; }
   fi
-  node "$batch/parse.cjs" "$batch/seeds.json" "$batch/discovery.json" "$batch/parse-progress" &
+  : > "$batch/parse-messages"
+  node "$batch/parse.cjs" "$batch/seeds.json" "$batch/discovery.json" "$batch/parse-progress" 2> "$batch/parse-messages" &
   parse_pid=$!
+  exec 4< "$batch/parse-messages"
+  drain_browser_messages() {
+    local line
+    while IFS= read -r line <&4; do
+      finish_progress
+      printf '%s\n' "$line" >&2
+    done
+  }
   while kill -0 "$parse_pid" 2>/dev/null; do
     detail='запуск браузера'
     if [ -s "$batch/parse-progress" ]; then detail=$(cat "$batch/parse-progress"); fi
+    drain_browser_messages
     progress "Сбор доменов: $detail"
     sleep 1
   done
-  wait "$parse_pid" || die 'Не удалось собрать домены сайта.'
+  parse_rc=0
+  wait "$parse_pid" || parse_rc=$?
   parse_pid=''
+  drain_browser_messages
+  exec 4<&-
+  [ "$parse_rc" -eq 0 ] || die 'Не удалось собрать домены сайта.' 
   else
     printf '{"domains":[],"pages":[],"complete":true}\n' > "$batch/discovery.json"
   fi

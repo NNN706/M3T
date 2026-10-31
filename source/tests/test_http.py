@@ -37,7 +37,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Handler);threading.Thread(target=server.serve_forever,daemon=True).start()
 with tempfile.TemporaryDirectory() as root:
  code='set -euo pipefail\nbatch=$1; verbose=0; stage=local; stage_name=HTTP; progress(){ :; }; finish_progress(){ :; };\n'+functions+'\nfetch_http site "$2"\n'
- cases=[('/ok',True,None)]+[('/r/'+str(n),True,'Редирект') for n in (301,302,303,307,308)]+[('/cross',True,'http://localhost:'),('/chain/7',True,'Редирект'),('/loop',False,'50 редиректов'),('/to/status/403',False,'HTTP 403'),('/to/slow',False,'общий лимит')]+[('/status/'+str(n),False,'HTTP '+str(n)) for n in (403,404,429,500)]+[('/challenge',False,'Cloudflare challenge'),('/slow',False,'не начал HTTP-ответ'),('/slowbody',False,'Не завершена загрузка')]
+ cases=[('/ok',True,None)]+[('/r/'+str(n),True,'Редирект') for n in (301,302,303,307,308)]+[('/cross',True,'127.0.0.1 → localhost'),('/chain/7',True,'Редирект'),('/loop',False,'50 редиректов'),('/to/status/403',False,'HTTP 403'),('/to/slow',False,'общий лимит')]+[('/status/'+str(n),False,'HTTP '+str(n)) for n in (403,404,429,500)]+[('/challenge',False,'Cloudflare challenge'),('/slow',False,'не начал HTTP-ответ'),('/slowbody',False,'Не завершена загрузка')]
  for route,success,reason in cases:
   before=counts[route]
   start=time.monotonic();r=subprocess.run(['bash','-c',code,'test',root,f'http://127.0.0.1:{server.server_port}'+route],capture_output=True,text=True,timeout=9);elapsed=time.monotonic()-start
@@ -46,7 +46,10 @@ with tempfile.TemporaryDirectory() as root:
   assert counts[route]-before==(1 if success else (102 if route=='/loop' else 2)),(route,counts)
   assert 'curl:' not in r.stderr and '\x1b' not in r.stderr
   if reason:assert reason in r.stderr,(route,r.stderr)
-  if route.startswith('/to/') or route=='/cross':assert 'конечный URL:' in r.stderr,(route,r.stderr)
+  if route.startswith('/to/'):assert 'конечный домен:' in r.stderr,(route,r.stderr)
+  if 'Редирект:' in r.stderr:
+   for line in r.stderr.splitlines():
+    if 'Редирект:' in line:assert 'http://' not in line and '/ok' not in line and '/chain/' not in line,line
   if 'slow' in route:assert 2.9<=elapsed<6,(elapsed,r.stderr)
   print('PASS real curl',route,'elapsed',round(elapsed,2),flush=True)
 server.shutdown()

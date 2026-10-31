@@ -39,7 +39,7 @@ p=subprocess.run(['node',str(root/'extracted-parse.cjs'),str(root/'parse-seeds.j
 assert p.returncode==0,(p.stdout,p.stderr)
 d=json.loads((root/'parse-discovery.json').read_text());expected={'site.localhost','api.localhost','delayed.localhost','socket.localhost','frame.localhost','lazy.localhost'}
 assert set(d['domains'])==expected,d
-assert d['complete'] and not p.stdout and 'Редирект:' in p.stderr
+assert d['complete'] and not p.stdout and 'Редирект: site.localhost → api.localhost' in p.stderr
 print('PASS real Chromium: JS, delayed fetch, dedup, iframe, WebSocket, scroll, URL path/case preserved',flush=True)
 # Same browser through the full Bash entrypoint, with DNS/BGP mock executables.
 bin=root/'parse-bin';bin.mkdir(exist_ok=True)
@@ -59,7 +59,9 @@ for file in bin.iterdir():file.chmod(0o755)
 env.update(PATH=str(bin)+':'+env['PATH'],SENT=str(root/'parse-sent'))
 (root/'parse-sent').write_text('')
 p=subprocess.run(['/bin/bash',str(script),'-parse','-4s',seed],env=env,text=True,capture_output=True,timeout=90)
-assert p.returncode==0 and 'Редирект' in p.stderr,p.stderr
+assert p.returncode==0 and 'Редирект: site.localhost → api.localhost' in p.stderr,p.stderr
+for line in p.stderr.splitlines():
+ if 'Редирект:' in line:assert 'http://' not in line and '?Case=' not in line,line
 r=json.loads(p.stdout);assert set(r)=={'ip','domain'} and r['domain']==['domain:'+h for h in sorted(expected)] and r['ip']==['1.1.1.0/24'],r
 transactions=(root/'parse-sent').read_text().split('end\n');assert transactions[0].splitlines().count('1.1.1.1')==1 and transactions[1].splitlines().count('1.1.1.1')==1 and len(transactions)==3
 print('PASS full -parse -4s: one JSON, unique domain: entries, one unique IP sent to BGP for six domains',flush=True)
