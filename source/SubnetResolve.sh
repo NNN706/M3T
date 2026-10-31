@@ -260,8 +260,11 @@ bgp_exchange() {
     cat "$batch/bgp-attempt" >> "$target"
     # Retry missing/invalid rows; never discard successfully received routes.
     if jq -Rne --rawfile wanted "$ip_file" --rawfile raw "$target" '
+      def ipnum: split(".") | map(tonumber) | if length == 4 and all(.[]; . >= 0 and . <= 255 and floor == .) then reduce .[] as $v (0; . * 256 + $v) else error("Invalid IPv4") end;
       ($raw | split("\n") | map(split("|") | map(gsub("^\\s+|\\s+$"; ""))) |
-       map(select(length >= 7 and (.[0]|test("^[0-9]+$")) and (.[2]|test("^[0-9.]+/[0-9]+$"))) | .[1])) as $got |
+       map(select(length >= 7 and (.[0]|test("^[0-9]+$")) and (.[2]|test("^[0-9.]+/([0-9]|[12][0-9]|3[0-2])$"))) |
+         select(try ((.[2]|split("/")) as $p | pow(2;32-($p[1]|tonumber)) as $size |
+           ((.[1]|ipnum)/$size|floor) == (($p[0]|ipnum)/$size)) catch false) | .[1])) as $got |
       ($wanted | split("\n") | map(select(length > 0))) | all(.[]; . as $ip | $got | index($ip) != null)
     ' >/dev/null; then return 0; fi
   done

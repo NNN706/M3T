@@ -55,6 +55,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 source/tests/test_http.py 2>&1 | tee "$TEST_ARTIFACTS/http.log"
           python3 source/tests/test_pipeline.py 2>&1 | tee "$TEST_ARTIFACTS/pipeline.log"
       - name: Save test results
         if: always()
