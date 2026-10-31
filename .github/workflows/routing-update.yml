@@ -45,7 +45,22 @@ jobs:
         env:
           XDG_CACHE_HOME: ${{ runner.temp }}/subnetresolve-cache
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/subnetresolve-browsers
-        run: python3 source/routing/update_routing.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/routing-evidence"
+          python3 source/routing/update_routing.py --allow-partial --evidence "$RUNNER_TEMP/routing-evidence" 2>&1 | tee "$RUNNER_TEMP/routing-evidence/scan.log"
+          if ! python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["complete"])' "$RUNNER_TEMP/routing-evidence/completeness.json"; then
+            echo '::warning::Неполный сбор: опубликованы доступные подсети; прежние записи сохранены. См. routing-evidence.'
+          fi
+          cat "$RUNNER_TEMP/routing-evidence/completeness.json" >> "$GITHUB_STEP_SUMMARY"
+      - name: Save scan evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: routing-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/routing-evidence
+          retention-days: 7
       - name: Commit changed IP.txt to test
         shell: bash
         run: |

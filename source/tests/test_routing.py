@@ -55,4 +55,12 @@ with tempfile.TemporaryDirectory() as directory:
     out=tmp/'IP.txt';out.write_text('existing\n')
     failed=subprocess.run(['python3',str(generator),'--sites',str(sites),'--scanner',str(fake),'--output',str(out)],capture_output=True,text=True)
     assert failed.returncode and out.read_text()=='existing\n'
+    fatal=subprocess.run(['python3',str(generator),'--allow-partial','--sites',str(sites),'--scanner',str(fake),'--output',str(out)],capture_output=True,text=True)
+    assert fatal.returncode and out.read_text()=='existing\n'
+    fake.write_text('printf \'%s\\n\' \'{"rules":[{"ruleTag":"a.example","ip":["192.0.2.0/25"]},{"ruleTag":"b.example","ip":[]}]}\'\nexit 3\n')
+    out.write_text(json.dumps({'rules':[{'ruleTag':'a.example','ip':['192.0.2.128/25']},{'ruleTag':'b.example','ip':['198.51.100.0/24']}]}))
+    partial=subprocess.run(['python3',str(generator),'--allow-partial','--evidence',str(tmp/'evidence'),'--sites',str(sites),'--scanner',str(fake),'--output',str(out)],capture_output=True,text=True)
+    assert partial.returncode==0,partial.stderr
+    assert json.loads(out.read_text())=={'rules':[{'ruleTag':'a.example','ip':['192.0.2.0/24']},{'ruleTag':'b.example','ip':['198.51.100.0/24']}]}
+    assert json.loads((tmp/'evidence/completeness.json').read_text())['complete'] is False
 print('PASS rule tags, service isolation, exact CIDR union, quiet no-A, parse rules, input dedup and failed scan preserves IP.txt')
