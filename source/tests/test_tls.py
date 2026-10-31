@@ -54,8 +54,8 @@ with tempfile.TemporaryDirectory() as directory:
      if '--tlsv1.2' in a:assert a[a.index('--tls-max')+1]=='1.2'
     if retries:assert 'Причина повторной попытки:' in r.stderr
     print('PASS TLS',expected,'failure',code,'modes',','.join(modes),flush=True)
-  for code in (28,35,60,22,-1):
+  for code in (35,60,22,-1):
    trace.write_text('');env.update(TLS_ALWAYS='1',TLS_FAILURE=str(code))
    r=subprocess.run(['bash','-c',setup+helpers+'\nfetch_http check https://check-host.net/check-dns','test',str(root)],env=env,capture_output=True,text=True,timeout=10)
    assert r.returncode==1 and not r.stdout and len(trace.read_text().splitlines())==2
-  print('PASS both attempts fail: timeout, TLS, certificate, HTTP, JSON')
+  print('PASS both attempts fail: TLS, certificate, HTTP, JSON; timeouts tested by wait matrix')

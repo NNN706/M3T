@@ -20,7 +20,7 @@ if name=='curl':
   host=next(a[5:] for a in args if a.startswith('host='));phase='health' if host=='https://check-host.net' else 'dns';log(phase,host)
   if phase=='health':
    assert 'max_nodes=3' in args
-   if mode=='health':print('curl: (28) Connection timed out',file=sys.stderr);sys.exit(28)
+   if mode=='health':print('curl: (22) HTTP 503',file=sys.stderr);sys.exit(22)
    if mode=='retry' and trace.read_text().count('"health"')==1:sys.exit(7)
   if phase=='dns' and mode=='dns' and host.startswith('bad'):print('{}');sys.exit(0)
   print(json.dumps(check(host)))
@@ -92,7 +92,7 @@ with tempfile.TemporaryDirectory(prefix='subnet-pipeline-') as directory:
   result,events,phases=run(mode,combinations[0])
   assert result.returncode==1 and not result.stdout,(mode,result.stderr)
   assert phases.count(mode)==2
-  if mode=='health':assert phases==['health','health'] and '1,5 секунды' in result.stderr
+  if mode=='health':assert phases==['health','health'] and 'HTTP-ошибку' in result.stderr
   else:assert 'bulk' not in phases
   print('PASS shared service unavailable:',mode,flush=True)
  result,events,phases=run('retry',combinations[0]);assert result.returncode==0 and phases.count('health')==2,result.stderr

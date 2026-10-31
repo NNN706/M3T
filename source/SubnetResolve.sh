@@ -185,10 +185,12 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 fetch_http() {
-  local expected=$1 attempt rc tls_mode=default meta status effective redirects tcp tls first challenge locations redirect_note request_url effective_host
+  local expected=$1 attempt rc tls_mode=default meta status effective redirects tcp tls first challenge locations redirect_note request_url effective_host wait_delay=5 wait_left wait_started=-1
   local tls_args=()
   shift
   for request_url do :; done
+  http_wait_seconds=${http_wait_seconds:-0}
+  while :; do
   # check/object are Check-Host API requests; site preflight keeps its TLS defaults.
   if [ "$expected" != site ]; then tls_mode=tls12; fi
   http_reason=''; http_transport_failed=0
@@ -252,6 +254,11 @@ fetch_http() {
       if [ "$expected" = site ] ||
          { [ "$expected" = object ] && jq -e 'type == "object"' "$batch/http-response" >/dev/null 2>&1; } ||
          { [ "$expected" = check ] && jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$batch/http-response" >/dev/null 2>&1; }; then
+        if [ "$wait_started" -ge 0 ]; then
+          http_wait_seconds=$((http_wait_seconds + SECONDS - wait_started))
+          finish_progress
+          printf '[%s] Check-Host снова отвечает; продолжаем: %s\n' "$stage_name" "$stage" >&2
+        fi
         cat "$batch/http-response"
         return 0
       fi
@@ -312,6 +319,23 @@ fetch_http() {
       if [ "$verbose" -eq 1 ]; then progress "Причина повторной попытки: $http_reason"; fi
     fi
   done
+  if [ "$expected" != site ] && [ "$rc" -eq 28 ]; then
+    if [ "$wait_started" -lt 0 ]; then wait_started=$SECONDS; fi
+    finish_progress
+    printf '[%s] %s: тайм-аут API Check-Host после двух попыток. Ждём %s с и повторяем тот же запрос; остановить — Ctrl+C.\n' "$stage_name" "$stage" "$wait_delay" >&2
+    for ((wait_left=wait_delay; wait_left>0; wait_left--)); do
+      if [ "$verbose" -eq 0 ] || [ "$((wait_left % 5))" -eq 0 ]; then
+        progress "$stage; ожидание API Check-Host — повтор через $wait_left с"
+      fi
+      sleep 1
+    done
+    wait_delay=$((wait_delay * 2))
+    [ "$wait_delay" -le 30 ] || wait_delay=30
+  else
+    break
+  fi
+  done
+  if [ "$wait_started" -ge 0 ]; then http_wait_seconds=$((http_wait_seconds + SECONDS - wait_started)); fi
   finish_progress
   printf '[%s] %s: %s; обе попытки не удались.\n' "$stage_name" "$stage" "$http_reason" >&2
   return 1
@@ -531,7 +555,7 @@ if [ "$verbose" -eq 1 ]; then
   printf 'Отчёт: %s\n' "$(jq -r .permanent_link "$tmp/check.json")" >&2
 fi
 printf '{}\n' > "$tmp/dns.json"
-# Bound the whole DNS polling phase, including slow HTTP calls.
+# Bound active polling; API outage recovery pauses this budget.
 dns_started=$SECONDS
 node_total=$(jq '.nodes | length' "$tmp/check.json")
 answered=0
@@ -539,8 +563,16 @@ for ((attempt=0; attempt<20; attempt++)); do
   remaining=$((60 - (SECONDS - dns_started)))
   [ "$remaining" -gt 0 ] || break
   stage="Домен $index/${#domains[@]}: $domain — ожидание DNS-ответов; ответили $answered/$node_total узлов; опрос $((attempt + 1))/20"
+  pause_before=${http_wait_seconds:-0}
   if get_json "https://check-host.net/check-result/$request_id" > "$tmp/next.json" && jq -e 'type == "object"' "$tmp/next.json" >/dev/null; then
-    mv "$tmp/next.json" "$tmp/dns.json"
+    dns_started=$((dns_started + ${http_wait_seconds:-0} - pause_before))
+    # A non-null node response is final, including errors and empty A records.
+    # Poll only for pending nodes; never replace/retry already completed ones.
+    jq --slurpfile old "$tmp/dns.json" --slurpfile c "$tmp/check.json" '
+      . as $next | reduce ($c[0].nodes | keys[]) as $node ($old[0];
+        if .[$node] == null and $next[$node] != null then .[$node] = $next[$node] else . end)
+    ' "$tmp/next.json" > "$tmp/merged.json"
+    mv "$tmp/merged.json" "$tmp/dns.json"
     answered=$(jq --slurpfile c "$tmp/check.json" '. as $r | [$c[0].nodes | keys[] | select($r[.] != null)] | length' "$tmp/dns.json")
     found=$(jq '[.. | objects | .A? | arrays | .[] | strings] | unique | length' "$tmp/dns.json")
     progress "Домен $index/${#domains[@]}: $domain — ответили $answered/$node_total узлов; уникальных A-адресов: $found"
