@@ -45,7 +45,7 @@ set -- ${args[@]+"${args[@]}"}
 # Install only missing tools. Package-manager output must not contaminate JSON.
 ensure_dependencies() {
   local dependency manager package seen existing
-  local missing=() packages=() elevate=() required=(curl jq nc mktemp mkfifo mkdir cat cp mv rm sleep wc tr)
+  local missing=() packages=() elevate=() required=(curl jq nc mktemp mkdir cat cp mv rm sleep wc tr)
   if [ "$parse" -eq 1 ]; then required+=(node npm); fi
   for dependency in "${required[@]}"; do
     if ! command -v "$dependency" >/dev/null 2>&1; then
@@ -161,7 +161,6 @@ unset input input_line
 batch=$(mktemp -d "${TMPDIR:-/tmp}/SubnetResolve.XXXXXXXX")
 tmp=$batch
 ncpid=''
-bgp_writer_pid=''
 http_pid=''
 parse_pid=''
 started=$SECONDS
@@ -196,7 +195,6 @@ cleanup() {
   finish_progress
   if [ -n "$http_pid" ]; then kill "$http_pid" 2>/dev/null || :; wait "$http_pid" 2>/dev/null || :; fi
   if [ -n "$ncpid" ]; then kill "$ncpid" 2>/dev/null || :; wait "$ncpid" 2>/dev/null || :; fi
-  if [ -n "$bgp_writer_pid" ]; then kill "$bgp_writer_pid" 2>/dev/null || :; wait "$bgp_writer_pid" 2>/dev/null || :; fi
   rm -rf "$batch"
 }
 trap cleanup EXIT
@@ -417,16 +415,11 @@ bgp_exchange() {
     before_count=$(jq '.pending|length' "$batch/bgp-state.json")
     for attempt in 1 2; do
       progress "$stage; обработано: $((total - before_count))/$total; в пакете: $(wc -l < "$batch/bgp-request" | tr -d ' '); попытка $attempt/2"
-      rm -f "$batch/bgp-input"
-      mkfifo "$batch/bgp-input"
-      exec 3<> "$batch/bgp-input"
       rc=0; timed_out=0; reply_complete=0
       { printf 'begin\nverbose\n'; cat "$batch/bgp-request"; printf 'end\n'; } > "$batch/bgp-payload"
       : > "$batch/bgp-attempt"
-      nc -w 10 bgp.tools 43 < "$batch/bgp-input" > "$batch/bgp-attempt" 2> "$batch/bgp-error" &
+      nc -w 10 bgp.tools 43 < "$batch/bgp-payload" > "$batch/bgp-attempt" 2> "$batch/bgp-error" &
       ncpid=$!
-      cat "$batch/bgp-payload" >&3 &
-      bgp_writer_pid=$!
       began=$SECONDS; last_data=$SECONDS; last_size=0
       transport_reason='тайм-аут ожидания WHOIS-ответа'
       while kill -0 "$ncpid" 2>/dev/null; do
@@ -452,9 +445,6 @@ bgp_exchange() {
       done
       wait "$ncpid" 2>/dev/null || rc=$?
       ncpid=''
-      if kill -0 "$bgp_writer_pid" 2>/dev/null; then kill "$bgp_writer_pid" 2>/dev/null || :; fi
-      wait "$bgp_writer_pid" 2>/dev/null || :
-      bgp_writer_pid=''; exec 3>&-
       if [ "$reply_complete" -eq 1 ]; then rc=0; fi
       # Some nc variants return success on their own idle timeout.
       if [ "$reply_complete" -eq 0 ] && [ "$((SECONDS - last_data))" -ge 9 ]; then timed_out=1; fi

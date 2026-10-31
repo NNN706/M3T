@@ -3,10 +3,10 @@ import argparse,ast,json,os,pathlib,signal,subprocess,tempfile,time
 p=argparse.ArgumentParser();p.add_argument('--script',type=pathlib.Path,default=pathlib.Path(__file__).resolve().parents[1]/'SubnetResolve.sh');p.add_argument('--live',action='store_true');args=p.parse_args();script=args.script.resolve();source=script.read_text()
 helpers=source[source.index('bgp_state() {'):source.index('\n# Optional browser')]
 setup='''set -euo pipefail
-batch=$1; started=$SECONDS; stage_name=BGP; stage=probe; verbose=1; ncpid=''; bgp_writer_pid=''
+batch=$1; started=$SECONDS; stage_name=BGP; stage=probe; verbose=1; ncpid=''
 progress(){ printf '%s\\n' "$*" >&2; }
 finish_progress(){ :; }
-cleanup(){ for pid in "$ncpid" "$bgp_writer_pid"; do if [ -n "$pid" ]; then kill "$pid" 2>/dev/null || :; wait "$pid" 2>/dev/null || :; fi; done; }
+cleanup(){ if [ -n "$ncpid" ]; then kill "$ncpid" 2>/dev/null || :; wait "$ncpid" 2>/dev/null || :; fi; }
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
@@ -76,7 +76,7 @@ with tempfile.TemporaryDirectory(prefix='subnet-bgp-') as directory:
    if mode=='prefix':assert 'не содержащую' in state['errors'][0]['message']
    if mode=='asn':assert 'без корректного ASN' in state['errors'][0]['message']
    evidence.append({'mode':mode,'calls':calls,'state':state,'stderr':err});print('PASS BGP',mode,flush=True)
-  # A stalled receiver must not block the parent while writing a large FIFO input.
+  # A stalled receiver with a large input must not block timeouts or cleanup.
   ips.write_text('2.2.2.2\n'*20000);sleeps.write_text('');env['MODE']='blocked'
   proc=subprocess.Popen(['bash','-c',code,'test',str(root)],env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
   deadline=time.monotonic()+6

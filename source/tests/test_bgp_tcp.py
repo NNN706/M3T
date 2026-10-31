@@ -1,10 +1,10 @@
 """Real loopback TCP WHOIS: delayed replies, streaming, batching 1339 IPs."""
-import argparse,ipaddress,json,os,pathlib,shlex,shutil,socketserver,subprocess,tempfile,threading,time
+import argparse,ipaddress,json,os,pathlib,shlex,shutil,signal,socketserver,subprocess,tempfile,threading,time
 p=argparse.ArgumentParser();p.add_argument('--script',type=pathlib.Path,default=pathlib.Path(__file__).resolve().parents[1]/'SubnetResolve.sh');args=p.parse_args();source=args.script.read_text();helpers=source[source.index('bgp_state() {'):source.index('\n# Optional browser')]
 setup='''set -euo pipefail
-batch=$1; stage_name=BGP; stage=loopback; verbose=0; ncpid=''; bgp_writer_pid=''
+batch=$1; stage_name=BGP; stage=loopback; verbose=0; ncpid=''
 progress(){ :; }
-cleanup(){ for pid in "$ncpid" "$bgp_writer_pid"; do if [ -n "$pid" ]; then kill "$pid" 2>/dev/null || :; wait "$pid" 2>/dev/null || :; fi; done; }
+cleanup(){ if [ -n "$ncpid" ]; then kill "$ncpid" 2>/dev/null || :; wait "$ncpid" 2>/dev/null || :; fi; }
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
@@ -45,10 +45,18 @@ with tempfile.TemporaryDirectory(prefix='bgp-tcp-') as directory:
   server.mode=mode;server.calls=[]
   ips=[str(ipaddress.IPv4Address(int(ipaddress.IPv4Address('11.0.0.1'))+i)) for i in range(count)]
   (root/'ips').write_text('\n'.join(ips)+'\n')
-  start=time.monotonic();proc=subprocess.run(['bash','-c',code,'test',directory],env={**os.environ,'PATH':str(bin)+':'+os.environ['PATH'],'BGP_TEST_PORT':str(server.server_address[1])},capture_output=True,text=True,timeout=45);elapsed=time.monotonic()-start
-  state=json.loads(proc.stdout);calls=server.calls.copy()
+  start=time.monotonic();proc=subprocess.Popen(['bash','-c',code,'test',directory],env={**os.environ,'PATH':str(bin)+':'+os.environ['PATH'],'BGP_TEST_PORT':str(server.server_address[1])},stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
+  try:out,err=proc.communicate(timeout=45)
+  except subprocess.TimeoutExpired:
+   os.killpg(proc.pid,signal.SIGTERM)
+   try:out,err=proc.communicate(timeout=3)
+   except subprocess.TimeoutExpired:
+    os.killpg(proc.pid,signal.SIGKILL);out,err=proc.communicate()
+   raise AssertionError('TCP case exceeded 45 seconds: '+mode+'; '+err[-1000:])
+  elapsed=time.monotonic()-start
+  state=json.loads(out);calls=server.calls.copy()
   assert all(0<len(c)<=100 for c in calls),(mode,[len(c) for c in calls])
-  assert proc.returncode==(1 if mode=='incomplete' else 0),(mode,proc.stderr,state)
+  assert proc.returncode==(1 if mode=='incomplete' else 0),(mode,err,state)
   if mode=='incomplete':
    assert [len(c) for c in calls]==[100,1,100,1,5,1],calls
    assert len(state['routes'])==202 and len(state['errors'])==3,state
