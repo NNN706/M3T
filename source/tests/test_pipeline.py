@@ -32,7 +32,9 @@ if name=='curl':
  else:
   host=urllib.parse.urlsplit(url).hostname;log('site',host)
   if mode=='site' and host.startswith('bad'):print('curl: (22) The requested URL returned error: 503',file=sys.stderr);sys.exit(22)
-  print('ok')
+  pathlib.Path(args[args.index('-o')+1]).write_text('ok')
+  pathlib.Path(args[args.index('-D')+1]).write_text('HTTP/1.1 200 OK\r\n\r\n')
+  print('200\t'+url+'\t0\t0.01\t0.02\t0.03')
 elif name=='nc':
  ips=[]
  for line in sys.stdin:

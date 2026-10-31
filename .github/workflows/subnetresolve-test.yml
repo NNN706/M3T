@@ -63,6 +63,11 @@ jobs:
         run: |
           set -euo pipefail
           python3 source/tests/test_tls.py --live 2>&1 | tee "$TEST_ARTIFACTS/live.log"
+      - name: Live website redirect diagnostics
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 source/tests/test_http.py --live-sites 2>&1 | tee "$TEST_ARTIFACTS/live-sites.log"
       - name: Save test results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

@@ -19,6 +19,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
    accept=base64.b64encode(hashlib.sha1(key.encode()).digest()).decode()
    self.send_response(101);self.send_header('Upgrade','websocket');self.send_header('Connection','Upgrade');self.send_header('Sec-WebSocket-Accept',accept);self.end_headers();return
   port=self.server.server_port
+  if self.path.startswith('/Redirect'):
+   self.send_response(307);self.send_header('Location',f'http://api.localhost:{port}/Start?Case=YES');self.end_headers();return
   if self.path.startswith('/Start'):
    body=f'''<html><body style="height:8000px"><script>
 fetch('http://api.localhost:{port}/data');
@@ -30,14 +32,14 @@ addEventListener('scroll',()=>fetch('http://lazy.localhost:{port}/data'),{{once:
   else:body='ok'
   self.send_response(403 if self.path.startswith('/Denied') else 200);self.send_header('Access-Control-Allow-Origin','*');self.send_header('Content-Type','text/html');self.end_headers();self.wfile.write(body.encode())
 server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Handler);threading.Thread(target=server.serve_forever,daemon=True).start()
-seed=f'http://site.localhost:{server.server_port}/Start?Case=YES'
+seed=f'http://site.localhost:{server.server_port}/Redirect?Case=YES'
 (root/'parse-seeds.json').write_text(json.dumps([seed]))
 env={**os.environ,'SUBNET_PLAYWRIGHT':runtime,'XDG_CACHE_HOME':str(cache)}
 p=subprocess.run(['node',str(root/'extracted-parse.cjs'),str(root/'parse-seeds.json'),str(root/'parse-discovery.json'),str(root/'parse-progress')],env=env,capture_output=True,text=True,timeout=65)
 assert p.returncode==0,(p.stdout,p.stderr)
 d=json.loads((root/'parse-discovery.json').read_text());expected={'site.localhost','api.localhost','delayed.localhost','socket.localhost','frame.localhost','lazy.localhost'}
 assert set(d['domains'])==expected,d
-assert d['complete'] and not p.stdout
+assert d['complete'] and not p.stdout and 'Редирект:' in p.stderr
 print('PASS real Chromium: JS, delayed fetch, dedup, iframe, WebSocket, scroll, URL path/case preserved',flush=True)
 # Same browser through the full Bash entrypoint, with DNS/BGP mock executables.
 bin=root/'parse-bin';bin.mkdir(exist_ok=True)
@@ -57,11 +59,11 @@ for file in bin.iterdir():file.chmod(0o755)
 env.update(PATH=str(bin)+':'+env['PATH'],SENT=str(root/'parse-sent'))
 (root/'parse-sent').write_text('')
 p=subprocess.run(['/bin/bash',str(script),'-parse','-4s',seed],env=env,text=True,capture_output=True,timeout=90)
-assert p.returncode==0,p.stderr
+assert p.returncode==0 and 'Редирект' in p.stderr,p.stderr
 r=json.loads(p.stdout);assert set(r)=={'ip','domain'} and r['domain']==['domain:'+h for h in sorted(expected)] and r['ip']==['1.1.1.0/24'],r
 transactions=(root/'parse-sent').read_text().split('end\n');assert transactions[0].splitlines().count('1.1.1.1')==1 and transactions[1].splitlines().count('1.1.1.1')==1 and len(transactions)==3
 print('PASS full -parse -4s: one JSON, unique domain: entries, one unique IP sent to BGP for six domains',flush=True)
-p=subprocess.run(['/bin/bash',str(script),'-parse','-vs',seed.replace('/Start?Case=YES','/Denied')],env=env,text=True,capture_output=True,timeout=65)
+p=subprocess.run(['/bin/bash',str(script),'-parse','-vs',seed.replace('/Redirect?Case=YES','/Denied')],env=env,text=True,capture_output=True,timeout=65)
 assert p.returncode==3,p.stderr
 r=json.loads(p.stdout);assert r['domain']==[] and not r['complete'] and 'отказал' in r['discovery']['pages'][0]['errors'][0] and 'domains' in r,r
 assert 'отказал' in p.stderr and 'Ресурсы страницы не загружены' in p.stderr and 'код выхода' not in p.stderr and 'код результата' not in p.stderr

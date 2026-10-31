@@ -185,14 +185,14 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 fetch_http() {
-  local expected=$1 attempt rc tls_mode=default
+  local expected=$1 attempt rc tls_mode=default meta status effective redirects tcp tls first challenge locations redirect_note
   local tls_args=()
   shift
   # check/object are Check-Host API requests; site preflight keeps its TLS defaults.
   if [ "$expected" != site ]; then tls_mode=tls12; fi
   http_reason=''; http_transport_failed=0
   for attempt in 1 2; do
-    rc=0
+    rc=0; redirect_note=''
     tls_args=()
     if [ "$tls_mode" = tls12 ]; then tls_args=(--tlsv1.2 --tls-max 1.2); fi
     if [ "$verbose" -eq 1 ] && [ "$expected" != site ]; then
@@ -201,13 +201,42 @@ fetch_http() {
     else
       progress "$stage; попытка $attempt/2"
     fi
-    curl ${tls_args[@]+"${tls_args[@]}"} -fsS --connect-timeout 1.5 --max-time 1.5 "$@" > "$batch/http-response" 2> "$batch/http-error" &
+    : > "$batch/http-headers"
+    : > "$batch/http-meta"
+    : > "$batch/http-response"
+    if [ "$expected" = site ]; then
+      # Keep response bodies even on HTTP errors: challenge pages carry evidence.
+      curl -sS --connect-timeout 1.5 --max-time 1.5 -L --max-redirs 50 \
+        --proto '=http,https' --proto-redir '=http,https' \
+        -D "$batch/http-headers" -o "$batch/http-response" \
+        -w '%{http_code}\t%{url_effective}\t%{num_redirects}\t%{time_connect}\t%{time_appconnect}\t%{time_starttransfer}\n' \
+        "$@" > "$batch/http-meta" 2> "$batch/http-error" &
+    else
+      curl ${tls_args[@]+"${tls_args[@]}"} -fsS --connect-timeout 1.5 --max-time 1.5 "$@" > "$batch/http-response" 2> "$batch/http-error" &
+    fi
     http_pid=$!
     while kill -0 "$http_pid" 2>/dev/null; do
       sleep 0.1
     done
     wait "$http_pid" || rc=$?
     http_pid=''
+    if [ "$expected" = site ]; then
+      meta=$(cat "$batch/http-meta" | tr -d '\000-\010\013-\037\177')
+      status=000; effective=''; redirects=0; tcp=0; tls=0; first=0
+      IFS=$'\t' read -r status effective redirects tcp tls first <<< "$meta" || :
+      # Header values are untrusted: remove control characters before diagnostics.
+      locations=$(jq -Rrs 'split("\n") | map(gsub("[\u0000-\u001f\u007f]"; "")) | map(select(test("^location:"; "i")) | sub("^[^:]+: *"; "")) | join(" → ")' "$batch/http-headers")
+      if [ -n "$locations" ]; then
+        finish_progress
+        printf '[%s] Редирект (%s): %s; конечный URL: %s\n' "$stage_name" "$stage" "$locations" "$effective" >&2
+      fi
+      challenge=0
+      if jq -Rrse 'test("(?im)^cf-mitigated: *challenge\r?$")' "$batch/http-headers" >/dev/null; then challenge=1; fi
+      if [ "$rc" -eq 0 ]; then
+        case "$status" in [45][0-9][0-9]) rc=22 ;; esac
+        if [ "$challenge" -eq 1 ]; then rc=22; fi
+      fi
+    fi
     if [ "$rc" -eq 0 ]; then
       if [ "$expected" = site ] ||
          { [ "$expected" = object ] && jq -e 'type == "object"' "$batch/http-response" >/dev/null 2>&1; } ||
@@ -232,6 +261,36 @@ fetch_http() {
         60) http_reason='Не удалось проверить сертификат HTTPS' ;;
         *) http_reason='Сетевой запрос завершился ошибкой' ;;
       esac
+    fi
+    if [ "$expected" = site ]; then
+      case "$rc" in
+        22)
+          case "$status" in
+            401) http_reason='Страница требует авторизацию' ;;
+            403) http_reason='Сайт отказал в доступе. Ресурсы страницы не загружены (HTTP 403)' ;;
+            404) http_reason='Страница не найдена (HTTP 404)' ;;
+            429) http_reason='Сервер ограничил частоту запросов (HTTP 429)' ;;
+            [5][0-9][0-9]) http_reason="Ошибка сервера сайта (HTTP $status)" ;;
+            [4][0-9][0-9]) http_reason="Сервер отклонил запрос (HTTP $status)" ;;
+          esac
+          if [ "$challenge" -eq 1 ]; then http_reason="Cloudflare challenge: страница проверки браузера; ресурсы сайта не загружены (HTTP $status)"; fi ;;
+        47) http_reason='Превышен предел 50 редиректов: возможен цикл переходов' ;;
+        28)
+          if [ "${tcp:-0}" = 0.000000 ] || [ "${tcp:-0}" = 0 ]; then http_reason='Нет ответа за 1,5 секунды: не завершено подключение к серверу'
+          elif [[ "$effective" = https://* ]] && { [ "${tls:-0}" = 0.000000 ] || [ "${tls:-0}" = 0 ]; }; then http_reason='Нет ответа за 1,5 секунды: не завершено TLS-согласование'
+          elif [ "${first:-0}" = 0.000000 ] || [ "${first:-0}" = 0 ]; then http_reason='Нет ответа за 1,5 секунды: сервер не начал HTTP-ответ'
+          else http_reason='Не завершена загрузка страницы за 1,5 секунды'; fi ;;
+      esac
+      if [ -n "$locations" ]; then
+        redirect_note="; ошибка после редиректа, конечный URL: $effective"
+        if [ "$rc" -eq 28 ]; then
+          http_reason='Истёк общий лимит 1,5 секунды на переходы и загрузку страницы'
+        fi
+      fi
+      if [ "$rc" -ne 0 ] && [ -n "$effective" ]; then
+        finish_progress
+        printf '[%s] %s: %s%s (попытка %s/2)\n' "$stage_name" "$effective" "$http_reason" "$redirect_note" "$attempt" >&2
+      fi
     fi
     if [ "$attempt" -eq 1 ]; then
       if [ "$expected" != site ]; then
@@ -299,7 +358,7 @@ if [ "$parse" -eq 1 ]; then
   while IFS= read -r seed; do
     site=$(normalize_domain "$seed")
     stage="$site: открытие страницы через curl"
-    if fetch_http site -L --max-redirs 5 --proto '=http,https' "$seed" > /dev/null; then
+    if fetch_http site "$seed" > /dev/null; then
       printf '%s\n' "$seed" >> "$batch/accepted-seeds"
     else
       jq -nc --arg site "$site" --arg message "$http_reason" '{site:$site, domains:[], skipped:true, errors:[$message + "; сайт пропущен до запуска Chromium"]}' >> "$batch/skipped-pages"
@@ -345,7 +404,11 @@ async function main() {
     const seen = new Set(), errors = new Set();
     const context = await browser.newContext({viewport:{width:1365,height:900},acceptDownloads:false});
     const record = raw => { const h = hostname(raw); if(h) { domains.add(h); seen.add(h); } };
-    context.on('request', req => record(req.url()));
+    context.on('request', req => {
+      record(req.url());
+      const previous = req.redirectedFrom();
+      if (previous) console.error(`[Этап 2/4: браузер] Редирект: ${previous.url()} → ${req.url()}`);
+    });
     context.on('page', p => p.on('websocket', ws => record(ws.url())));
     const page = await context.newPage();
     fs.writeFileSync(progressPath, `${i+1}/${seeds.length}: ${origin}; загрузка и прокрутка`);

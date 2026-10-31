@@ -18,7 +18,12 @@ assert a[a.index('--max-time')+1]=='1.5' and a[a.index('--connect-timeout')+1]==
 if n==1 or os.environ.get('TLS_ALWAYS')=='1':
  if code==-1:print('bad json');sys.exit(0)
  if code:sys.exit(code)
-print('{"ok":1,"request_id":"abc","nodes":{"n":[]},"permanent_link":"https://check-host.net/check-report/abc"}')
+body='{"ok":1,"request_id":"abc","nodes":{"n":[]},"permanent_link":"https://check-host.net/check-report/abc"}'
+if '-o' in a:
+ pathlib.Path(a[a.index('-o')+1]).write_text(body)
+ pathlib.Path(a[a.index('-D')+1]).write_text('HTTP/1.1 200 OK\r\n\r\n')
+ print('200\t'+a[-1]+'\t0\t0.01\t0.02\t0.03')
+else:print(body)
 '''
 with tempfile.TemporaryDirectory() as directory:
  root=pathlib.Path(directory)
