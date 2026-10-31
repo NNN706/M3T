@@ -171,6 +171,9 @@ stage_name='Подготовка'
 stage='подготовка запроса'
 progress() {
   if [ "$verbose" -eq 1 ]; then
+    local event_key="$stage_name|$*"
+    [ "${last_progress_event:-}" != "$event_key" ] || return 0
+    last_progress_event=$event_key
     printf '[%3ds] [%s] %s\n' "$((SECONDS - started))" "$stage_name" "$*" >&2
   elif [ -t 2 ]; then
     local rendered term_size term_cols count row
@@ -225,8 +228,10 @@ fetch_http() {
     tls_args=()
     if [ "$tls_mode" = tls12 ]; then tls_args=(--tlsv1.2 --tls-max 1.2); fi
     if [ "$verbose" -eq 1 ] && [ "$expected" != site ]; then
+      if [ "$expected" != object ] || [ "$attempt" -gt 1 ] || [ "$wait_started" -ge 0 ]; then
       if [ "$tls_mode" = tls12 ]; then progress "$stage; попытка $attempt/2; TLS 1.2"
       else progress "$stage; попытка $attempt/2; обычное согласование TLS"; fi
+      fi
     elif [ "$expected" != site ] || [ "$verbose" -eq 0 ]; then
       progress "$stage; попытка $attempt/2"
     fi
@@ -342,7 +347,7 @@ fetch_http() {
     if [ "$wait_started" -lt 0 ]; then wait_started=$SECONDS; fi
     progress "$stage; тайм-аут API Check-Host; Ждём $wait_delay с"
     for ((wait_left=wait_delay; wait_left>0; wait_left--)); do
-      if [ "$verbose" -eq 0 ] || [ "$((wait_left % 5))" -eq 0 ]; then
+      if [ "$verbose" -eq 0 ]; then
         progress "$stage; ожидание API Check-Host — повтор через $wait_left с"
       fi
       sleep 1
@@ -480,7 +485,7 @@ bgp_exchange() {
     recovering=1
     progress "BGP.tools: $transport_reason; ждём $wait_delay с; недостающих IP: $remaining"
     for ((wait_left=wait_delay; wait_left>0; wait_left--)); do
-      if [ "$verbose" -eq 0 ] || [ "$((wait_left % 5))" -eq 0 ]; then progress "BGP.tools: ожидание ответа — повтор через $wait_left с"; fi
+      if [ "$verbose" -eq 0 ]; then progress "BGP.tools: ожидание ответа — повтор через $wait_left с"; fi
       sleep 1
     done
     wait_delay=$((wait_delay * 2)); [ "$wait_delay" -le 30 ] || wait_delay=30
