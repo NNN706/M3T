@@ -4,9 +4,10 @@ set -euo pipefail
 export LC_ALL=C
 usage() {
   cat <<'HELP'
-Usage: SubnetResolve.sh [-parse] [-v] [-4] [-s] [domain-or-URL ...]
+Usage: SubnetResolve.sh [-parse] [-rules] [-v] [-4] [-s] [domain-or-URL ...]
   No arguments: enter domains or HTTP(S) URLs separated by spaces.
   -parse  Discover site request domains with headless Chromium, then DNS/BGP.
+  -rules  Output per-service Xray rule fragments: {"rules":[{"ruleTag":...,"ip":[...]}]}.
   -v  Detailed progress log and complete Check-Host node metadata.
   -4  Output only unique IPv4 BGP prefixes: {"ip":[...]}.
   -s  Never ask to save and never save resolved.json.
@@ -21,11 +22,12 @@ finish_progress() {
   if [ "$progress_active" -eq 1 ]; then printf '\n' >&2; progress_active=0; fi
 }
 die() { finish_progress; printf 'Ошибка: %s\n' "$*" >&2; exit 1; }
-verbose=0; prefixes=0; silent=0; parse=0
+verbose=0; prefixes=0; silent=0; parse=0; rules=0
 args=()
 while [ "$#" -gt 0 ]; do
   case "$1" in
     -parse|--parse) parse=1 ;;
+    -rules|--rules) rules=1 ;;
     --) shift; while [ "$#" -gt 0 ]; do args+=("$1"); shift; done; break ;;
     -*)
       flags=${1#-}
@@ -160,6 +162,7 @@ done
 unset input input_line
 batch=$(mktemp -d "${TMPDIR:-/tmp}/SubnetResolve.XXXXXXXX")
 tmp=$batch
+printf '%s\n' "${domains[@]}" | jq -Rs 'split("\n") | map(select(length>0)) | unique' > "$batch/services.json"
 ncpid=''
 http_pid=''
 parse_pid=''
@@ -778,11 +781,13 @@ fi
 if ! jq -e .complete "$tmp/batch.json" >/dev/null; then
   status=3
   finish_progress
-  printf 'Для части доменов, узлов или IP не удалось получить DNS/BGP-данные:\n' >&2
-  jq -r '.domains[] | .domain as $d | .errors[] |
+  if [ "$verbose" -eq 1 ] || jq -e '[.domains[].errors[] | select(.check_host == null)] | length>0' "$tmp/batch.json" >/dev/null; then
+  printf 'Для части доменов или IP не удалось получить DNS/BGP-данные:\n' >&2
+  jq -r --argjson verbose "$verbose" '.domains[] | .domain as $d | .errors[] | select($verbose == 1 or .check_host == null) |
     "[\($d)] \(.check_host // .ip // "Check-Host")" +
     (if .country != null or .city != null then " [\(.country // "—"), \(.city // "—")]" else "" end) +
     ": \(.error)" + (if .message != null and .message != .error then " — \(.message)" else "" end)' "$tmp/batch.json" >&2
+  fi
   if [ "$verbose" -eq 1 ]; then
     jq -c '.domains[] | .domain as $d | .errors[] | {domain: $d} + .' "$tmp/batch.json" >&2
   fi
@@ -804,6 +809,18 @@ if [ "$parse" -eq 1 ]; then
     jq --slurpfile d "$batch/discovery.json" '. + {domain: ($d[0].domains | map("domain:" + .)), discovery: $d[0], complete: (.complete and $d[0].complete)}' "$tmp/batch.json" > "$tmp/parsed-output.json"
   fi
   mv "$tmp/parsed-output.json" "$tmp/output.json"
+fi
+if [ "$rules" -eq 1 ]; then
+  if [ "$parse" -eq 1 ]; then
+    cp "$batch/discovery.json" "$batch/rule-discovery.json"
+  else
+    printf '{"pages":[]}\n' > "$batch/rule-discovery.json"
+  fi
+  jq -n --slurpfile services "$batch/services.json" --slurpfile data "$batch/batch.json" --slurpfile discovery "$batch/rule-discovery.json" '
+    {rules: [$services[0][] as $service |
+      ([$service] + [$discovery[0].pages[] | select(.site==$service) | .domains[]] | unique) as $hosts |
+      {ruleTag:$service, ip: ([$data[0].domains[] | . as $d | select($hosts | index($d.domain)) | .results[].prefix] | unique | sort)}]}
+  ' > "$tmp/output.json"
 fi
 stage_name='Результат'
 if [ "$status" -eq 0 ]; then

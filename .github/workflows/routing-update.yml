@@ -1,0 +1,43 @@
+name: Update service routing prefixes
+on:
+  workflow_dispatch:
+  push:
+    branches: [test]
+    paths:
+      - 'source/routing/sites.txt'
+permissions:
+  contents: write
+concurrency:
+  group: routing-update-test
+  cancel-in-progress: false
+jobs:
+  update:
+    if: github.ref == 'refs/heads/test'
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 120
+    steps:
+      - name: Verify runner
+        run: test "$RUNNER_NAME" = Admiralteskiy
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: test
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Test routing generator
+        run: python3 source/tests/test_routing.py
+      - name: Scan sites and compact prefixes
+        env:
+          XDG_CACHE_HOME: ${{ runner.temp }}/subnetresolve-cache
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/subnetresolve-browsers
+        run: python3 source/routing/update_routing.py
+      - name: Commit changed IP.txt to test
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- source/routing/IP.txt
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Update service routing prefixes'
+          git push origin HEAD:test
