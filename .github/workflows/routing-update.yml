@@ -24,6 +24,21 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
+      - name: Prepare Chromium without interactive sudo
+        shell: bash
+        env:
+          XDG_CACHE_HOME: ${{ runner.temp }}/subnetresolve-cache
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/subnetresolve-browsers
+        run: |
+          set -euo pipefail
+          runtime="$XDG_CACHE_HOME/SubnetResolve/playwright-1.64.1"
+          mkdir -p "$runtime"
+          npm install --prefix "$runtime" --no-audit --no-fund --ignore-scripts playwright@1.64.1
+          node "$runtime/node_modules/playwright/cli.js" install --only-shell chromium
+          PLAYWRIGHT_MODULE="$runtime/node_modules/playwright" node -e '
+            require(process.env.PLAYWRIGHT_MODULE).chromium.launch({headless:true})
+              .then(browser => browser.close()).catch(error => {console.error(error.message);process.exit(1)});
+          '
       - name: Test routing generator
         run: python3 source/tests/test_routing.py
       - name: Scan sites and compact prefixes
