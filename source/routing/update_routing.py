@@ -49,11 +49,12 @@ def main():
     parser.add_argument('--sites', type=Path, default=root / 'sites.txt')
     parser.add_argument('--output', type=Path, default=root / 'IP.txt')
     parser.add_argument('--allow-partial', action='store_true', help='Keep available prefixes and union previous entries on incomplete scans')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed scanner stages on stderr')
     parser.add_argument('--evidence', type=Path, help='Directory for raw scan output and completeness report')
     parser.add_argument('--scanner', type=Path, default=root.parent / 'SubnetResolve.sh')
     args = parser.parse_args()
     entries = services(args.sites)
-    scan = subprocess.run(['bash', str(args.scanner), '-parse', '-rules', '-s', '--', *[value for _, value in entries]],
+    scan = subprocess.run(['bash', str(args.scanner), '-parse', '-rules', '-s', *(['-v'] if args.verbose else []), '--', *[value for _, value in entries]],
                           stdout=subprocess.PIPE, text=True, timeout=6600)
     if args.evidence:
         args.evidence.mkdir(parents=True, exist_ok=True)
