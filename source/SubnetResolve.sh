@@ -378,14 +378,17 @@ bgp_state() {
       (try ((.[2]|split("/")) as $p | pow(2;32-($p[1]|tonumber)) as $size |
         ((.[1]|ipnum)/$size|floor) == (($p[0]|ipnum)/$size)) catch false);
     ($wanted|split("\n")|map(select(length>0))|unique) as $ips |
+    ($ips|map({key:.,value:true})|from_entries) as $wanted_set |
     ($raw|split("\n")|map(split("|")|map(gsub("^\\s+|\\s+$";"")))|
-      map(select(length>=7) | select(.[1] as $ip | $ips|index($ip)!=null))) as $rows |
+      map(select(length>=7) | select(.[1] as $ip | $wanted_set[$ip]==true))) as $rows |
     ($rows|map(select(valid))) as $valid |
+    ($valid|map({key:.[1],value:true})|from_entries) as $valid_set |
+    ($rows|map({key:.[1],value:.})|from_entries) as $row_map |
     {routes: ($valid|map({ip:.[1],asn:("AS"+.[0]),prefix:.[2],country:.[3],registry:.[4],
       allocated:(if .[5]=="0001-01-01" or .[5]=="" then null else .[5] end),as_name:(.[6:]|join(" | "))})|unique),
-     pending: ($ips-[$rows[][1]]),
-     errors: [$ips[] as $ip | select(all($valid[]; .[1]!=$ip)) |
-       ([$rows[]|select(.[1]==$ip)]|last) as $row |
+     pending: [$ips[]|select($row_map[.]==null)],
+     errors: [$ips[] as $ip | select($valid_set[$ip]!=true) |
+       $row_map[$ip] as $row |
        {ip:$ip,error:"Не получены BGP-префикс и ASN",message:
          (if $row==null then "В ответе WHOIS нет записи для этого IP"
           elif ($row[0]=="NA" or $row[0]=="N/A" or $row[0]=="0" or $row[0]=="") and ($row[2]=="NA" or $row[2]=="N/A" or $row[2]=="") then "BGP.tools ответил, но не указал анонсируемую подсеть и ASN для этого IP"
@@ -394,60 +397,97 @@ bgp_state() {
   ' > "$state"
 }
 bgp_exchange() {
-  local ip_file=$1 target=$2 attempt tick rc timed_out cycle_timeout wait_delay=5 wait_left recovering=0 cycle_remaining
+  local ip_file=$1 target=$2 attempt rc timed_out reply_complete
+  local wait_delay=5 wait_left recovering=0 cycle_timeout before_count remaining total
+  local began last_data last_size size now transport_reason
   : > "$target"
-  cp "$ip_file" "$batch/bgp-pending"
+  : > "$batch/bgp-unanswered"
   bgp_state "$ip_file" "$target" "$batch/bgp-state.json"
+  total=$(jq '.pending|length' "$batch/bgp-state.json")
   while :; do
+    jq -nr --slurpfile state "$batch/bgp-state.json" --rawfile skipped "$batch/bgp-unanswered" '
+      $state[0].pending - ($skipped|split("\n")|map(select(length>0))) | .[]
+    ' > "$batch/bgp-work"
+    if [ ! -s "$batch/bgp-work" ]; then
+      jq -e '.errors|length==0' "$batch/bgp-state.json" >/dev/null
+      return $?
+    fi
+    jq -Rrs 'split("\n")|map(select(length>0))|.[:100][]' "$batch/bgp-work" > "$batch/bgp-request"
     cycle_timeout=0
-    cycle_remaining=$(wc -l < "$batch/bgp-pending" | tr -d ' ')
+    before_count=$(jq '.pending|length' "$batch/bgp-state.json")
     for attempt in 1 2; do
-      progress "$stage; не получено IP: $(wc -l < "$batch/bgp-pending" | tr -d ' '); попытка $attempt/2"
+      progress "$stage; обработано: $((total - before_count))/$total; в пакете: $(wc -l < "$batch/bgp-request" | tr -d ' '); попытка $attempt/2"
       rm -f "$batch/bgp-input"
       mkfifo "$batch/bgp-input"
       exec 3<> "$batch/bgp-input"
-      rc=0; timed_out=0
-      { printf 'begin\nverbose\n'; cat "$batch/bgp-pending"; printf 'end\n'; } > "$batch/bgp-payload"
-      nc -w 2 bgp.tools 43 < "$batch/bgp-input" > "$batch/bgp-attempt" 2> "$batch/bgp-error" &
+      rc=0; timed_out=0; reply_complete=0
+      { printf 'begin\nverbose\n'; cat "$batch/bgp-request"; printf 'end\n'; } > "$batch/bgp-payload"
+      : > "$batch/bgp-attempt"
+      nc -w 10 bgp.tools 43 < "$batch/bgp-input" > "$batch/bgp-attempt" 2> "$batch/bgp-error" &
       ncpid=$!
-      # Write asynchronously: a large input must not block the watchdog.
       cat "$batch/bgp-payload" >&3 &
       bgp_writer_pid=$!
-      for ((tick=0; tick<15; tick++)); do
-        kill -0 "$ncpid" 2>/dev/null || break
+      began=$SECONDS; last_data=$SECONDS; last_size=0
+      transport_reason='тайм-аут ожидания WHOIS-ответа'
+      while kill -0 "$ncpid" 2>/dev/null; do
+        size=$(wc -c < "$batch/bgp-attempt" | tr -d ' ')
+        if [ "$size" -gt "$last_size" ]; then
+          last_data=$SECONDS; last_size=$size
+          # Only complete lines can confirm that every requested IP has an answer.
+          jq -Rrs 'split("\n")|.[:-1][]|select(length>0)' "$batch/bgp-attempt" > "$batch/bgp-live-lines"
+          bgp_state "$batch/bgp-request" "$batch/bgp-live-lines" "$batch/bgp-live-state.json"
+          if jq -e '.pending|length==0' "$batch/bgp-live-state.json" >/dev/null; then
+            reply_complete=1
+            kill "$ncpid" 2>/dev/null || :
+            break
+          fi
+        fi
+        now=$SECONDS
+        if [ "$((now - last_data))" -ge 10 ] || [ "$((now - began))" -ge 30 ]; then
+          timed_out=1
+          kill "$ncpid" 2>/dev/null || :
+          break
+        fi
         sleep 0.1
       done
-      if kill -0 "$ncpid" 2>/dev/null; then timed_out=1; kill "$ncpid" 2>/dev/null || :; fi
       wait "$ncpid" 2>/dev/null || rc=$?
       ncpid=''
       if kill -0 "$bgp_writer_pid" 2>/dev/null; then kill "$bgp_writer_pid" 2>/dev/null || :; fi
       wait "$bgp_writer_pid" 2>/dev/null || :
       bgp_writer_pid=''; exec 3>&-
-      # Do not join a truncated last line with the next response.
+      if [ "$reply_complete" -eq 1 ]; then rc=0; fi
+      # Some nc variants return success on their own idle timeout.
+      if [ "$reply_complete" -eq 0 ] && [ "$((SECONDS - last_data))" -ge 9 ]; then timed_out=1; fi
+      if [ "$timed_out" -eq 0 ] && [ "$rc" -ne 0 ]; then transport_reason='ошибка TCP-соединения'; fi
       jq -Rrs --argjson truncated "$timed_out" '
         if $truncated==1 and (endswith("\n")|not) then split("\n")|.[:-1][] else split("\n")[] end | select(length>0)
       ' "$batch/bgp-attempt" >> "$target"
       bgp_state "$ip_file" "$target" "$batch/bgp-state.json"
-      jq -r '.pending[]' "$batch/bgp-state.json" > "$batch/bgp-pending"
-      if [ ! -s "$batch/bgp-pending" ]; then
-        if [ "$recovering" -eq 1 ]; then
-          progress 'BGP.tools снова отвечает; полученные записи сохранены' 
-        fi
-        jq -e '.errors|length==0' "$batch/bgp-state.json" >/dev/null
-        return $?
+      bgp_state "$batch/bgp-request" "$target" "$batch/bgp-request-state.json"
+      jq -r '.pending[]' "$batch/bgp-request-state.json" > "$batch/bgp-next-request"
+      mv "$batch/bgp-next-request" "$batch/bgp-request"
+      remaining=$(jq '.pending|length' "$batch/bgp-state.json")
+      if [ "$recovering" -eq 1 ] && [ "$remaining" -lt "$before_count" ]; then
+        progress 'BGP.tools снова отвечает; полученные записи сохранены'
+        recovering=0
       fi
+      if [ ! -s "$batch/bgp-request" ]; then break; fi
       if [ "$timed_out" -eq 1 ] || [ "$rc" -ne 0 ]; then cycle_timeout=1; fi
     done
-    if [ "$cycle_timeout" -eq 0 ]; then
-      # Completed TCP responses with missing/invalid data are not timeouts.
-      return 1
+    if [ ! -s "$batch/bgp-request" ]; then
+      wait_delay=5
+      continue
     fi
-    # Keep pauses short while partial responses are making progress.
-    if [ "$(wc -l < "$batch/bgp-pending" | tr -d ' ')" -lt "$cycle_remaining" ]; then wait_delay=5; fi
+    if [ "$cycle_timeout" -eq 0 ]; then
+      # Do not retry forever when a completed response omitted these IPs.
+      cat "$batch/bgp-request" >> "$batch/bgp-unanswered"
+      continue
+    fi
+    if [ "$remaining" -lt "$before_count" ]; then wait_delay=5; fi
     recovering=1
-    progress "BGP.tools: тайм-аут или ошибка TCP-соединения; ждём $wait_delay с; недостающих IP: $(wc -l < "$batch/bgp-pending" | tr -d ' ')"
+    progress "BGP.tools: $transport_reason; ждём $wait_delay с; недостающих IP: $remaining"
     for ((wait_left=wait_delay; wait_left>0; wait_left--)); do
-      if [ "$verbose" -eq 0 ] || [ "$((wait_left % 5))" -eq 0 ]; then progress "BGP.tools: ожидание связи — повтор через $wait_left с"; fi
+      if [ "$verbose" -eq 0 ] || [ "$((wait_left % 5))" -eq 0 ]; then progress "BGP.tools: ожидание ответа — повтор через $wait_left с"; fi
       sleep 1
     done
     wait_delay=$((wait_delay * 2)); [ "$wait_delay" -le 30 ] || wait_delay=30

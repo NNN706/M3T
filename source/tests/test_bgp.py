@@ -40,7 +40,7 @@ with tempfile.TemporaryDirectory(prefix='subnet-bgp-') as directory:
  ips=root/'ips';ips.write_text('2.2.2.2\n3.3.3.3\n')
  code=setup+helpers+'\nrc=0\nbgp_exchange "$batch/ips" "$batch/result" || rc=$?\ncat "$batch/bgp-state.json"\nexit "$rc"\n'
  if args.live:
-  ips.write_text('1.1.1.1\n8.8.8.8\n')
+  ips.write_text('1.1.1.1\n8.8.8.8\n23.48.248.198\n')
   proc=subprocess.Popen(['bash','-c',code,'live',str(root)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
   try:out,err=proc.communicate(timeout=15)
   except subprocess.TimeoutExpired:
@@ -52,8 +52,9 @@ with tempfile.TemporaryDirectory(prefix='subnet-bgp-') as directory:
  else:
   f=bin/'nc';f.write_text(mock);f.chmod(0o755)
   f=bin/'sleep';f.write_text('#!/bin/bash\nif [ "$1" = 0.1 ]; then exec /bin/sleep 0.03; fi\nprintf "%s\\n" "$1" >> "$SLEEPS"\n');f.chmod(0o755)
+  clock=root/'clock.sh';clock.write_text('sleep() { if [ "$1" = 0.1 ]; then SECONDS=$((SECONDS + 1)); /bin/sleep 0.03; else printf "%s\\n" "$1" >> "$SLEEPS"; fi; }\n')
   for mode in ('ok','recover','partial','long','refused','missing','na','prefix','asn','forever'):
-   trace.write_text('');sleeps.write_text('');env={**os.environ,'PATH':str(bin)+':'+os.environ['PATH'],'TRACE':str(trace),'SLEEPS':str(sleeps),'MODE':mode}
+   trace.write_text('');sleeps.write_text('');env={**os.environ,'PATH':str(bin)+':'+os.environ['PATH'],'TRACE':str(trace),'SLEEPS':str(sleeps),'MODE':mode,'BASH_ENV':str(clock)}
    proc=subprocess.Popen(['bash','-c',code,'test',str(root)],env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
    if mode=='forever':
     # Wait for evidence that backoff has started, then interrupt the whole group.
@@ -82,6 +83,6 @@ with tempfile.TemporaryDirectory(prefix='subnet-bgp-') as directory:
   while time.monotonic()<deadline and not sleeps.read_text():time.sleep(0.02)
   started_wait=bool(sleeps.read_text());os.killpg(proc.pid,signal.SIGINT);out,err=proc.communicate(timeout=3)
   assert started_wait and proc.returncode in (130,-signal.SIGINT),(proc.returncode,err)
-  print('PASS BGP large FIFO input: watchdog and cleanup remain responsive',flush=True)
+  print('PASS BGP large input: bounded batches and cleanup remain responsive',flush=True)
   if os.environ.get('TEST_ARTIFACTS'):
    dest=pathlib.Path(os.environ['TEST_ARTIFACTS']);dest.mkdir(parents=True,exist_ok=True);(dest/'bgp-tests.json').write_text(json.dumps(evidence,ensure_ascii=False,indent=2))

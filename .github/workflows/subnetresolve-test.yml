@@ -34,8 +34,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for tool in python3 jq; do
-            command -v "$tool" >/dev/null || { echo "Missing $tool. Install python3 and jq on the runner."; exit 1; }
+          for tool in python3 jq nc; do
+            command -v "$tool" >/dev/null || { echo "Missing $tool. Install python3, jq and netcat on the runner."; exit 1; }
           done
           runtime="$XDG_CACHE_HOME/SubnetResolve/playwright-1.64.1"
           mkdir -p "$runtime" "$TEST_ARTIFACTS"
@@ -71,6 +71,7 @@ jobs:
           python3 source/tests/test_progress.py 2>&1 | tee "$TEST_ARTIFACTS/progress.log"
           python3 source/tests/test_tls.py 2>&1 | tee "$TEST_ARTIFACTS/tls.log"
           python3 source/tests/test_http.py 2>&1 | tee "$TEST_ARTIFACTS/http.log"
+          python3 source/tests/test_bgp_tcp.py 2>&1 | tee "$TEST_ARTIFACTS/bgp-tcp.log"
           python3 source/tests/test_bgp.py 2>&1 | tee "$TEST_ARTIFACTS/bgp.log"
           python3 source/tests/test_wait.py 2>&1 | tee "$TEST_ARTIFACTS/wait.log"
           python3 source/tests/test_pipeline.py 2>&1 | tee "$TEST_ARTIFACTS/pipeline.log"
