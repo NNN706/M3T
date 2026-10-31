@@ -34,7 +34,7 @@ addEventListener('scroll',()=>fetch('http://lazy.localhost:{port}/data'),{{once:
 server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Handler);threading.Thread(target=server.serve_forever,daemon=True).start()
 seed=f'http://site.localhost:{server.server_port}/Redirect?Case=YES'
 (root/'parse-seeds.json').write_text(json.dumps([seed]))
-env={**os.environ,'SUBNET_PLAYWRIGHT':runtime,'XDG_CACHE_HOME':str(cache)}
+env={**os.environ,'SUBNET_PLAYWRIGHT':runtime,'XDG_CACHE_HOME':str(cache),'SUBNET_VERBOSE':'1'}
 p=subprocess.run(['node',str(root/'extracted-parse.cjs'),str(root/'parse-seeds.json'),str(root/'parse-discovery.json'),str(root/'parse-progress')],env=env,capture_output=True,text=True,timeout=65)
 assert p.returncode==0,(p.stdout,p.stderr)
 d=json.loads((root/'parse-discovery.json').read_text());expected={'site.localhost','api.localhost','delayed.localhost','socket.localhost','frame.localhost','lazy.localhost'}
@@ -62,6 +62,8 @@ p=subprocess.run(['/bin/bash',str(script),'-parse','-4s',seed],env=env,text=True
 assert p.returncode==0 and 'Редирект: site.localhost → api.localhost' in p.stderr,p.stderr
 for line in p.stderr.splitlines():
  if 'Редирект:' in line:assert 'http://' not in line and '?Case=' not in line,line
+assert '[Этап 2/4: браузер] Редирект:' not in p.stderr and 'SUBNET_PAGE_DONE' not in p.stderr,p.stderr
+assert p.stderr.count('Сбор доменов: 1/1: site.localhost; найдено доменов:')==1,p.stderr
 r=json.loads(p.stdout);assert set(r)=={'ip','domain'} and r['domain']==['domain:'+h for h in sorted(expected)] and r['ip']==['1.1.1.0/24'],r
 transactions=(root/'parse-sent').read_text().split('end\n');assert transactions[0].splitlines().count('1.1.1.1')==1 and transactions[1].splitlines().count('1.1.1.1')==1 and len(transactions)==3
 print('PASS full -parse -4s: one JSON, unique domain: entries, one unique IP sent to BGP for six domains',flush=True)

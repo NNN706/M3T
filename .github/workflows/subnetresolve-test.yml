@@ -68,6 +68,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 source/tests/test_progress.py 2>&1 | tee "$TEST_ARTIFACTS/progress.log"
           python3 source/tests/test_tls.py 2>&1 | tee "$TEST_ARTIFACTS/tls.log"
           python3 source/tests/test_http.py 2>&1 | tee "$TEST_ARTIFACTS/http.log"
           python3 source/tests/test_bgp.py 2>&1 | tee "$TEST_ARTIFACTS/bgp.log"
@@ -82,6 +83,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 source/tests/test_progress.py 2>&1 | tee "$TEST_ARTIFACTS/progress.log"
           python3 source/tests/test_tls.py --live 2>&1 | tee "$TEST_ARTIFACTS/live.log"
       - name: Live website redirect diagnostics
         shell: bash

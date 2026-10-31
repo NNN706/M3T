@@ -279,8 +279,7 @@ fetch_http() {
         fi
         if [ "$wait_started" -ge 0 ]; then
           http_wait_seconds=$((http_wait_seconds + SECONDS - wait_started))
-          finish_progress
-          printf '[%s] Check-Host снова отвечает; продолжаем: %s\n' "$stage_name" "$stage" >&2
+          progress "Check-Host снова отвечает; $stage"
         fi
         cat "$batch/http-response"
         return 0
@@ -340,8 +339,7 @@ fetch_http() {
   done
   if [ "$expected" != site ] && [ "$rc" -eq 28 ]; then
     if [ "$wait_started" -lt 0 ]; then wait_started=$SECONDS; fi
-    finish_progress
-    printf '[%s] %s: тайм-аут API Check-Host после двух попыток. Ждём %s с и повторяем тот же запрос; остановить — Ctrl+C.\n' "$stage_name" "$stage" "$wait_delay" >&2
+    progress "$stage; тайм-аут API Check-Host; Ждём $wait_delay с"
     for ((wait_left=wait_delay; wait_left>0; wait_left--)); do
       if [ "$verbose" -eq 0 ] || [ "$((wait_left % 5))" -eq 0 ]; then
         progress "$stage; ожидание API Check-Host — повтор через $wait_left с"
@@ -433,8 +431,7 @@ bgp_exchange() {
       jq -r '.pending[]' "$batch/bgp-state.json" > "$batch/bgp-pending"
       if [ ! -s "$batch/bgp-pending" ]; then
         if [ "$recovering" -eq 1 ]; then
-          finish_progress
-          printf '[%s] BGP.tools снова отвечает; полученные записи сохранены.\n' "$stage_name" >&2
+          progress 'BGP.tools снова отвечает; полученные записи сохранены' 
         fi
         jq -e '.errors|length==0' "$batch/bgp-state.json" >/dev/null
         return $?
@@ -448,8 +445,7 @@ bgp_exchange() {
     # Keep pauses short while partial responses are making progress.
     if [ "$(wc -l < "$batch/bgp-pending" | tr -d ' ')" -lt "$cycle_remaining" ]; then wait_delay=5; fi
     recovering=1
-    finish_progress
-    printf '[%s] BGP.tools: тайм-аут или ошибка TCP-соединения; ждём %s с. Повторяем только недостающие IP: %s; остановить — Ctrl+C.\n' "$stage_name" "$wait_delay" "$(wc -l < "$batch/bgp-pending" | tr -d ' ')" >&2
+    progress "BGP.tools: тайм-аут или ошибка TCP-соединения; ждём $wait_delay с; недостающих IP: $(wc -l < "$batch/bgp-pending" | tr -d ' ')"
     for ((wait_left=wait_delay; wait_left>0; wait_left--)); do
       if [ "$verbose" -eq 0 ] || [ "$((wait_left % 5))" -eq 0 ]; then progress "BGP.tools: ожидание связи — повтор через $wait_left с"; fi
       sleep 1
@@ -516,7 +512,7 @@ async function main() {
     context.on('request', req => {
       record(req.url());
       const previous = req.redirectedFrom();
-      if (previous) console.error(`[Этап 2/4: браузер] Редирект: ${hostname(previous.url()) || "неизвестный домен"} → ${hostname(req.url()) || "неизвестный домен"}`);
+      if (previous && process.env.SUBNET_VERBOSE === '1') console.error(`[Этап 2/4: браузер] Редирект: ${hostname(previous.url()) || "неизвестный домен"} → ${hostname(req.url()) || "неизвестный домен"}`);
     });
     context.on('page', p => p.on('websocket', ws => record(ws.url())));
     const page = await context.newPage();
@@ -545,6 +541,7 @@ async function main() {
     } catch { errors.add('Сбор запросов не завершился за 45 секунд. Список доменов неполный.'); }
     finally { clearTimeout(timeout); await context.close(); }
     pages.push({site:origin, domains:[...seen].sort(), errors:[...errors]});
+    console.error(`SUBNET_PAGE_DONE ${i+1}/${seeds.length}: ${origin}; найдено доменов: ${seen.size}`);
   }
   await browser.close();
   fs.writeFileSync(outputPath, JSON.stringify({domains:[...domains].sort(),pages,complete:pages.every(p=>!p.errors.length)}));
@@ -563,21 +560,30 @@ SUBNET_PARSE_JS
     SUBNET_PROBE=1 node "$batch/parse.cjs" 2> "$batch/browser-error" || { cat "$batch/browser-error" >&2; die 'Chromium не запускается: проверьте системные библиотеки и поддержку ОС.'; }
   fi
   : > "$batch/parse-messages"
-  node "$batch/parse.cjs" "$batch/seeds.json" "$batch/discovery.json" "$batch/parse-progress" 2> "$batch/parse-messages" &
+  SUBNET_VERBOSE="$verbose" node "$batch/parse.cjs" "$batch/seeds.json" "$batch/discovery.json" "$batch/parse-progress" 2> "$batch/parse-messages" &
   parse_pid=$!
   exec 4< "$batch/parse-messages"
+  browser_completed_index=''
   drain_browser_messages() {
-    local line
+    local line completed
     while IFS= read -r line <&4; do
-      finish_progress
-      printf '%s\n' "$line" >&2
+      case "$line" in
+        SUBNET_PAGE_DONE\ *)
+          completed=${line#SUBNET_PAGE_DONE }
+          browser_completed_index=${completed%%:*}
+          site_progress "Сбор доменов: $completed"
+          finish_progress ;;
+        '[Этап 2/4: браузер] Редирект:'*)
+          if [ "$verbose" -eq 1 ]; then finish_progress; printf '%s\n' "$line" >&2; fi ;;
+        *) finish_progress; printf '%s\n' "$line" >&2 ;;
+      esac
     done
   }
   while kill -0 "$parse_pid" 2>/dev/null; do
+    drain_browser_messages
     detail='запуск браузера'
     if [ -s "$batch/parse-progress" ]; then detail=$(cat "$batch/parse-progress"); fi
-    drain_browser_messages
-    progress "Сбор доменов: $detail"
+    if [ "${detail%%:*}" != "$browser_completed_index" ]; then progress "Сбор доменов: $detail"; fi
     sleep 1
   done
   parse_rc=0

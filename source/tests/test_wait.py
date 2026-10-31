@@ -56,6 +56,11 @@ with tempfile.TemporaryDirectory(prefix='subnet-wait-') as directory:
   else:assert result['results']==[]
   assert ('Ждём' in err)==(mode=='wait-budget')
   print('PASS final node response: no restart/replacement',mode,flush=True)
+ proc=run('wait-health',['good1.example','good2.example'],'-4s')
+ out,err=proc.communicate(timeout=25)
+ assert proc.returncode==0 and json.loads(out)=={'ip':['2.2.2.0/24']},err
+ assert 'Ждём' not in err and 'снова отвечает' not in err and 'Ctrl+C' not in err,err
+ print('PASS quiet redirected output: no transient API wait/recovery lines',flush=True)
  for sig,status in ((signal.SIGINT,130),(signal.SIGTERM,143)):
   proc=run('wait-forever',['good1.example'],'-4sv',real_sleep=True)
   try:
