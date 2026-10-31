@@ -234,7 +234,7 @@ fetch_http() {
     : > "$batch/http-response"
     if [ "$expected" = site ]; then
       # Keep response bodies even on HTTP errors: challenge pages carry evidence.
-      curl -sS --connect-timeout 1.5 --max-time 1.5 -L --max-redirs 50 \
+      curl -sS --connect-timeout 2 --max-time 2 -L --max-redirs 50 \
         --proto '=http,https' --proto-redir '=http,https' \
         -D "$batch/http-headers" -o "$batch/http-response" \
         -w '%{http_code}\t%{url_effective}\t%{num_redirects}\t%{time_connect}\t%{time_appconnect}\t%{time_starttransfer}\n' \
@@ -317,14 +317,14 @@ fetch_http() {
           if [ "$challenge" -eq 1 ]; then http_reason="Cloudflare challenge: страница проверки браузера; ресурсы сайта не загружены (HTTP $status)"; fi ;;
         47) http_reason='Превышен предел 50 редиректов: возможен цикл переходов' ;;
         28)
-          if [ "${tcp:-0}" = 0.000000 ] || [ "${tcp:-0}" = 0 ]; then http_reason='Нет ответа за 1,5 секунды: не завершено подключение к серверу'
-          elif [[ "$effective" = https://* ]] && { [ "${tls:-0}" = 0.000000 ] || [ "${tls:-0}" = 0 ]; }; then http_reason='Нет ответа за 1,5 секунды: не завершено TLS-согласование'
-          elif [ "${first:-0}" = 0.000000 ] || [ "${first:-0}" = 0 ]; then http_reason='Нет ответа за 1,5 секунды: сервер не начал HTTP-ответ'
-          else http_reason='Не завершена загрузка страницы за 1,5 секунды'; fi ;;
+          if [ "${tcp:-0}" = 0.000000 ] || [ "${tcp:-0}" = 0 ]; then http_reason='Нет ответа за 2 секунды: не завершено подключение к серверу'
+          elif [[ "$effective" = https://* ]] && { [ "${tls:-0}" = 0.000000 ] || [ "${tls:-0}" = 0 ]; }; then http_reason='Нет ответа за 2 секунды: не завершено TLS-согласование'
+          elif [ "${first:-0}" = 0.000000 ] || [ "${first:-0}" = 0 ]; then http_reason='Нет ответа за 2 секунды: сервер не начал HTTP-ответ'
+          else http_reason='Не завершена загрузка страницы за 2 секунды'; fi ;;
       esac
       if [ -n "$locations" ]; then
         if [ "$rc" -eq 28 ]; then
-          http_reason='Истёк общий лимит 1,5 секунды на переходы и загрузку страницы'
+          http_reason='Истёк общий лимит 2 секунды на переходы и загрузку страницы'
         fi
       fi
       site_progress "$stage; попытка $attempt/2${locations:+; Редирект: $locations}; $http_reason"

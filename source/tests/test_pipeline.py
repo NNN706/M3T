@@ -14,7 +14,8 @@ if name=='node':
  for d in domains:log('browser',d)
  pathlib.Path(args[2]).write_text(json.dumps({'domains':domains,'pages':[{'site':d,'domains':[d],'errors':[]} for d in domains],'complete':True}));sys.exit(0)
 if name=='curl':
- assert args[args.index('--max-time')+1]=='1.5' and args[args.index('--connect-timeout')+1]=='1.5'
+ timeout='2' if '-o' in args else '1.5'
+ assert args[args.index('--max-time')+1]==timeout and args[args.index('--connect-timeout')+1]==timeout
  url=args[-1]
  if 'check-host.net/check-dns' in url:
   host=next(a[5:] for a in args if a.startswith('host='));phase='health' if host=='https://check-host.net' else 'dns';log(phase,host)

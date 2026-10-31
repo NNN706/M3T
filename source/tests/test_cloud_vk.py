@@ -8,7 +8,7 @@ with tempfile.TemporaryDirectory(prefix='cloud-vk-live-') as directory:
  code='set -euo pipefail\nbatch=$1; stage=cloud.vk.com; stage_name=HTTP; verbose=1; started=$SECONDS\nprogress(){ printf "%s\\n" "$*" >&2; }; finish_progress(){ :; }\n'+helper+'\nfetch_http site "$2" > /dev/null\n'
  preflight=subprocess.run(['bash','-c',code,'test',directory,url],capture_output=True,text=True,timeout=9)
  (artifact/'cloud-vk-preflight.log').write_text(preflight.stderr)
- print('Production 1.5s preflight:', 'PASS' if preflight.returncode==0 else 'TIMEOUT/ERROR (see artifact)',flush=True)
+ print('Production 2s preflight:', 'PASS' if preflight.returncode==0 else 'TIMEOUT/ERROR (see artifact)',flush=True)
  curl=subprocess.run(['curl','-sS','-L','--connect-timeout','5','--max-time','15','--max-redirs','50','--proto','=http,https','--proto-redir','=http,https','-o',str(root/'body'),'-D',str(root/'headers'),'-w','%{http_code}\t%{url_effective}\t%{num_redirects}\t%{time_total}\n',url],capture_output=True,text=True,timeout=18)
  curl_result={'returncode':curl.returncode,'meta':curl.stdout.strip(),'error':curl.stderr}
  (artifact/'cloud-vk-curl.json').write_text(json.dumps(curl_result,ensure_ascii=False,indent=2))

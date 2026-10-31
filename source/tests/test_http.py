@@ -25,13 +25,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
    status=302;redirect=path[len('/to'):]
   elif path.startswith('/status/'):status=int(path.rsplit('/',1)[1])
   elif path in ('/slow','/slowbody'):
-   if path=='/slow':time.sleep(2)
+   if path=='/slow':time.sleep(3)
   elif path=='/challenge':status=403
   self.send_response(status)
   if redirect:self.send_header('Location',redirect)
   if path=='/challenge':self.send_header('cf-mitigated','challenge')
   self.end_headers()
-  if path=='/slowbody':self.wfile.flush();time.sleep(2)
+  if path=='/slowbody':self.wfile.flush();time.sleep(3)
   try:self.wfile.write(body)
   except (BrokenPipeError,ConnectionResetError):pass
 server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Handler);threading.Thread(target=server.serve_forever,daemon=True).start()
@@ -49,7 +49,7 @@ with tempfile.TemporaryDirectory() as root:
   if 'Редирект:' in r.stderr:
    for line in r.stderr.splitlines():
     if 'Редирект:' in line:assert 'http://' not in line and '/ok' not in line and '/chain/' not in line,line
-  if 'slow' in route:assert 2.9<=elapsed<6,(elapsed,r.stderr)
+  if 'slow' in route:assert 3.9<=elapsed<7,(elapsed,r.stderr)
   print('PASS real curl',route,'elapsed',round(elapsed,2),flush=True)
 # Verify terminal behavior using the production progress/finish functions.
 finish=source[source.index('finish_progress() {'):source.index('\ndie()')]

@@ -40,10 +40,23 @@ jobs:
           runtime="$XDG_CACHE_HOME/SubnetResolve/playwright-1.64.1"
           mkdir -p "$runtime" "$TEST_ARTIFACTS"
           npm install --prefix "$runtime" --no-audit --no-fund --ignore-scripts playwright@1.64.1
-          if [ "$EUID" -eq 0 ] || { command -v sudo >/dev/null && sudo -n true; }; then
-            node "$runtime/node_modules/playwright/cli.js" install-deps chromium
-          fi
           node "$runtime/node_modules/playwright/cli.js" install --only-shell chromium
+          probe_browser() {
+            PLAYWRIGHT_MODULE="$runtime/node_modules/playwright" node -e '
+              require(process.env.PLAYWRIGHT_MODULE).chromium.launch({headless:true})
+                .then(browser => browser.close()).catch(error => {console.error(error.message);process.exit(1)});
+            '
+          }
+          if ! probe_browser > "$TEST_ARTIFACTS/browser-probe.log" 2>&1; then
+            if [ "$EUID" -eq 0 ] || { command -v sudo >/dev/null && sudo -n true; }; then
+              node "$runtime/node_modules/playwright/cli.js" install-deps chromium
+              probe_browser
+            else
+              cat "$TEST_ARTIFACTS/browser-probe.log"
+              echo 'Chromium cannot start; install its system dependencies on the runner.'
+              exit 1
+            fi
+          fi
           echo "SUBNET_PLAYWRIGHT=$runtime/node_modules/playwright" >> "$GITHUB_ENV"
       - name: Syntax and local multi-domain browser integration
         shell: bash

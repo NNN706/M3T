@@ -14,7 +14,8 @@ p=pathlib.Path(os.environ['TLS_TRACE']);a=sys.argv[1:]
 with p.open('a') as f:f.write(json.dumps(a)+'\n')
 n=len(p.read_text().splitlines());code=int(os.environ['TLS_FAILURE'])
 assert '--insecure' not in a and '-k' not in a
-assert a[a.index('--max-time')+1]=='1.5' and a[a.index('--connect-timeout')+1]=='1.5'
+timeout='2' if '-o' in a else '1.5'
+assert a[a.index('--max-time')+1]==timeout and a[a.index('--connect-timeout')+1]==timeout
 if n==1 or os.environ.get('TLS_ALWAYS')=='1':
  if code==-1:print('bad json');sys.exit(0)
  if code:sys.exit(code)
