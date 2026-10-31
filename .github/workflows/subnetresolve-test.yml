@@ -1,0 +1,78 @@
+name: SubnetResolve local browser tests
+on:
+  push:
+    branches: [test]
+    paths:
+      - 'source/SubnetResolve.sh'
+      - 'source/tests/**'
+      - '.github/workflows/subnetresolve-test.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: subnetresolve-local-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser-integration:
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 15
+    steps:
+      - name: Verify target runner
+        shell: bash
+        run: |
+          test "$RUNNER_NAME" = Admiralteskiy || { echo 'This job must run on Admiralteskiy.'; exit 1; }
+          echo "XDG_CACHE_HOME=$RUNNER_TEMP/subnetresolve-cache" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/subnetresolve-browsers" >> "$GITHUB_ENV"
+          echo "TEST_ARTIFACTS=$RUNNER_TEMP/subnetresolve-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Prepare local test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          for tool in python3 jq; do
+            command -v "$tool" >/dev/null || { echo "Missing $tool. Install python3 and jq on the runner."; exit 1; }
+          done
+          runtime="$XDG_CACHE_HOME/SubnetResolve/playwright-1.64.1"
+          mkdir -p "$runtime" "$TEST_ARTIFACTS"
+          npm install --prefix "$runtime" --no-audit --no-fund --ignore-scripts playwright@1.64.1
+          if [ "$EUID" -eq 0 ] || { command -v sudo >/dev/null && sudo -n true; }; then
+            node "$runtime/node_modules/playwright/cli.js" install-deps chromium
+          fi
+          node "$runtime/node_modules/playwright/cli.js" install --only-shell chromium
+          echo "SUBNET_PLAYWRIGHT=$runtime/node_modules/playwright" >> "$GITHUB_ENV"
+      - name: Syntax and local multi-domain browser integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n source/SubnetResolve.sh
+          python3 source/tests/test_parse.py 2>&1 | tee "$TEST_ARTIFACTS/test.log"
+      - name: Failure matrix and stage ordering
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 source/tests/test_tls.py 2>&1 | tee "$TEST_ARTIFACTS/tls.log"
+          python3 source/tests/test_http.py 2>&1 | tee "$TEST_ARTIFACTS/http.log"
+          python3 source/tests/test_pipeline.py 2>&1 | tee "$TEST_ARTIFACTS/pipeline.log"
+      - name: Live Check-Host API from Admiralteskiy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 source/tests/test_tls.py --live 2>&1 | tee "$TEST_ARTIFACTS/live.log"
+      - name: Live website redirect diagnostics
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 source/tests/test_http.py --live-sites 2>&1 | tee "$TEST_ARTIFACTS/live-sites.log"
+      - name: Save test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: subnetresolve-local-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.TEST_ARTIFACTS }}
+          if-no-files-found: ignore
+          retention-days: 7
