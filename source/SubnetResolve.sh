@@ -185,13 +185,23 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 fetch_http() {
-  local expected=$1 attempt rc
+  local expected=$1 attempt rc tls_mode=default
+  local tls_args=()
   shift
+  # check/object are Check-Host API requests; site preflight keeps its TLS defaults.
+  if [ "$expected" != site ]; then tls_mode=tls12; fi
   http_reason=''; http_transport_failed=0
   for attempt in 1 2; do
     rc=0
-    progress "$stage; попытка $attempt/2"
-    curl -fsS --connect-timeout 1.5 --max-time 1.5 "$@" > "$batch/http-response" 2> "$batch/http-error" &
+    tls_args=()
+    if [ "$tls_mode" = tls12 ]; then tls_args=(--tlsv1.2 --tls-max 1.2); fi
+    if [ "$verbose" -eq 1 ] && [ "$expected" != site ]; then
+      if [ "$tls_mode" = tls12 ]; then progress "$stage; попытка $attempt/2; TLS 1.2"
+      else progress "$stage; попытка $attempt/2; обычное согласование TLS"; fi
+    else
+      progress "$stage; попытка $attempt/2"
+    fi
+    curl ${tls_args[@]+"${tls_args[@]}"} -fsS --connect-timeout 1.5 --max-time 1.5 "$@" > "$batch/http-response" 2> "$batch/http-error" &
     http_pid=$!
     while kill -0 "$http_pid" 2>/dev/null; do
       sleep 0.1
@@ -218,9 +228,18 @@ fetch_http() {
               *404*) http_reason='Страница не найдена' ;;
               *429*) http_reason='Сервер ограничил частоту запросов' ;;
             esac ;;
+        35) http_reason='Не удалось согласовать TLS-соединение' ;;
         60) http_reason='Не удалось проверить сертификат HTTPS' ;;
         *) http_reason='Сетевой запрос завершился ошибкой' ;;
       esac
+    fi
+    if [ "$attempt" -eq 1 ]; then
+      if [ "$expected" != site ]; then
+        case "$rc" in
+          28|35|60) tls_mode=default ;;
+        esac
+      fi
+      if [ "$verbose" -eq 1 ]; then progress "Причина повторной попытки: $http_reason"; fi
     fi
   done
   finish_progress

@@ -15,7 +15,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Handler);threading.Thread(target=server.serve_forever,daemon=True).start()
 with tempfile.TemporaryDirectory() as root:
  for route,wanted in [('ok',1),('bad',2),('slow',2)]:
-  code='set -euo pipefail\nbatch=$1; stage=local; stage_name=HTTP; progress(){ :; }; finish_progress(){ :; };\n'+functions+'\nfetch_http site "$2"\n'
+  code='set -euo pipefail\nbatch=$1; verbose=0; stage=local; stage_name=HTTP; progress(){ :; }; finish_progress(){ :; };\n'+functions+'\nfetch_http site "$2"\n'
   start=time.monotonic();r=subprocess.run(['bash','-c',code,'test',root,f'http://127.0.0.1:{server.server_port}/{route}'],capture_output=True,text=True,timeout=8);elapsed=time.monotonic()-start
   assert counts['/'+route]==wanted and r.returncode==(0 if route=='ok' else 1),(route,r.stderr,counts)
   assert 'curl:' not in r.stderr

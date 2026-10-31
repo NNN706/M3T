@@ -55,8 +55,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 source/tests/test_tls.py 2>&1 | tee "$TEST_ARTIFACTS/tls.log"
           python3 source/tests/test_http.py 2>&1 | tee "$TEST_ARTIFACTS/http.log"
           python3 source/tests/test_pipeline.py 2>&1 | tee "$TEST_ARTIFACTS/pipeline.log"
+      - name: Live Check-Host API from Admiralteskiy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 source/tests/test_tls.py --live 2>&1 | tee "$TEST_ARTIFACTS/live.log"
       - name: Save test results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
