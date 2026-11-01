@@ -6,19 +6,21 @@ import subprocess
 import tempfile
 
 INPUTS = ['source/routing/sites.txt', 'source/SubnetResolve.sh',
-          'source/routing/update_routing.py', 'source/routing/domains.json', 'source/routing/IP.json']
+          'source/routing/update_routing.py', 'source/routing/domains.json', 'source/routing/sources.json', 'source/routing/IP.json']
 OUTPUT = 'source/routing/IP.json'
 
 def git(repo, *args, check=True):
     return subprocess.run(['git', '-C', str(repo), *args], text=True,
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=check)
 
-def publish(repo, output, base, branch='test', domains=None):
+def publish(repo, output, base, branch='test', domains=None, sources=None):
     if branch != 'test':
         raise ValueError('Only test publication is enabled')
     payloads = {OUTPUT:output.read_bytes()}
     if domains is not None:
         payloads['source/routing/domains.json'] = domains.read_bytes()
+    if sources is not None:
+        payloads['source/routing/sources.json'] = sources.read_bytes()
     for attempt in range(3):
         git(repo, 'fetch', 'origin', 'refs/heads/test')
         head = git(repo, 'rev-parse', 'FETCH_HEAD').stdout.strip()
@@ -57,10 +59,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', type=Path, default=Path.cwd())
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--sources', type=Path)
     parser.add_argument('--domains', type=Path)
     parser.add_argument('--base', required=True)
     args = parser.parse_args()
-    publish(args.repo.resolve(), args.output.resolve(), args.base, domains=args.domains.resolve() if args.domains else None)
+    publish(args.repo.resolve(), args.output.resolve(), args.base, domains=args.domains.resolve() if args.domains else None, sources=args.sources.resolve() if args.sources else None)
 
 if __name__ == '__main__':
     main()
