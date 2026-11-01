@@ -1,0 +1,106 @@
+{
+  "rules": [
+    {
+      "ruleTag": "beget.com",
+      "domain": [
+        "domain:beget.com"
+      ]
+    },
+    {
+      "ruleTag": "cdnvideo.com",
+      "domain": [
+        "domain:cdnvideo.com"
+      ]
+    },
+    {
+      "ruleTag": "cloud.ru",
+      "domain": [
+        "domain:cloud.ru"
+      ]
+    },
+    {
+      "ruleTag": "cloud.vk.com",
+      "domain": [
+        "domain:cloud.vk.com"
+      ]
+    },
+    {
+      "ruleTag": "contell.ru",
+      "domain": [
+        "domain:contell.ru"
+      ]
+    },
+    {
+      "ruleTag": "datahouse.ru",
+      "domain": [
+        "domain:datahouse.ru"
+      ]
+    },
+    {
+      "ruleTag": "ddos-guard.net",
+      "domain": [
+        "domain:ddos-guard.net"
+      ]
+    },
+    {
+      "ruleTag": "fornex.com",
+      "domain": [
+        "domain:fornex.com"
+      ]
+    },
+    {
+      "ruleTag": "ihc.ru",
+      "domain": [
+        "domain:ihc.ru"
+      ]
+    },
+    {
+      "ruleTag": "landvps.ru",
+      "domain": [
+        "domain:landvps.ru"
+      ]
+    },
+    {
+      "ruleTag": "majordomo.ru",
+      "domain": [
+        "domain:majordomo.ru"
+      ]
+    },
+    {
+      "ruleTag": "mws.ru",
+      "domain": [
+        "domain:mws.ru"
+      ]
+    },
+    {
+      "ruleTag": "reg.ru",
+      "domain": [
+        "domain:reg.ru"
+      ]
+    },
+    {
+      "ruleTag": "ruvds.com",
+      "domain": [
+        "domain:ruvds.com"
+      ]
+    },
+    {
+      "ruleTag": "selectel.ru",
+      "domain": [
+        "domain:selectel.ru"
+      ]
+    },
+    {
+      "ruleTag": "smartape.ru",
+      "domain": [
+        "domain:smartape.ru"
+      ]
+    },
+    {
+      "ruleTag": "timeweb.cloud",
+      "domain": [
+        "domain:timeweb.cloud"
+      ]
+    }
+  ]
+}

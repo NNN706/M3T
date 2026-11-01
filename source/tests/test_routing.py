@@ -44,7 +44,7 @@ with tempfile.TemporaryDirectory() as directory:
         assert scan.returncode==3,scan.stderr
         assert ('No A records' in scan.stderr)==verbose,scan.stderr
         assert ('Узел сообщил об ошибке DNS' in scan.stderr)==verbose,scan.stderr
-        assert json.loads(scan.stdout)['rules']==[{'ruleTag':'bad.example','ip':[]},{'ruleTag':'good.example','ip':['2.2.2.0/24']}]
+        assert json.loads(scan.stdout)['rules']==[{'ruleTag':'bad.example','domain':['domain:bad.example'],'ip':[]},{'ruleTag':'good.example','domain':['domain:good.example'],'ip':['2.2.2.0/24']}]
     env['CASE']='ok'
     scan=subprocess.run(['bash',str(source),'-parse','-rules','-s','good.example','good2.example'],env=env,text=True,capture_output=True,timeout=30)
     assert scan.returncode==0,scan.stderr

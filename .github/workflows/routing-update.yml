@@ -42,6 +42,7 @@ jobs:
       - name: Test routing generator
         run: |
           python3 source/tests/test_routing.py
+          python3 source/tests/test_json_routing.py
           python3 source/tests/test_publish_routing.py
       - name: Scan sites and compact prefixes
         env:
@@ -56,7 +57,8 @@ jobs:
             echo '::warning::Неполный сбор: опубликованы доступные подсети; прежние записи сохранены. См. routing-evidence.'
           fi
           cat "$RUNNER_TEMP/routing-evidence/completeness.json" >> "$GITHUB_STEP_SUMMARY"
-          cp source/routing/IP.txt "$RUNNER_TEMP/routing-evidence/IP.txt"
+          cp source/routing/IP.json "$RUNNER_TEMP/routing-evidence/IP.json"
+          cp source/routing/domains.json "$RUNNER_TEMP/routing-evidence/domains.json"
       - name: Save scan evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -64,8 +66,8 @@ jobs:
           name: routing-evidence-${{ github.run_id }}
           path: ${{ runner.temp }}/routing-evidence
           retention-days: 7
-      - name: Publish IP.txt on current test
+      - name: Publish IP.json on current test
         shell: bash
         run: |
           set -euo pipefail
-          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --output "$RUNNER_TEMP/routing-evidence/IP.txt"
+          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --output "$RUNNER_TEMP/routing-evidence/IP.json" --domains "$RUNNER_TEMP/routing-evidence/domains.json"

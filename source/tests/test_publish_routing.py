@@ -26,13 +26,16 @@ with tempfile.TemporaryDirectory() as directory:
     (other/'unrelated.txt').write_text('keep this\n')
     git(other,'add','.');git(other,'commit','-m','Concurrent unrelated change');git(other,'push')
     latest=git(other,'rev-parse','HEAD')
-    payload=tmp/'IP.txt';payload.write_text('{"rules":[]}\n')
-    module.publish(repo,payload,base)
+    payload=tmp/'IP.json';payload.write_text('{"rules":[]}\n')
+    domain_payload=tmp/'domains.json';domain_payload.write_text('{"rules":[]}\n')
+    module.publish(repo,payload,base,domains=domain_payload)
     published=git(other,'ls-remote','origin','refs/heads/test').split()[0]
     git(other,'fetch','origin','test')
     assert git(other,'rev-parse',published+'^')==latest
     assert git(other,'show',published+':unrelated.txt')=='keep this'
     assert git(other,'show',published+':'+module.OUTPUT)=='{"rules":[]}'
+    assert git(other,'show',published+':source/routing/domains.json')=='{"rules":[]}'
+    assert set(git(other,'diff-tree','--no-commit-id','--name-only','-r',published).splitlines())=={module.OUTPUT,'source/routing/domains.json'}
     assert git(repo,'status','--porcelain')==''
     assert git(repo,'worktree','list','--porcelain').count('worktree ')==1
     module.publish(repo,payload,published)
@@ -69,7 +72,7 @@ with tempfile.TemporaryDirectory() as directory:
     git(other,'add','.');git(other,'commit','-m','Other update');git(other,'push')
     try:module.publish(repo,payload,changed)
     except RuntimeError as error:assert 'changed during scan' in str(error)
-    else:raise AssertionError('Newer IP.txt was overwritten')
+    else:raise AssertionError('Newer IP.json was overwritten')
     try:module.publish(repo,payload,changed,branch='main')
     except ValueError:pass
     else:raise AssertionError('main publication enabled')

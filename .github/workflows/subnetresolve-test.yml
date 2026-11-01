@@ -70,6 +70,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 source/tests/test_json_routing.py 2>&1 | tee "$TEST_ARTIFACTS/json-routing.log"
           python3 source/tests/test_publish_routing.py 2>&1 | tee "$TEST_ARTIFACTS/publish-routing.log"
           python3 source/tests/test_routing.py 2>&1 | tee "$TEST_ARTIFACTS/routing.log"
           python3 source/tests/test_progress_changes.py 2>&1 | tee "$TEST_ARTIFACTS/progress-changes.log"

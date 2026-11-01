@@ -824,7 +824,7 @@ if [ "$rules" -eq 1 ]; then
   jq -n --slurpfile services "$batch/services.json" --slurpfile data "$batch/batch.json" --slurpfile discovery "$batch/rule-discovery.json" '
     {rules: [$services[0][] as $service |
       ([$service] + [$discovery[0].pages[] | select(.site==$service) | .domains[]] | unique) as $hosts |
-      {ruleTag:$service, ip: ([$data[0].domains[] | . as $d | select($hosts | index($d.domain)) | .results[].prefix] | unique | sort)}]}
+      {ruleTag:$service, domain: ($hosts | map("domain:" + .)), ip: ([$data[0].domains[] | . as $d | select($hosts | index($d.domain)) | .results[].prefix] | unique | sort)}]}
   ' > "$tmp/output.json"
 fi
 stage_name='Результат'
