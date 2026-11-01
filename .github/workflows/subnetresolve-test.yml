@@ -6,6 +6,7 @@ on:
       - 'source/SubnetResolve.sh'
       - 'source/tests/**'
       - 'source/routing/update_routing.py'
+      - 'source/routing/publish_routing.py'
       - '.github/workflows/subnetresolve-test.yml'
   workflow_dispatch:
 permissions:
@@ -69,6 +70,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 source/tests/test_publish_routing.py 2>&1 | tee "$TEST_ARTIFACTS/publish-routing.log"
           python3 source/tests/test_routing.py 2>&1 | tee "$TEST_ARTIFACTS/routing.log"
           python3 source/tests/test_progress_changes.py 2>&1 | tee "$TEST_ARTIFACTS/progress-changes.log"
           python3 source/tests/test_progress.py 2>&1 | tee "$TEST_ARTIFACTS/progress.log"

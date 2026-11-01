@@ -40,7 +40,9 @@ jobs:
               .then(browser => browser.close()).catch(error => {console.error(error.message);process.exit(1)});
           '
       - name: Test routing generator
-        run: python3 source/tests/test_routing.py
+        run: |
+          python3 source/tests/test_routing.py
+          python3 source/tests/test_publish_routing.py
       - name: Scan sites and compact prefixes
         env:
           XDG_CACHE_HOME: ${{ runner.temp }}/subnetresolve-cache
@@ -54,6 +56,7 @@ jobs:
             echo '::warning::Неполный сбор: опубликованы доступные подсети; прежние записи сохранены. См. routing-evidence.'
           fi
           cat "$RUNNER_TEMP/routing-evidence/completeness.json" >> "$GITHUB_STEP_SUMMARY"
+          cp source/routing/IP.txt "$RUNNER_TEMP/routing-evidence/IP.txt"
       - name: Save scan evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -61,13 +64,8 @@ jobs:
           name: routing-evidence-${{ github.run_id }}
           path: ${{ runner.temp }}/routing-evidence
           retention-days: 7
-      - name: Commit changed IP.txt to test
+      - name: Publish IP.txt on current test
         shell: bash
         run: |
           set -euo pipefail
-          git add -- source/routing/IP.txt
-          if git diff --cached --quiet; then exit 0; fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Update service routing prefixes'
-          git push origin HEAD:test
+          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --output "$RUNNER_TEMP/routing-evidence/IP.txt"
