@@ -10,7 +10,7 @@ import sys
 from urllib.parse import urlsplit
 
 
-def services(path):
+def services(path, parse_asn=None):
     result = []
     seen = set()
     for line in path.read_text().splitlines():
@@ -18,19 +18,24 @@ def services(path):
         if not line:
             continue
         for value in line.split():
+            origin = parse_asn(value) if parse_asn else None
+            if origin:
+                if origin not in seen:
+                    seen.add(origin)
+                    result.append((origin, value))
+                continue
             url = urlsplit(value if '://' in value else 'https://' + value)
             if url.scheme not in ('http', 'https') or not url.hostname or url.username or url.password:
                 raise ValueError('Expected a domain or HTTP(S) URL without credentials')
             host = url.hostname.lower().rstrip('.')
-            if host not in seen:
-                seen.add(host)
+            key = value if host == 'bgp.he.net' else host
+            if key not in seen:
+                seen.add(key)
                 result.append((host, value))
-    if not result:
-        raise ValueError('sites.txt is empty: add one service domain or URL per line')
     return result
 
 
-def compact_rules(data, expected):
+def compact_rules(data, expected, dual_stack=False):
     rules = data['rules']
     if not isinstance(rules, list) or [r['ruleTag'] for r in rules] != sorted(expected):
         raise ValueError('Unexpected service tags in scanner result')
@@ -38,8 +43,8 @@ def compact_rules(data, expected):
     for rule in rules:
         if not isinstance(rule['ip'], list):
             raise ValueError('No prefixes for service ' + rule['ruleTag'])
-        networks = [ipaddress.IPv4Network(value, strict=True) for value in rule['ip']]
-        result.append({'ruleTag': rule['ruleTag'], 'ip': [str(n) for n in ipaddress.collapse_addresses(networks)]})
+        networks = [(ipaddress.ip_network if dual_stack else ipaddress.IPv4Network)(value, strict=True) for value in rule['ip']]
+        result.append({'ruleTag': rule['ruleTag'], 'ip': [str(n) for version in (4, 6) for n in ipaddress.collapse_addresses(n for n in networks if n.version == version)]})
     return {'rules': result}
 
 
@@ -98,9 +103,11 @@ def domain_rules(data, expected):
 
 
 def main():
+    from asn_routes import asn, collect
     parser = argparse.ArgumentParser(description=__doc__)
     root = Path(__file__).resolve().parent
     parser.add_argument('--sites', type=Path, default=root / 'sites.txt')
+    parser.add_argument('--asn-file', type=Path)
     parser.add_argument('--output', type=Path, default=root / 'IP.json')
     parser.add_argument('--sources-output', type=Path, help='Original per-service prefixes before global grouping')
     parser.add_argument('--domains-output', type=Path, help='Defaults to domains.json beside IP.json')
@@ -109,29 +116,59 @@ def main():
     parser.add_argument('--evidence', type=Path, help='Directory for raw scan output and completeness report')
     parser.add_argument('--scanner', type=Path, default=root.parent / 'SubnetResolve.sh')
     args = parser.parse_args()
-    entries = services(args.sites)
+    entries = services(args.sites, asn)
+    explicit = {tag for tag, _ in entries if asn(tag)}
+    entries = [(tag, value) for tag, value in entries if not asn(tag)]
+    asn_file = args.asn_file or args.sites.with_name('ASN.txt')
+    if asn_file.exists() or args.asn_file:
+        for tag, value in services(asn_file, asn):
+            origin = asn(tag)
+            if not origin and tag == 'bgp.he.net':
+                origin = asn(urlsplit(value).path.strip('/'))
+            if not origin:
+                raise ValueError(f'Invalid ASN entry: {value}')
+            explicit.add(origin)
+    if not entries and not explicit:
+        raise ValueError('No domains or ASNs configured')
     if args.sources_output is None:
         args.sources_output = args.output.with_name('sources.json')
     if args.domains_output is None:
         args.domains_output = args.output.with_name('domains.json')
-    scan = subprocess.run(['bash', str(args.scanner), '-parse', '-rules', '-s', *(['-v'] if args.verbose else []), '--', *[value for _, value in entries]],
-                          stdout=subprocess.PIPE, text=True, timeout=6600)
+    with tempfile.TemporaryDirectory(prefix='routing-bgp-') as directory:
+        metadata = Path(directory) / 'observations.json'
+        scan = subprocess.run(
+            ['bash', str(args.scanner), '-parse', '-rules', '-s',
+             *(['-v'] if args.verbose else []), '--', *[value for _, value in entries]],
+            stdout=subprocess.PIPE, text=True, timeout=6600,
+            env={**os.environ, 'SUBNET_BGP_OBSERVATIONS': str(metadata)}
+        ) if entries else subprocess.CompletedProcess([], 0, '{"rules":[]}')
+        observations = json.loads(metadata.read_text()) if metadata.exists() else []
     if args.evidence:
         args.evidence.mkdir(parents=True, exist_ok=True)
         (args.evidence / 'scanner-output.json').write_text(scan.stdout)
-    if scan.returncode != 0 and not (args.allow_partial and scan.returncode == 3):
-        raise RuntimeError('Scan incomplete or failed; existing IP.json/domains.json retained. See stderr above.')
+    if scan.returncode not in (0, 3):
+        raise RuntimeError('Domain scan failed; existing routing files retained.')
     data = json.loads(scan.stdout)
-    result = compact_rules(data, [host for host, _ in entries])
-    domains = domain_rules(data, [host for host, _ in entries])
+    domain_tags = [host for host, _ in entries]
+    domains = domain_rules(data, domain_tags)
+    as_rules, as_missing, report = collect(explicit, observations)
+    print(report, flush=True)
+    if args.evidence:
+        (args.evidence / 'asn-report.md').write_text(report)
+    partial = scan.returncode == 3 or bool(as_missing)
+    if partial and not args.allow_partial:
+        raise RuntimeError('Scan incomplete or failed; existing routing files retained.')
+    expected = domain_tags + sorted(explicit)
+    data['rules'] = sorted(data['rules'] + as_rules, key=lambda r: r['ruleTag'])
+    result = compact_rules(data, expected, dual_stack=True)
     missing = [r['ruleTag'] for r in result['rules'] if not r['ip']]
     previous_path = args.sources_output if args.sources_output.exists() else args.output
-    if scan.returncode == 3 and previous_path.exists():
+    if partial and previous_path.exists():
         previous = json.loads(previous_path.read_text())
         old = {r['ruleTag']: r['ip'] for r in previous['rules']}
         for rule in result['rules']:
             rule['ip'] += old.get(rule['ruleTag'], [])
-        result = compact_rules(result, [host for host, _ in entries])
+        result = compact_rules(result, expected, dual_stack=True)
     result['rules'] = [r for r in result['rules'] if r['ip']]
     if not result['rules']:
         raise RuntimeError('No usable prefixes; existing IP.json/domains.json retained.')
@@ -151,10 +188,10 @@ def main():
     result = global_rules(sources)
     if args.evidence:
         (args.evidence / 'completeness.json').write_text(json.dumps({
-            'complete': scan.returncode == 0, 'services_without_new_prefixes': missing,
+            'complete': not partial, 'services_without_new_prefixes': missing,
             'services_written': len(result['rules']),
             'prefixes_written': sum(len(r['ip']) for r in result['rules'])}, indent=2) + '\n')
-    if scan.returncode == 3:
+    if partial:
         print('WARNING: неполный сбор; сохранены доступные и прежние подсети. Подробности в артефактах запуска.', file=sys.stderr)
 
     write_json(args.output, result)

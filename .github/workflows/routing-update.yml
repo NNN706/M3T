@@ -5,6 +5,7 @@ on:
     branches: [test]
     paths:
       - 'source/routing/sites.txt'
+      - 'source/routing/ASN.txt'
 permissions:
   contents: write
 concurrency:
@@ -57,6 +58,7 @@ jobs:
           if ! python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["complete"])' "$RUNNER_TEMP/routing-evidence/completeness.json"; then
             echo '::warning::Неполный сбор: опубликованы доступные подсети; прежние записи сохранены. См. routing-evidence.'
           fi
+          cat "$RUNNER_TEMP/routing-evidence/asn-report.md" >> "$GITHUB_STEP_SUMMARY"
           cat "$RUNNER_TEMP/routing-evidence/completeness.json" >> "$GITHUB_STEP_SUMMARY"
           cp source/routing/IP.json "$RUNNER_TEMP/routing-evidence/IP.json"
           cp source/routing/domains.json "$RUNNER_TEMP/routing-evidence/domains.json"

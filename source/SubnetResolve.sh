@@ -816,6 +816,9 @@ if [ "$parse" -eq 1 ]; then
   mv "$tmp/parsed-output.json" "$tmp/output.json"
 fi
 if [ "$rules" -eq 1 ]; then
+  if [ -n "${SUBNET_BGP_OBSERVATIONS:-}" ]; then
+    jq '[.domains[].results[] | {asn, as_name, prefix}] | unique' "$batch/batch.json" > "$SUBNET_BGP_OBSERVATIONS"
+  fi
   if [ "$parse" -eq 1 ]; then
     cp "$batch/discovery.json" "$batch/rule-discovery.json"
   else

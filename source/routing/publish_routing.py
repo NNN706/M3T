@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import tempfile
 
-INPUTS = ['source/routing/sites.txt', 'source/SubnetResolve.sh',
+INPUTS = ['source/routing/sites.txt', 'source/routing/ASN.txt', 'source/routing/asn_routes.py', 'source/SubnetResolve.sh',
           'source/routing/update_routing.py', 'source/routing/domains.json', 'source/routing/sources.json', 'source/routing/IP.json']
 OUTPUT = 'source/routing/IP.json'
 
