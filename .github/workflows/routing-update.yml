@@ -1,0 +1,77 @@
+name: Update service routing prefixes
+on:
+  workflow_dispatch:
+  push:
+    branches: [test]
+    paths:
+      - 'source/routing/sites.txt'
+      - 'source/routing/ASN.txt'
+permissions:
+  contents: write
+concurrency:
+  group: routing-update-test
+  cancel-in-progress: false
+jobs:
+  update:
+    if: github.ref == 'refs/heads/test'
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 120
+    steps:
+      - name: Verify runner
+        run: test "$RUNNER_NAME" = Admiralteskiy
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: test
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Prepare Chromium without interactive sudo
+        shell: bash
+        env:
+          XDG_CACHE_HOME: ${{ runner.temp }}/subnetresolve-cache
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/subnetresolve-browsers
+        run: |
+          set -euo pipefail
+          runtime="$XDG_CACHE_HOME/SubnetResolve/playwright-1.64.1"
+          mkdir -p "$runtime"
+          npm install --prefix "$runtime" --no-audit --no-fund --ignore-scripts playwright@1.64.1
+          node "$runtime/node_modules/playwright/cli.js" install --only-shell chromium
+          PLAYWRIGHT_MODULE="$runtime/node_modules/playwright" node -e '
+            require(process.env.PLAYWRIGHT_MODULE).chromium.launch({headless:true})
+              .then(browser => browser.close()).catch(error => {console.error(error.message);process.exit(1)});
+          '
+      - name: Test routing generator
+        run: |
+          python3 source/tests/test_routing.py
+          python3 source/tests/test_global_routing.py
+          python3 source/tests/test_json_routing.py
+          python3 source/tests/test_publish_routing.py
+      - name: Scan sites and compact prefixes
+        env:
+          XDG_CACHE_HOME: ${{ runner.temp }}/subnetresolve-cache
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/subnetresolve-browsers
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/routing-evidence"
+          python3 source/routing/update_routing.py --verbose --allow-partial --evidence "$RUNNER_TEMP/routing-evidence" 2>&1 | tee "$RUNNER_TEMP/routing-evidence/scan.log"
+          if ! python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["complete"])' "$RUNNER_TEMP/routing-evidence/completeness.json"; then
+            echo '::warning::Неполный сбор: опубликованы доступные подсети; прежние записи сохранены. См. routing-evidence.'
+          fi
+          cat "$RUNNER_TEMP/routing-evidence/asn-report.md" >> "$GITHUB_STEP_SUMMARY"
+          cat "$RUNNER_TEMP/routing-evidence/completeness.json" >> "$GITHUB_STEP_SUMMARY"
+          cp source/routing/IP.json "$RUNNER_TEMP/routing-evidence/IP.json"
+          cp source/routing/domains.json "$RUNNER_TEMP/routing-evidence/domains.json"
+          cp source/routing/sources.json "$RUNNER_TEMP/routing-evidence/sources.json"
+      - name: Save scan evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: routing-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/routing-evidence
+          retention-days: 7
+      - name: Publish IP.json on current test
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --output "$RUNNER_TEMP/routing-evidence/IP.json" --domains "$RUNNER_TEMP/routing-evidence/domains.json" --sources "$RUNNER_TEMP/routing-evidence/sources.json"
