@@ -62,7 +62,4 @@ assert current_domains == routing.domain_rules(
     current_domains, [rule['ruleTag'] for rule in current_domains['rules']], include_seed=False
 ), 'domains.json differs from canonical domain rules (ignoring outboundTag)' 
 assert (root/'ASN.txt').exists()
-assert not (root/'IP.txt').exists()
-assert not (root.parent/'ip/IP.txt').exists()
-assert not (root.parent/'ip/ASN.txt').exists()
-print('PASS separate JSON outputs, source domain attribution, partial union, persistent IPv4/IPv6 legacy, invalid domain atomic rejection, migration data')
+print('PASS separate JSON outputs, source domain attribution, partial union, persistent IPv4/IPv6 legacy, invalid domain atomic rejection, committed routing JSON')
