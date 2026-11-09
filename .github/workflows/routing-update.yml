@@ -154,26 +154,42 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: test
+      - name: Download DNS/BGP observations from this workflow
+        if: needs.update.result == 'success'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: routing-evidence-${{ github.run_id }}-*
+          path: ${{ runner.temp }}/routing-report-input-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Build report from published IP.json
         shell: bash
         run: |
           set -euo pipefail
           test "$RUNNER_NAME" = Admiralteskiy
           export XDG_CACHE_HOME="$HOME/.cache/m3t-routing"
-          mkdir -p "$RUNNER_TEMP/routing-report-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
-          report="$RUNNER_TEMP/routing-report-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/asn-report.md"
+          output="$RUNNER_TEMP/routing-report-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          mkdir -p "$output"
+          evidence=()
+          for directory in "$RUNNER_TEMP/routing-report-input-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/"*/; do
+            if [ -d "$directory" ]; then evidence+=(--evidence "$directory"); fi
+          done
           python3 source/tests/test_routing_report.py
-          python3 source/routing/routing_report.py source/routing/IP.json "$report"
-          cat "$report" >> "$GITHUB_STEP_SUMMARY"
+          python3 source/routing/routing_report.py source/routing/IP.json "$output/asn-report.md" \
+            --verbose-output "$output/asn-report-verbose.md" \
+            --previous-provenance source/routing/dns-provenance.json \
+            --provenance-output "$output/dns-provenance.json" "${evidence[@]}"
+          cat "$output/asn-report.md" >> "$GITHUB_STEP_SUMMARY"
+          printf '\n[Подробный отчёт ASN с доменами](https://github.com/NNN706/M3T/blob/test/source/routing/asn-report-verbose.md)\n' >> "$GITHUB_STEP_SUMMARY"
       - name: Save overall routing report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: overall-routing-report-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/routing-report-${{ github.run_id }}-${{ github.run_attempt }}/asn-report.md
+          path: ${{ runner.temp }}/routing-report-${{ github.run_id }}-${{ github.run_attempt }}
           retention-days: 7
       - name: Publish report on test
         shell: bash
         run: |
           set -euo pipefail
-          report="$RUNNER_TEMP/routing-report-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/asn-report.md"
-          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --report "$report"
+          output="$RUNNER_TEMP/routing-report-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" \
+            --report "$output/asn-report.md" --report-verbose "$output/asn-report-verbose.md" \
+            --provenance "$output/dns-provenance.json"

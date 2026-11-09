@@ -10,7 +10,9 @@ INPUTS = ['source/routing/exclusion_policy.py', 'source/routing/exclude', 'sourc
           'source/routing/update_routing.py', 'source/routing/domains.json', 'source/routing/sources.json', 'source/routing/IP.json']
 OUTPUT = 'source/routing/IP.json'
 REPORT = 'source/routing/asn-report.md'
-REPORT_INPUTS = [OUTPUT, REPORT, 'source/routing/routing_report.py', 'source/routing/asn_routes.py']
+REPORT_VERBOSE = 'source/routing/asn-report-verbose.md'
+PROVENANCE = 'source/routing/dns-provenance.json'
+REPORT_INPUTS = [OUTPUT, REPORT, REPORT_VERBOSE, PROVENANCE, 'source/routing/routing_report.py', 'source/routing/asn_routes.py']
 
 def git(repo, *args, check=True):
     return subprocess.run(['git', '-C', str(repo), *args], text=True,
@@ -73,14 +75,22 @@ def main():
     operation = parser.add_mutually_exclusive_group(required=True)
     operation.add_argument('--output', type=Path)
     operation.add_argument('--report', type=Path)
+    parser.add_argument('--report-verbose', type=Path)
+    parser.add_argument('--provenance', type=Path)
     parser.add_argument('--sources', type=Path)
     parser.add_argument('--domains', type=Path)
     parser.add_argument('--base', required=True)
     args = parser.parse_args()
+    if bool(args.report_verbose) != bool(args.provenance) or (args.report_verbose and not args.report):
+        parser.error('--report-verbose and --provenance require --report and must be supplied together')
     if args.report:
         if args.sources or args.domains:
             parser.error('--sources and --domains require --output')
-        publish_payloads(args.repo.resolve(), args.base, {REPORT: args.report.read_bytes()},
+        payloads = {REPORT: args.report.read_bytes()}
+        if args.report_verbose:
+            payloads[REPORT_VERBOSE] = args.report_verbose.read_bytes()
+            payloads[PROVENANCE] = args.provenance.read_bytes()
+        publish_payloads(args.repo.resolve(), args.base, payloads,
                          REPORT_INPUTS, 'Update overall routing ASN report')
     else:
         publish(args.repo.resolve(), args.output, args.base, domains=args.domains, sources=args.sources)
