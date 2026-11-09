@@ -29,10 +29,11 @@ if name=='curl':
   host=bytes.fromhex(url.rsplit('/',1)[1]).decode();log('result',host)
   if mode=='result' and host.startswith('bad'):print('not json');sys.exit(0)
   if mode=='empty' and host.startswith('bad'):print(json.dumps({'n':[None,{'message':'No A records'}]}))
+  elif mode=='cert' and host=='esmdtpep.vtb.ru':print(json.dumps({'n':[{'A':['195.242.82.12']}]}))
   else:print(json.dumps({'n':[{'A':['3.3.3.3' if host.startswith('bad') else '2.2.2.2']}]}))
  else:
   host=urllib.parse.urlsplit(url).hostname;log('site',host)
-  if mode=='cert' and host.startswith('bad'):
+  if mode=='cert' and (host.startswith('bad') or host=='esmdtpep.vtb.ru'):
    assert '-k' not in args and '--insecure' not in args
    sys.exit(60)
   if mode=='site' and host.startswith('bad'):print('curl: (22) The requested URL returned error: 503',file=sys.stderr);sys.exit(22)
@@ -49,6 +50,9 @@ elif name=='nc':
  if mode=='bgp-health' and phase=='bgp-health':print('invalid response');sys.exit(0)
  for ip in ips:
   if mode=='bgp' and ip=='3.3.3.3':continue
+  if ip=='195.242.82.12':
+   print('24823 | 195.242.82.12 | 195.242.82.0/24 | RU | RIPE | 2002-04-10 | VTB')
+   continue
   print('13335 | '+ip+' | '+ip.rsplit('.',1)[0]+'.0/24 | US | ARIN | 2020-01-01 | Test')
 '''
 with tempfile.TemporaryDirectory(prefix='subnet-pipeline-') as directory:
@@ -100,12 +104,12 @@ with tempfile.TemporaryDirectory(prefix='subnet-pipeline-') as directory:
      if phase=='bulk':assert len(ips)==len(set(ips)) and ('3.3.3.3' in ips)==((mode=='bgp' or web_failure) and bool(bad))
    else:assert not good
    print('PASS',mode,','.join(hosts),flush=True)
- result,events,phases=run('cert',['bad1.example'],parse=True,rules=True)
+ result,events,phases=run('cert',['esmdtpep.vtb.ru'],parse=True,rules=True)
  assert result.returncode==3,result.stderr
  assert json.loads(result.stdout)=={'rules':[
-  {'ruleTag':'bad1.example','domain':['domain:bad1.example'],'ip':['3.3.3.0/24']}
+  {'ruleTag':'esmdtpep.vtb.ru','domain':['domain:esmdtpep.vtb.ru'],'ip':['195.242.82.0/24']}
  ]}
- assert 'browser' not in phases and ['dns','bad1.example'] in events
+ assert 'browser' not in phases and ['dns','esmdtpep.vtb.ru'] in events and ['bulk',['195.242.82.12']] in events
  print('PASS service domain yields a routing rule despite HTTPS certificate failure',flush=True)
  for mode in ('health','bgp-health'):
   result,events,phases=run(mode,combinations[0])
