@@ -35,14 +35,17 @@ with tempfile.TemporaryDirectory() as directory:
     assert 'IPv4: **3**, IPv6: **1**' in report
     assert 'анонсы **3** ASN' in report
     assert sha256(ip_file.read_bytes()).hexdigest() in report
-    assert '| AS100 | Example &#124; Inc. | 2 / 2 | Полностью покрыто: 1 |' in report
-    assert '| AS101 | Other origin | 2 / 2 | Все |' in report
-    assert '| AS103 | — | 1 / 1 | Полностью покрыто: 0 |' in report
+    assert '| AS100 | Example &#124; Inc. | 2 / 2 |' in report
+    assert '| AS101 | Other origin | 2 / 2 |' in report
+    assert '| AS103 | — | 1 / 1 |' in report
     assert '| AS102 |' not in report
+    assert '| ASN | Название | Затронуто / всего |' in report
+    assert 'Полностью покрыто' not in report
+    assert all(line.count('|') == 4 for line in report.splitlines() if line.startswith('|'))
 
     ip_file.write_text('{"rules":[]}')
     with patch('routing_report.cached_export') as download:
         assert 'анонсы **0** ASN' in build_report(ip_file)
         download.assert_not_called()
 
-print('PASS overall ASN report: published IPv4/IPv6, CIDR union, multi-origin, partial and full coverage')
+print('PASS overall ASN report: published IPv4/IPv6, CIDR union, multi-origin, partial overlaps and three columns')

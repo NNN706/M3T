@@ -22,7 +22,7 @@ def summarize(prefixes, snapshot):
         )
     rows = {}
     for origin, announced in snapshot.items():
-        touched = full = 0
+        touched = 0
         for prefix in announced:
             network = ipaddress.ip_network(prefix)
             starts, ends = coverage[network.version]
@@ -30,9 +30,8 @@ def summarize(prefixes, snapshot):
             index = bisect_left(ends, first)
             if index < len(starts) and starts[index] <= last:
                 touched += 1
-                full += starts[index] <= first and last <= ends[index]
         if touched:
-            rows['AS' + str(origin)] = (touched, len(announced), full)
+            rows['AS' + str(origin)] = (touched, len(announced))
     return rows
 
 
@@ -69,14 +68,13 @@ def build_report(path):
         '«Всего» — все анонсы этого ASN в снимке. '
         'Один префикс может учитываться у нескольких ASN, если они его анонсируют.',
         '',
-        '| ASN | Название | Затронуто / всего | Покрытие |',
-        '| --- | --- | ---: | --- |',
+        '| ASN | Название | Затронуто / всего |',
+        '| --- | --- | ---: |',
     ]
     for origin in sorted(rows, key=lambda asn: int(asn[2:])):
-        touched, total, full = rows[origin]
+        touched, total = rows[origin]
         name = ' '.join(names.get(origin, '—').split()).replace('|', '&#124;').replace('<', '&lt;')
-        coverage = 'Все' if full == total else f'Полностью покрыто: {full}'
-        report.append(f'| {origin} | {name} | {touched} / {total} | {coverage} |')
+        report.append(f'| {origin} | {name} | {touched} / {total} |')
     return '\n'.join(report) + '\n'
 
 
