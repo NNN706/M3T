@@ -22,6 +22,13 @@ with tempfile.TemporaryDirectory() as directory:
     write_json(args.sources_output, {'rules': [
         {'ruleTag': 'old.example', 'ip': ['192.0.2.0/24']}
     ]})
+    baseline = {p: p.read_bytes() for p in (args.domains_output, args.sources_output)}
+
+    def checkout():
+        args.output.unlink(missing_ok=True)
+        for path, content in baseline.items():
+            path.write_bytes(content)
+
     discovery = {
         'pages': [
             {'site': 'old.example', 'domains': ['old.example', 'child.old.example'], 'errors': []},
@@ -59,6 +66,35 @@ with tempfile.TemporaryDirectory() as directory:
     report = json.loads((args.evidence / 'completeness.json').read_text())
     assert report['domains_without_complete_dns_bgp'] == ['pending.example']
     assert report['dns_skipped_existing'] == 1 and report['dns_requested'] == 4
+    args.resume = args.evidence
+    args.evidence = tmp / 'resumed'
+    checkout()
+    with patch('update_routing.subprocess.run', return_value=subprocess.CompletedProcess(
+        [], 0, json.dumps(dict(good, domain='pending.example'))
+    )) as run:
+        incremental_update(args, entries, set(), lambda *_: ([], [], ''))
+        assert run.call_count == 1 and run.call_args.args[0][-1] == 'pending.example'
+    prepared_output = args.output.read_bytes()
+    assert json.loads((args.evidence / 'dns-checkpoint.json').read_text()).keys() == {
+        'cdn.pending.example', 'child.old.example', 'service.example', 'pending.example',
+    }
+
+    args.resume = args.evidence
+    args.evidence = tmp / 'ready'
+    checkout()
+    with patch('update_routing.subprocess.run') as run:
+        incremental_update(args, entries, set(), lambda *_: (_ for _ in ()).throw(AssertionError('ASN stage repeated')))
+        run.assert_not_called()
+    assert args.output.read_bytes() == prepared_output
+    try:
+        incremental_update(args, entries, set(), lambda *_: ([], [], ''))
+    except RuntimeError as error:
+        assert 'Контрольная точка несовместима' in str(error)
+    else:
+        raise AssertionError('Changed routing baseline was accepted')
+    args.resume = None
+    result = json.loads(args.output.read_text())
+
     discovery.update(pages=[], complete=True)
     with patch('update_routing.subprocess.run', return_value=subprocess.CompletedProcess([], 0, json.dumps(discovery))) as run:
         incremental_update(args, [('old.example', 'old.example')], set(), lambda *_: ([], [], ''))

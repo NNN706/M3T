@@ -1,12 +1,14 @@
 """Scan services and atomically write deduplicated Xray rule fragments (Python stdlib)."""
 import argparse
 from collections import Counter
+from hashlib import sha256
 import ipaddress
 import json
 import os
 from pathlib import Path
 import subprocess
 import tempfile
+import time
 import sys
 from urllib.parse import urlsplit
 
@@ -127,8 +129,56 @@ def domain_rules(data, expected, *, include_seed=True):
     return {'rules':result}
 
 
+def routing_fingerprint(paths):
+    return {name: sha256(path.read_bytes()).hexdigest() if path.exists() else None
+            for name, path in paths.items()}
+
+
 def incremental_update(args, entries, explicit, collect):
     """Workflow mode. Append verified discoveries to the published baseline."""
+    resume = getattr(args, 'resume', None)
+    outputs = {'IP.json': args.output, 'domains.json': args.domains_output, 'sources.json': args.sources_output}
+    manifest = {
+        'version': 1,
+        'inputs': routing_fingerprint({
+            **outputs, 'scanner': args.scanner,
+            **({'sites': args.sites, 'asn_file': args.asn_file or args.sites.with_name('ASN.txt')}
+               if hasattr(args, 'sites') else {}),
+        }),
+        'sites': [list(entry) for entry in entries],
+        'asns': sorted(explicit),
+    }
+    implementation = routing_fingerprint({
+        'generator': Path(__file__), 'asn_routes': Path(__file__).with_name('asn_routes.py'),
+    })
+    if resume:
+        if not (resume / 'checkpoint.json').is_file():
+            raise RuntimeError('В артефакте нет checkpoint.json. Этот запуск нельзя продолжить автоматически.')
+        saved = json.loads((resume / 'checkpoint.json').read_text())
+        if saved != manifest:
+            changed = [name for name, digest in manifest['inputs'].items()
+                       if saved.get('inputs', {}).get(name) != digest]
+            detail = ', '.join(changed) or 'версия формата или список входных данных'
+            raise RuntimeError(f'Контрольная точка несовместима. Изменились: {detail}.')
+    if args.evidence:
+        write_json(args.evidence / 'checkpoint.json', manifest)
+    if resume and (resume / 'prepared.json').is_file():
+        prepared = json.loads((resume / 'prepared.json').read_text())
+        files = [*outputs, 'asn-report.md', 'completeness.json']
+        saved_files = {name: resume / name for name in files}
+        if prepared.get('implementation') == implementation:
+            if prepared.get('files') != routing_fingerprint(saved_files) or not all(p.is_file() for p in saved_files.values()):
+                raise RuntimeError('Контрольная точка публикации повреждена: файлы не совпадают с контрольными суммами.')
+            status = json.loads(saved_files['completeness.json'].read_text())
+            if not status['domains_without_complete_dns_bgp'] and not status['asns_without_prefixes']:
+                for name, path in outputs.items():
+                    write_json(path, json.loads(saved_files[name].read_text()))
+                for name in ('asn-report.md', 'completeness.json', 'discovery.json', 'dns-checkpoint.json'):
+                    if (resume / name).is_file():
+                        (args.evidence / name).write_bytes((resume / name).read_bytes())
+                save_prepared(args.evidence, outputs, implementation)
+                print('Восстановлены готовые файлы маршрутизации. Продолжаем с публикации.', flush=True)
+                return
     previous_domains = json.loads(args.domains_output.read_text()) if args.domains_output.exists() else {'rules': []}
     if args.output.exists() and not args.sources_output.exists():
         raise RuntimeError('Инкрементальный сбор требует sources.json для сохранения групп подсетей.')
@@ -141,7 +191,10 @@ def incremental_update(args, entries, explicit, collect):
              for matcher in group if matcher.startswith('domain:')}
     discovery = {'domains': [], 'pages': [], 'complete': True}
     flags = ['-v'] if args.verbose else []
-    if entries:
+    if resume and (resume / 'discovery.json').is_file():
+        discovery = json.loads((resume / 'discovery.json').read_text())
+        print('Chromium: восстановлен список доменов из артефакта.', flush=True)
+    elif entries:
         # Reuse the production curl/Chromium phase without executing its DNS phase.
         # Fail closed if SubnetResolve changes its phase boundary.
         marker = "\nunset inputs\nstage_name='Этап 3/4: DNS'\n"
@@ -168,19 +221,41 @@ def incremental_update(args, entries, explicit, collect):
     if args.evidence:
         args.evidence.mkdir(parents=True, exist_ok=True)
         write_json(args.evidence / 'discovery.json', discovery)
-    if pending:
-        scan = subprocess.run(['bash', str(args.scanner), '-s', *flags, '--', *pending],
-                              stdout=subprocess.PIPE, text=True, timeout=6600)
+    if resume and (resume / 'dns-checkpoint.json').is_file():
+        saved_dns = json.loads((resume / 'dns-checkpoint.json').read_text())
+        if not set(saved_dns) <= set(pending) or any(
+            row['domain'] != host or row['complete'] is not True or not row['results']
+            for host, row in saved_dns.items()
+        ):
+            raise ValueError('DNS/BGP: контрольная точка содержит неполные или незапрошенные домены.')
+        responses.update(saved_dns)
+        print(f'DNS/BGP: восстановлено доменов {len(saved_dns)}.', flush=True)
+    remaining = [host for host in pending if host not in responses]
+    deadline = time.monotonic() + 6600
+    if args.evidence:
+        write_json(args.evidence / 'dns-checkpoint.json', responses)
+    for start in range(0, len(remaining), 32):
+        batch = remaining[start:start + 32]
+        budget = deadline - time.monotonic()
+        if budget <= 0:
+            raise RuntimeError('Истёк общий лимит DNS/BGP. Завершённые пакеты сохранены.')
+        scan = subprocess.run(['bash', str(args.scanner), '-s', *flags, '--', *batch],
+                              stdout=subprocess.PIPE, text=True, timeout=budget)
         if args.evidence:
-            (args.evidence / 'scanner-output.json').write_text(scan.stdout)
+            (args.evidence / f'scanner-output-{start // 32 + 1}.json').write_text(scan.stdout)
         if scan.returncode not in (0, 3):
             raise RuntimeError(f'DNS/BGP-сканирование завершилось с ошибкой {scan.returncode}. См. журнал.')
         data = json.loads(scan.stdout)
         rows = data['domains'] if 'domains' in data else [data]
-        responses = {row['domain']: row for row in rows}
-        if len(responses) != len(rows) or set(responses) != set(pending):
-            raise ValueError(f'DNS/BGP вернул другой список доменов. Нет: {sorted(set(pending)-responses.keys())}. '
-                             f'Лишние: {sorted(responses.keys()-set(pending))}.')
+        received = {row['domain']: row for row in rows}
+        if len(received) != len(rows) or set(received) != set(batch):
+            raise ValueError(f'DNS/BGP вернул другой список доменов. Нет: {sorted(set(batch)-received.keys())}. '
+                             f'Лишние: {sorted(received.keys()-set(batch))}.')
+        responses.update(received)
+        if args.evidence:
+            write_json(args.evidence / 'dns-checkpoint.json', {
+                host: row for host, row in responses.items() if row['complete'] is True and row['results']
+            })
     resolved = {}
     for host, row in responses.items():
         if row['complete'] and row['results']:
@@ -221,6 +296,18 @@ def incremental_update(args, entries, explicit, collect):
     write_json(args.domains_output, domains)
     write_json(args.sources_output, sources)
 
+    if args.evidence:
+        save_prepared(args.evidence, outputs, implementation)
+
+
+def save_prepared(evidence, outputs, implementation):
+    files = {name: evidence / name for name in (*outputs, 'asn-report.md', 'completeness.json')}
+    for name, source in outputs.items():
+        write_json(files[name], json.loads(source.read_text()))
+    write_json(evidence / 'prepared.json', {
+        'files': routing_fingerprint(files), 'implementation': implementation,
+    })
+
 
 def main():
     from asn_routes import asn, collect
@@ -231,12 +318,15 @@ def main():
     parser.add_argument('--output', type=Path, default=root / 'IP.json')
     parser.add_argument('--sources-output', type=Path, help='Original per-service prefixes before global grouping')
     parser.add_argument('--domains-output', type=Path, help='Defaults to domains.json beside IP.json')
+    parser.add_argument('--resume', type=Path, help='Resume incremental routing from an evidence directory')
     parser.add_argument('--incremental', action='store_true', help='Resolve only names absent from published domain rules')
     parser.add_argument('--allow-partial', action='store_true', help='Keep available prefixes and union previous entries on incomplete scans')
     parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed scanner stages on stderr')
     parser.add_argument('--evidence', type=Path, help='Directory for raw scan output and completeness report')
     parser.add_argument('--scanner', type=Path, default=root.parent / 'SubnetResolve.sh')
     args = parser.parse_args()
+    if args.resume and (not args.incremental or not args.evidence):
+        parser.error('--resume requires --incremental and --evidence')
     entries = services(args.sites, asn)
     explicit = {tag for tag, _ in entries if asn(tag)}
     entries = [(tag, value) for tag, value in entries if not asn(tag)]
