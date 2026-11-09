@@ -79,6 +79,20 @@ with tempfile.TemporaryDirectory() as directory:
     try:module.publish(repo,payload,changed)
     except RuntimeError as error:assert 'changed during scan' in str(error)
     else:raise AssertionError('Newer IP.json was overwritten')
+    try:
+        module.publish_payloads(repo, changed, {module.REPORT: b'# Old report\n'},
+                                module.REPORT_INPUTS, 'Report')
+    except RuntimeError as error:
+        assert module.OUTPUT in str(error)
+    else:
+        raise AssertionError('Report was published for a replaced IP.json')
+    latest = git(other, 'rev-parse', 'HEAD')
+    module.publish_payloads(repo, latest, {module.REPORT: b'# Current report\n'},
+                            module.REPORT_INPUTS, 'Report')
+    report_commit = git(other, 'ls-remote', 'origin', 'refs/heads/test').split()[0]
+    git(other, 'fetch', 'origin', 'test')
+    assert git(other, 'diff-tree', '--no-commit-id', '--name-only', '-r', report_commit) == module.REPORT
+    assert git(other, 'show', f'{report_commit}:{module.REPORT}') == '# Current report'
     try:module.publish(repo,payload,changed,branch='main')
     except ValueError:pass
     else:raise AssertionError('main publication enabled')

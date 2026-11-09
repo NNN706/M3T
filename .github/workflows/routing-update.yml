@@ -6,6 +6,10 @@ on:
         description: ID запуска с сохранёнными результатами
         required: false
         type: string
+      report_only:
+        description: Построить общий отчёт из опубликованного IP.json без нового сканирования
+        type: boolean
+        default: false
   push:
     branches: [test]
     paths:
@@ -19,7 +23,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   update:
-    if: github.ref == 'refs/heads/test'
+    if: github.ref == 'refs/heads/test' && !inputs.report_only
     runs-on: [self-hosted, Linux, X64]
     timeout-minutes: 120
     steps:
@@ -137,3 +141,38 @@ jobs:
         run: |
           set -euo pipefail
           python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --output "$ROUTING_EVIDENCE/IP.json" --domains "$ROUTING_EVIDENCE/domains.json" --sources "$ROUTING_EVIDENCE/sources.json"
+
+  routing-report:
+    needs: update
+    if: >-
+      ${{ !cancelled() && github.ref == 'refs/heads/test' &&
+          (needs.update.result == 'success' || (inputs.report_only && needs.update.result == 'skipped')) }}
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: test
+      - name: Build report from published IP.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$RUNNER_NAME" = Admiralteskiy
+          export XDG_CACHE_HOME="$HOME/.cache/m3t-routing"
+          mkdir -p "$RUNNER_TEMP/routing-report-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          report="$RUNNER_TEMP/routing-report-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/asn-report.md"
+          python3 source/tests/test_routing_report.py
+          python3 source/routing/routing_report.py source/routing/IP.json "$report"
+          cat "$report" >> "$GITHUB_STEP_SUMMARY"
+      - name: Save overall routing report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: overall-routing-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/routing-report-${{ github.run_id }}-${{ github.run_attempt }}/asn-report.md
+          retention-days: 7
+      - name: Publish report on test
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$RUNNER_TEMP/routing-report-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/asn-report.md"
+          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --report "$report"
