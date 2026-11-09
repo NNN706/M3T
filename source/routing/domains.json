@@ -4,13 +4,15 @@
       "ruleTag": "async-online4.vtb.ru",
       "domain": [
         "domain:async-online4.vtb.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "back.vtb.fp.f6.security",
       "domain": [
         "domain:back.vtb.fp.f6.security"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "beget.com",
@@ -27,7 +29,8 @@
         "domain:top-fwz1.mail.ru",
         "domain:vk.com",
         "domain:www.googletagmanager.com"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "cdnvideo.com",
@@ -38,7 +41,8 @@
         "domain:code.jquery.com",
         "domain:extreme-ip-lookup.com",
         "domain:www.cdnvideo.com"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "cloud.ru",
@@ -136,7 +140,8 @@
         "domain:www.googletagmanager.com",
         "domain:x.bidswitch.net",
         "domain:x01.aidata.io"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "cloud.vk.com",
@@ -154,7 +159,8 @@
         "domain:vkcloud-cms-prod.s3.prodcloud.vk.team",
         "domain:vkcloud-next.vktech-static.ru",
         "domain:vkcs-scripts.mrgcdn.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "contell.ru",
@@ -169,7 +175,8 @@
         "domain:widget.me-talk.ru",
         "domain:www.google.com",
         "domain:www.gstatic.com"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "datahouse.ru",
@@ -191,7 +198,8 @@
         "domain:vk.com",
         "domain:yandex.ru",
         "domain:yastatic.net"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "ddos-guard.net",
@@ -223,13 +231,15 @@
         "domain:www.google.com",
         "domain:www.google.ru",
         "domain:www.googletagmanager.com"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "esmdtpep.vtb.ru",
       "domain": [
         "domain:esmdtpep.vtb.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "fornex.com",
@@ -238,13 +248,15 @@
         "domain:client.crisp.chat",
         "domain:fornex.com",
         "domain:ru.fornex.com"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "h2.vtb.ru",
       "domain": [
         "domain:h2.vtb.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "ihc.ru",
@@ -268,7 +280,8 @@
         "domain:vi-sber1-24.jivosite.com",
         "domain:vk.com",
         "domain:www.ihc.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "landvps.ru",
@@ -279,7 +292,8 @@
         "domain:mc.yandex.ru",
         "domain:mdd.yandex.net",
         "domain:my.landvps.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "majordomo.ru",
@@ -297,13 +311,15 @@
         "domain:uaas.yandex.ru",
         "domain:vk.com",
         "domain:www.majordomo.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "mb.vtb.ru",
       "domain": [
         "domain:mb.vtb.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "mws.ru",
@@ -329,13 +345,15 @@
         "domain:top-fwz1.mail.ru",
         "domain:uaas.yandex.ru",
         "domain:web-static.s.mindbox.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "online.vtb.ru",
       "domain": [
         "domain:online.vtb.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "reg.ru",
@@ -354,7 +372,8 @@
         "domain:www.reg.ru",
         "domain:yandex.ru",
         "domain:yastatic.net"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "ruvds.com",
@@ -395,13 +414,15 @@
         "domain:www.google.ru",
         "domain:www.googletagmanager.com",
         "domain:yekat-ping-test.ruvds.com"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "s2.vtb.ru",
       "domain": [
         "domain:s2.vtb.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "selectel.ru",
@@ -425,7 +446,8 @@
         "domain:vk.com",
         "domain:web-static.s.mindbox.ru",
         "domain:widgets.mango-office.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "smartape.ru",
@@ -440,13 +462,15 @@
         "domain:widgets-mcw.mango-office.ru",
         "domain:widgets.mango-office.ru",
         "domain:www.smartape.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "sso-mb.vtb.ru",
       "domain": [
         "domain:sso-mb.vtb.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     },
     {
       "ruleTag": "timeweb.cloud",
@@ -461,7 +485,8 @@
         "domain:sentry.timeweb.cloud",
         "domain:timeweb.cloud",
         "domain:web-static.mindbox.ru"
-      ]
+      ],
+      "outboundTag": "direct"
     }
   ]
 }
