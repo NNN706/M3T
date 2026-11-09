@@ -116,6 +116,12 @@ jobs:
             printf '\n## Полнота сбора\n\n%s\n' '```json'
             cat "$ROUTING_EVIDENCE/completeness.json"
             printf '\n%s\n' '```'
+            printf '\n## Итоговые правила маршрутизации\n'
+            for file in domains.json IP.json; do
+              printf '\n<details>\n<summary>%s</summary>\n\n%s\n' "$file" '```json'
+              cat "$ROUTING_EVIDENCE/$file"
+              printf '\n%s\n\n</details>\n' '```'
+            done
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Save scan evidence
         if: always()
