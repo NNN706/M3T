@@ -1,6 +1,7 @@
 """Scan services and atomically write deduplicated Xray rule fragments (Python stdlib)."""
 import argparse
 from collections import Counter
+from contextlib import ExitStack
 from hashlib import sha256
 import ipaddress
 import json
@@ -146,6 +147,7 @@ def incremental_update(args, entries, explicit, collect, cloudflare=None):
     for host in invalid:
         print(f'Некорректное DNS-имя в sites.txt: {host!r}. Остальные записи будут обработаны.', file=sys.stderr)
     entries = [(host, url) for host, url in entries if host not in invalid]
+    ipv4_index = cloudflare.ipv4_index() if cloudflare else None
     manifest = {
         'version': 1,
         'inputs': routing_fingerprint({
@@ -156,6 +158,8 @@ def incremental_update(args, entries, explicit, collect, cloudflare=None):
         'sites': [list(entry) for entry in entries],
         'asns': sorted(explicit),
     }
+    if ipv4_index is not None:
+        manifest['ipv4_exclusions'] = sha256(json.dumps(ipv4_index, sort_keys=True).encode()).hexdigest()
     implementation = routing_fingerprint({
         'generator': Path(__file__), 'asn_routes': Path(__file__).with_name('asn_routes.py'),
     })
@@ -198,7 +202,6 @@ def incremental_update(args, entries, explicit, collect, cloudflare=None):
     domain_groups = {r['ruleTag']: set(r['domain']) for r in previous_domains['rules']}
     source_groups = {r['ruleTag']: set(r['ip']) for r in previous_sources['rules']}
     known = {matcher.split(':', 1)[1] for group in domain_groups.values() for matcher in group}
-    excluded = set(previous_sources.get('excluded_cloudflare_domains', [])) if cloudflare else set()
     retry_names = set(previous_sources.get('pending_dns', []))
     discovery = {'domains': [], 'pages': [], 'complete': True}
     browser_entries = entries
@@ -243,17 +246,18 @@ def incremental_update(args, entries, explicit, collect, cloudflare=None):
             message = error.removesuffix('; домен будет проверен через DNS/BGP')
             print(f"[{page['site']}] {message}", file=sys.stderr)
     discovered = set().union(*candidates.values())
-    pending = sorted(host for host in discovered - excluded if host not in known or host in retry_names)
+    pending = sorted(host for host in discovered if host not in known or host in retry_names)
     print(f'DNS Check-Host: на проверку {len(pending)}, пропущено известных {len(discovered)-len(pending)}.', flush=True)
     observations = []
     responses = {}
     if args.evidence:
         args.evidence.mkdir(parents=True, exist_ok=True)
         write_json(args.evidence / 'discovery.json', discovery)
-    if resume and (resume / 'dns-checkpoint.json').is_file():
+    if resume and (resume / 'dns-checkpoint.json').is_file() and (
+            saved.get('ipv4_exclusions') == manifest.get('ipv4_exclusions')):
         saved_dns = json.loads((resume / 'dns-checkpoint.json').read_text())
         if any(
-            row['domain'] != host or row['complete'] is not True or not row['results']
+            row['domain'] != host or row['complete'] is not True or not (row['results'] or row.get('excluded_ips'))
             for host, row in saved_dns.items()
         ):
             raise ValueError('DNS/BGP: контрольная точка содержит неполные или незапрошенные домены.')
@@ -270,8 +274,15 @@ def incremental_update(args, entries, explicit, collect, cloudflare=None):
             print('Истёк общий лимит DNS/BGP. Сохраняем завершённые пакеты.', file=sys.stderr)
             break
         try:
-            scan = subprocess.run(['bash', str(args.scanner), '-s', *flags, '--', *batch],
-                                  stdout=subprocess.PIPE, text=True, timeout=budget)
+            with ExitStack() as stack:
+                env = os.environ.copy()
+                if ipv4_index is not None:
+                    index_file = stack.enter_context(tempfile.NamedTemporaryFile(mode='w', encoding='utf-8'))
+                    json.dump(ipv4_index, index_file, separators=(',', ':'))
+                    index_file.flush()
+                    env['SUBNET_EXCLUDED_IPV4_INDEX'] = index_file.name
+                scan = subprocess.run(['bash', str(args.scanner), '-s', *flags, '--', *batch],
+                                      stdout=subprocess.PIPE, text=True, timeout=budget, env=env)
         except subprocess.TimeoutExpired:
             print('Истёк лимит DNS/BGP. Сохраняем найденные имена и полученные префиксы.', file=sys.stderr)
             break
@@ -294,21 +305,21 @@ def incremental_update(args, entries, explicit, collect, cloudflare=None):
         responses.update(received)
         if args.evidence:
             write_json(args.evidence / 'dns-checkpoint.json', {
-                host: row for host, row in responses.items() if row['complete'] is True and row['results']
+                host: row for host, row in responses.items() if row['complete'] is True and (row['results'] or row.get('excluded_ips'))
             })
+    excluded_asns = cloudflare.asns if cloudflare else set()
+    explicit = set(explicit) - excluded_asns
     resolved = {}
+    excluded_ips = set()
     for host, row in responses.items():
-        if row['results']:
-            resolved[host] = {str(ipaddress.ip_network(route['prefix'])) for route in row['results']}
-            observations.extend(row['results'])
+        routes = [route for route in row['results'] if route.get('asn') not in excluded_asns]
+        if routes:
+            resolved[host] = {str(ipaddress.ip_network(route['prefix'])) for route in routes}
+            observations.extend(routes)
+        excluded_ips.update(row.get('excluded_ips', []))
     if cloudflare:
-        excluded = cloudflare.excluded_hosts(known | discovered, excluded, responses)
-        explicit = set(explicit) - cloudflare.asns
-        observations = [row for row in observations if row['asn'] not in cloudflare.asns]
-        print(f'Cloudflare: исключено доменов {len(excluded & (known | discovered))}; ASN: '
-              + ', '.join(sorted(cloudflare.asns)), flush=True)
-    unresolved = sorted(host for host in set(pending) - excluded
-                        if host not in resolved or responses[host]['complete'] is not True)
+        print(f'Cloudflare: пропущено уникальных IPv4 перед WHOIS — {len(excluded_ips)}.', flush=True)
+    unresolved = [host for host in pending if host not in responses or responses[host]['complete'] is not True]
     if unresolved:
         print('DNS/BGP без полного результата. Домены остаются на повтор: ' + ', '.join(unresolved), file=sys.stderr)
     if args.evidence:
@@ -326,20 +337,18 @@ def incremental_update(args, entries, explicit, collect, cloudflare=None):
         if rule['ip']:
             source_groups.setdefault(rule['ruleTag'], set()).update(rule['ip'])
     for tag, hosts in candidates.items():
-        new_matchers = {'domain:' + host for host in hosts - known - excluded}
+        new_matchers = {'domain:' + host for host in hosts - known}
         if new_matchers:
             domain_groups.setdefault(tag, set()).update(new_matchers)
-        for host in sorted((hosts & resolved.keys()) - excluded):
+        for host in sorted(hosts & resolved.keys()):
             source_groups.setdefault(tag, set()).update(resolved[host])
     sources = {'rules': [{'ruleTag': tag, 'ip': sorted(values)} for tag, values in sorted(source_groups.items())]}
     domains = {'rules': [{'ruleTag': tag, 'domain': sorted(values)} for tag, values in sorted(domain_groups.items())]}
     domains = domain_rules(domains, domain_groups, include_seed=False)
     if cloudflare:
-        sources, domains = cloudflare.filter_rules(sources, domains, excluded)
+        sources = cloudflare.filter_ip_rules(sources)
     sources = compact_rules(sources, [rule['ruleTag'] for rule in sources['rules']], dual_stack=True)
-    sources['pending_dns'] = sorted((retry_names - set(pending) - excluded) | set(unresolved))
-    if cloudflare:
-        sources['excluded_cloudflare_domains'] = sorted(excluded)
+    sources['pending_dns'] = sorted((retry_names - set(pending)) | set(unresolved))
     result = global_rules(sources)
     complete = discovery['complete'] and not unresolved and not as_missing and not invalid and asn_error is None
     if args.evidence:
@@ -348,8 +357,8 @@ def incremental_update(args, entries, explicit, collect, cloudflare=None):
             'complete': complete, 'mode': 'incremental', 'invalid_sites': invalid, 'dns_requested': len(pending),
             'dns_skipped_existing': len(discovered) - len(pending),
             'domains_without_complete_dns_bgp': unresolved,
-            'domains_without_any_prefix': sorted(set(pending) - resolved.keys() - excluded),
-            'domains_excluded_cloudflare': sorted(excluded & (known | discovered)),
+            'domains_without_any_prefix': sorted(set(pending) - resolved.keys()),
+            'cloudflare_ipv4_skipped_before_whois': len(excluded_ips),
             'asns_without_prefixes': as_missing,
             'asn_export_error': asn_error,
             'services_written': len(result['rules']),

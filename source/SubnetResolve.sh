@@ -694,9 +694,14 @@ unset inputs
 stage_name='Этап 3/4: DNS'
 check_bgp_service() {
   local probe_ip
-  stage_name='Подготовка DNS/BGP'
+  local probes=(1.1.1.1 8.8.8.8)
+  if [ "$filter_ipv4" -eq 1 ]; then
+    probes=(8.8.8.8 9.9.9.9)
+  else
+    stage_name='Подготовка DNS/BGP'
+  fi
   # One route can be temporarily unavailable while WHOIS is healthy.
-  for probe_ip in 1.1.1.1 8.8.8.8; do
+  for probe_ip in "${probes[@]}"; do
     printf '%s\n' "$probe_ip" > "$batch/probe-ip"
     stage="проверка BGP.tools WHOIS для $probe_ip"
     if bgp_exchange "$batch/probe-ip" "$batch/probe-bgp" probe; then return 0; fi
@@ -705,17 +710,28 @@ check_bgp_service() {
       jq -r '.errors[] | "[BGP.tools WHOIS] \(.ip): \(.message)"' "$batch/bgp-state.json" >&2
     fi
   done
-  die 'BGP.tools WHOIS: не получены пригодные префиксы и ASN для 1.1.1.1 и 8.8.8.8. DNS-проверки и массовый запрос не запускаются.'
+  die "BGP.tools WHOIS: не получены пригодные префиксы и ASN для ${probes[*]}. Массовый запрос не запускается."
 }
 save_bgp_checkpoint() {
   local data=$checkpoint.part
   (umask 077; jq -n --slurpfile services "$batch/services.json" --slurpfile dns "$batch/dns-checkpoint.json" \
     --slurpfile discovery "$batch/discovery.json" --rawfile whois "$batch/bgp.txt" \
-    '{version:1,services:$services[0],dns:$dns[0],discovery:$discovery[0],whois:$whois}' > "$data") &&
+    --slurpfile exclusions "$batch/excluded-ips.json" \
+    '{version:1,services:$services[0],dns:$dns[0],discovery:$discovery[0],whois:$whois}
+     + (if $exclusions[0] == null then {} else {excluded_ipv4:$exclusions[0]} end)' > "$data") &&
     chmod 600 "$data" && mv -f "$data" "$checkpoint"
 }
+ipv4_index=${SUBNET_EXCLUDED_IPV4_INDEX:-}
+printf 'null\n' > "$batch/excluded-ips.json"
+if [ -n "$resume_bgp" ]; then
+  jq -e '(.excluded_ipv4 == null) or (.excluded_ipv4 | type == "array" and all(.[]; type == "string"))' \
+    "$resume_bgp" >/dev/null || die 'Файл продолжения BGP содержит некорректный список исключённых IPv4.'
+  jq '.excluded_ipv4' "$resume_bgp" > "$batch/excluded-ips.json"
+fi
+filter_ipv4=0
+if [ -n "$ipv4_index" ] || jq -e '. != null' "$batch/excluded-ips.json" >/dev/null; then filter_ipv4=1; fi
 if [ -z "$resume_bgp" ]; then check_service; fi
-check_bgp_service
+if [ "$filter_ipv4" -eq 0 ]; then check_bgp_service; fi
 stage_name='Этап 3/4: DNS'
 if [ -n "$resume_bgp" ]; then
   jq '.services' "$resume_bgp" > "$batch/services.json"
@@ -802,9 +818,24 @@ done
 fi
 tmp=$batch
 jq -s 'add | unique' "${observation_files[@]}" > "$tmp/observations.json"
-# Deduplicate across ALL domains before the single Bulk WHOIS request.
-jq -r '[.[].ip] | unique[]' "$tmp/observations.json" > "$tmp/ips"
+# Filter DNS observations and deduplicate across all domains before WHOIS.
+if [ -n "$ipv4_index" ]; then
+  jq --slurpfile index "$ipv4_index" '
+    def ipnum: split(".") | map(tonumber) | reduce .[] as $octet (0; . * 256 + $octet);
+    ($index[0] | to_entries | map({size:(.key | tonumber), networks:.value})) as $ranges |
+    [.[].ip] | unique | map(select(
+      (ipnum) as $ip | any($ranges[]; . as $range |
+        (($ip / $range.size | floor) * $range.size | tostring) as $start |
+        $range.networks[$start] == true)
+    ))
+  ' "$tmp/observations.json" > "$tmp/excluded-ips.json" || die 'Не удалось применить индекс исключённых IPv4.'
+fi
+jq -r --slurpfile excluded "$tmp/excluded-ips.json" \
+  '([.[].ip] | unique) - ($excluded[0] // []) | .[]' "$tmp/observations.json" > "$tmp/ips"
 stage_name='Этап 4/4: BGP'
+if [ "$filter_ipv4" -eq 1 ]; then
+  progress "Cloudflare: пропущено IPv4 перед WHOIS — $(jq 'length' "$tmp/excluded-ips.json")"
+fi
 if [ -s "$tmp/ips" ]; then
   # Keep DNS data even if the process is interrupted during WHOIS.
   if [ ! -f "$batch/discovery.json" ]; then printf 'null\n' > "$batch/discovery.json"; fi
@@ -827,6 +858,7 @@ if [ -s "$tmp/ips" ]; then
   mode=bulk
   if [ -n "$resume_bgp" ]; then mode=resume; fi
   stage="BGP-префиксы и ASN для уникальных IP: $(wc -l < "$tmp/ips" | tr -d ' ')"
+  if [ "$filter_ipv4" -eq 1 ]; then check_bgp_service; fi
   if bgp_exchange "$tmp/ips" "$tmp/bgp.txt" "$mode"; then
     bgp_complete=1
   else
@@ -846,13 +878,15 @@ for domain in "${domains[@]}"; do
   tmp="$batch/domain-$index"
 jq -n --arg domain "$domain" --argjson verbose "$verbose" \
   --slurpfile c "$tmp/check.json" --slurpfile n "$tmp/nodes.json" \
-  --slurpfile o "$tmp/observations.json" --slurpfile b "$batch/routes.json" --slurpfile be "$batch/bgp-errors.json" '
+  --slurpfile x "$batch/excluded-ips.json" --slurpfile o "$tmp/observations.json" --slurpfile b "$batch/routes.json" --slurpfile be "$batch/bgp-errors.json" '
   # Reject unrelated/malformed ranges, including a prefix not containing its IP.
   def ipnum: split(".") | map(tonumber) | if length == 4 and all(.[]; . >= 0 and . <= 255) then reduce .[] as $v (0; . * 256 + $v) else error("Invalid IPv4") end;
   [$b[0][] | . as $route | select(any($o[0][]; .ip == $route.ip)) |
    (.prefix | split("/")) as $p | pow(2; 32 - ($p[1]|tonumber)) as $size |
    select(try (((.ip|ipnum) / $size | floor) == (($p[0]|ipnum) / $size) ) catch false)] as $routes |
   [$o[0][] | . as $obs | $routes[] | select(.ip == $obs.ip) | . + {node: $obs.node}] as $joined |
+  ([$o[0][].ip] | unique) as $observed |
+  ($observed - ($x[0] // [])) as $queried |
   {domain: $domain, record_type: "A",
    results: ($joined | group_by([.asn, .prefix]) | map(
      . as $group | .[0] | {asn, as_name, prefix, country, registry, allocated} +
@@ -871,10 +905,10 @@ jq -n --arg domain "$domain" --argjson verbose "$verbose" \
         message: (if .response == null then ($c[0].poll_error // "Узел не предоставил результат до завершения опроса")
                   elif ($messages | length > 0) then ($messages | join("; "))
                   else "Узел ответил, но не вернул IPv4 A-записи" end), response: .response}] +
-     ([$o[0][].ip] | unique | map(. as $ip | select(all($routes[]; .ip != $ip)) | ([$be[0][] | select(.ip==$ip)] | first // {ip:$ip,error:"Не получены BGP-префикс и ASN",message:"BGP.tools не прислал данные для этого IP"})))),
+     ($queried | map(. as $ip | select(all($routes[]; .ip != $ip)) | ([$be[0][] | select(.ip==$ip)] | first // {ip:$ip,error:"Не получены BGP-префикс и ASN",message:"BGP.tools не прислал данные для этого IP"})))),
    permanent_link: $c[0].permanent_link} |
-  . + {complete: ((.results | length > 0) and
-                   all(.errors[]; .check_host != null))}
+  . + {complete: (($observed | length > 0) and all(.errors[]; .check_host != null))} +
+  (if $x[0] == null then {} else {excluded_ips: ($observed - $queried)} end)
 ' > "$tmp/full.json"
   full_files+=("$tmp/full.json")
 done

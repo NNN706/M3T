@@ -1420,9 +1420,8 @@
       ]
     }
   ],
-  "excluded_cloudflare_domains": [
+  "pending_dns": [
     "app.termly.io",
-    "auth.openai.com",
     "cdn.jsdelivr.net",
     "client.crisp.chat",
     "cllctr.roistat.com",

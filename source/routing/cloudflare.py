@@ -1,16 +1,10 @@
-"""Keep Cloudflare destinations out of generated direct rules."""
+"""Keep Cloudflare IP ranges out of generated direct IP rules."""
 from bisect import bisect_left
-from concurrent.futures import ThreadPoolExecutor
 import csv
 import ipaddress
 import re
-import socket
 
 from asn_routes import cached_export, table_prefixes
-
-
-# The supplied example must stay off direct even when DNS is temporarily unavailable.
-EXCLUDED_HOSTS = {'auth.openai.com'}
 
 
 def cloudflare_origins(path):
@@ -24,13 +18,6 @@ def cloudflare_origins(path):
     if not {13335, 209242} <= origins:
         raise ValueError('BGP.tools asns.csv: отсутствуют основные ASN Cloudflare')
     return origins
-
-
-def lookup_addresses(host):
-    try:
-        return {record[4][0] for record in socket.getaddrinfo(host + '.', None, type=socket.SOCK_STREAM)}
-    except socket.gaierror:
-        return set()
 
 
 class CloudflarePolicy:
@@ -60,31 +47,14 @@ class CloudflarePolicy:
                 break
             yield candidate
 
-    def _contains(self, address):
-        ip = ipaddress.ip_address(address)
-        index = bisect_left(self.ends[ip.version], int(ip))
-        return index < len(self.ranges[ip.version]) and ip in self.ranges[ip.version][index]
+    def ipv4_index(self):
+        """Map subnet sizes to their integer network addresses for jq lookups."""
+        index = {}
+        for network in self.ranges[4]:
+            index.setdefault(str(network.num_addresses), {})[str(int(network.network_address))] = True
+        return index
 
-    def excluded_hosts(self, hosts, previous, responses):
-        excluded = set(previous) | EXCLUDED_HOSTS
-        for host, row in responses.items():
-            routes = row['results']
-            addresses = {ip for route in routes for ip in route.get('ips', [])}
-            addresses.update(error['ip'] for error in row.get('errors', []) if 'ip' in error)
-            if (any(route.get('asn') in self.asns for route in routes)
-                    or any(self._contains(ip) for ip in addresses)):
-                excluded.add(host)
-
-        # Supplement Check-Host's IPv4 observations with the runner's A/AAAA
-        # answers, including hosts from older rules without per-host BGP records.
-        candidates = sorted(set(hosts) - excluded)
-        with ThreadPoolExecutor(max_workers=24) as pool:
-            for host, addresses in zip(candidates, pool.map(lookup_addresses, candidates)):
-                if any(self._contains(ip) for ip in addresses):
-                    excluded.add(host)
-        return excluded
-
-    def filter_rules(self, sources, domains, excluded):
+    def filter_ip_rules(self, sources):
         rules = []
         for rule in sources['rules']:
             if rule['ruleTag'] in self.asns:
@@ -104,20 +74,4 @@ class CloudflarePolicy:
             if prefixes:
                 rules.append({**rule, 'ip': prefixes})
 
-        # Xray domain: matches the hostname and all its descendants. Narrow any
-        # ancestor of an excluded host to an exact hostname.
-        ancestors = {host.split('.', offset)[-1] for host in excluded
-                     for offset in range(1, host.count('.'))}
-        domain_rules = []
-        for rule in domains['rules']:
-            matchers = set()
-            for matcher in rule['domain']:
-                kind, host = matcher.split(':', 1)
-                if host in excluded:
-                    continue
-                if kind == 'domain' and host in ancestors:
-                    kind = 'full'
-                matchers.add(f'{kind}:{host}')
-            if matchers:
-                domain_rules.append({**rule, 'domain': sorted(matchers)})
-        return {**sources, 'rules': rules}, {'rules': domain_rules}
+        return {**sources, 'rules': rules}
