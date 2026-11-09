@@ -43,3 +43,25 @@ exec "$@"
     }
   });
 }
+
+test('negative probe requires the default block access log for the exact IP', () => {
+  const script = fs.readFileSync('deploy.sh', 'utf8');
+  const start = `python3 - "$evidence/preflight-xray.log" "$negative" <<'PY'`;
+  const probe = script.split(start + '\n')[1].split('\nPY\n')[0];
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'xray-preflight-'));
+  try {
+    const log = path.join(tmp, 'access.log');
+    for (const [line, status] of [
+      ['accepted tcp:1.1.1.1:443 [routing-test-socks >> block]', 0],
+      ['accepted tcp:1.1.1.1:443 [routing-test-socks -> block]', 1],
+      ['accepted tcp:1.1.1.1:443 [routing-test-socks >> direct]', 1],
+      ['accepted tcp:11.1.1.1:443 [routing-test-socks >> block]', 1],
+    ]) {
+      fs.writeFileSync(log, line);
+      const result = spawnSync('python3', ['-c', probe, log, '1.1.1.1'], {encoding: 'utf8'});
+      assert.equal(result.status, status, result.stderr);
+    }
+  } finally {
+    fs.rmSync(tmp, {recursive: true, force: true});
+  }
+});

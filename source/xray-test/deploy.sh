@@ -75,9 +75,11 @@ fi
 run_docker logs "$container" > "$evidence/preflight-xray.log" 2>&1
 python3 - "$evidence/preflight-xray.log" "$negative" <<'PY'
 import sys
+# Xray writes >> for a default outbound and -> for an explicit routing rule.
+expected = f'accepted tcp:{sys.argv[2]}:443 [routing-test-socks >> block]'
 with open(sys.argv[1]) as log:
-    if not any(sys.argv[2] + ':443' in line and 'routing-test-socks -> block' in line for line in log):
-        raise SystemExit('Не подтверждён default block в журнале Xray; браузерный тест не запускается')
+    if not any(expected in line for line in log):
+        raise SystemExit(f'Не подтверждён default block в журнале Xray. Ожидалась запись: {expected}')
 PY
 printf 'Container: %s\nImage: %s\nSHA: %s\nStarted: %s\n'   "$container" "$XRAY_IMAGE" "${GITHUB_SHA:-local}" "$(date -u +%FT%TZ)" > "$evidence/deployment.txt"
 cat "$evidence/deployment.txt" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
