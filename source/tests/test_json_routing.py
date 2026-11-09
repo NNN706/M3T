@@ -54,7 +54,7 @@ for rule in ips:
 current_domains=json.loads((root/'domains.json').read_text())
 # The committed JSON describes the previous scan. sites.txt may already have changed.
 assert current_domains == routing.domain_rules(
-    current_domains, [rule['ruleTag'] for rule in current_domains['rules']]
+    current_domains, [rule['ruleTag'] for rule in current_domains['rules']], include_seed=False
 )
 assert (root/'ASN.txt').exists()
 assert not (root/'IP.txt').exists()

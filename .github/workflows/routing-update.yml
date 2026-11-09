@@ -46,6 +46,7 @@ jobs:
           python3 source/tests/test_global_routing.py
           python3 source/tests/test_json_routing.py
           python3 source/tests/test_asn_routes.py
+          python3 source/tests/test_incremental_routing.py
           python3 source/tests/test_publish_routing.py
       - name: Scan sites and compact prefixes
         env:
@@ -55,7 +56,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/routing-evidence"
-          python3 source/routing/update_routing.py --verbose --allow-partial --evidence "$RUNNER_TEMP/routing-evidence" 2>&1 | tee "$RUNNER_TEMP/routing-evidence/scan.log"
+          python3 source/routing/update_routing.py --incremental --verbose --allow-partial --evidence "$RUNNER_TEMP/routing-evidence" 2>&1 | tee "$RUNNER_TEMP/routing-evidence/scan.log"
           if ! python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["complete"])' "$RUNNER_TEMP/routing-evidence/completeness.json"; then
             echo '::warning::Неполный сбор: опубликованы доступные подсети; прежние записи сохранены. См. routing-evidence.'
           fi
