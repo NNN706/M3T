@@ -1,6 +1,18 @@
 {
   "rules": [
     {
+      "ruleTag": "async-online4.vtb.ru",
+      "domain": [
+        "domain:async-online4.vtb.ru"
+      ]
+    },
+    {
+      "ruleTag": "back.vtb.fp.f6.security",
+      "domain": [
+        "domain:back.vtb.fp.f6.security"
+      ]
+    },
+    {
       "ruleTag": "beget.com",
       "domain": [
         "domain:api-cp.beget.com",
@@ -66,6 +78,8 @@
         "domain:eac9628e-8819-4514-9cda-02203eb05a79.dsp.mts.ru",
         "domain:ev.adriver.ru",
         "domain:exchange.buzzoola.com",
+        "domain:f4c97d91-3463-4cfe-b468-d786b9eedda8.dsp.mts.ru",
+        "domain:gck.needcallbuy.ru",
         "domain:id.cloud.ru",
         "domain:id.uma.media",
         "domain:kimberlite.io",
@@ -212,9 +226,24 @@
       ]
     },
     {
+      "ruleTag": "esmdtpep.vtb.ru",
+      "domain": [
+        "domain:esmdtpep.vtb.ru"
+      ]
+    },
+    {
       "ruleTag": "fornex.com",
       "domain": [
-        "domain:fornex.com"
+        "domain:app.termly.io",
+        "domain:client.crisp.chat",
+        "domain:fornex.com",
+        "domain:ru.fornex.com"
+      ]
+    },
+    {
+      "ruleTag": "h2.vtb.ru",
+      "domain": [
+        "domain:h2.vtb.ru"
       ]
     },
     {
@@ -271,6 +300,12 @@
       ]
     },
     {
+      "ruleTag": "mb.vtb.ru",
+      "domain": [
+        "domain:mb.vtb.ru"
+      ]
+    },
+    {
       "ruleTag": "mws.ru",
       "domain": [
         "domain:5882964711793495484340.cm.a.mts.ru",
@@ -294,6 +329,12 @@
         "domain:top-fwz1.mail.ru",
         "domain:uaas.yandex.ru",
         "domain:web-static.s.mindbox.ru"
+      ]
+    },
+    {
+      "ruleTag": "online.vtb.ru",
+      "domain": [
+        "domain:online.vtb.ru"
       ]
     },
     {
@@ -357,6 +398,12 @@
       ]
     },
     {
+      "ruleTag": "s2.vtb.ru",
+      "domain": [
+        "domain:s2.vtb.ru"
+      ]
+    },
+    {
       "ruleTag": "selectel.ru",
       "domain": [
         "domain:6ef4e6a1-9d49-47ac-bfed-170f67a815cf.selcdn.net",
@@ -393,6 +440,12 @@
         "domain:widgets-mcw.mango-office.ru",
         "domain:widgets.mango-office.ru",
         "domain:www.smartape.ru"
+      ]
+    },
+    {
+      "ruleTag": "sso-mb.vtb.ru",
+      "domain": [
+        "domain:sso-mb.vtb.ru"
       ]
     },
     {
