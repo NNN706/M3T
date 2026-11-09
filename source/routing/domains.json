@@ -1,18 +1,22 @@
 {
   "rules": [
     {
+      "ruleTag": "alfabank.ru",
+      "domain": [
+        "domain:alfabank.ru"
+      ]
+    },
+    {
       "ruleTag": "async-online4.vtb.ru",
       "domain": [
         "domain:async-online4.vtb.ru"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "back.vtb.fp.f6.security",
       "domain": [
         "domain:back.vtb.fp.f6.security"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "beget.com",
@@ -29,8 +33,13 @@
         "domain:top-fwz1.mail.ru",
         "domain:vk.com",
         "domain:www.googletagmanager.com"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "cbro.online.sberbank.ru",
+      "domain": [
+        "domain:cbro.online.sberbank.ru"
+      ]
     },
     {
       "ruleTag": "cdnvideo.com",
@@ -41,8 +50,7 @@
         "domain:code.jquery.com",
         "domain:extreme-ip-lookup.com",
         "domain:www.cdnvideo.com"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "cloud.ru",
@@ -73,12 +81,14 @@
         "domain:code.moviead55.ru",
         "domain:const.uno",
         "domain:creatives.al-adtech.com",
+        "domain:crm.deepcall.ru",
         "domain:crm.info-it-data.ru",
         "domain:crm.viva-lead.ru",
         "domain:cs.alfasense.com",
         "domain:dm.hybrid.ai",
         "domain:dmg.digitaltarget.ru",
         "domain:dmp.sbermarketing.ru",
+        "domain:dsp.nrich.ai",
         "domain:eac9628e-8819-4514-9cda-02203eb05a79.dsp.mts.ru",
         "domain:ev.adriver.ru",
         "domain:exchange.buzzoola.com",
@@ -111,6 +121,7 @@
         "domain:s.suprion.ru",
         "domain:sentry.sbercloud.tech",
         "domain:sm.rtb.mts.ru",
+        "domain:smi2.ru",
         "domain:sp.linkssp.ru",
         "domain:ssp-rtb.sape.ru",
         "domain:ssp-statistics.dsp.nt.technology",
@@ -140,8 +151,7 @@
         "domain:www.googletagmanager.com",
         "domain:x.bidswitch.net",
         "domain:x01.aidata.io"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "cloud.vk.com",
@@ -159,8 +169,7 @@
         "domain:vkcloud-cms-prod.s3.prodcloud.vk.team",
         "domain:vkcloud-next.vktech-static.ru",
         "domain:vkcs-scripts.mrgcdn.ru"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "contell.ru",
@@ -175,8 +184,7 @@
         "domain:widget.me-talk.ru",
         "domain:www.google.com",
         "domain:www.gstatic.com"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "datahouse.ru",
@@ -198,8 +206,7 @@
         "domain:vk.com",
         "domain:yandex.ru",
         "domain:yastatic.net"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "ddos-guard.net",
@@ -215,6 +222,7 @@
         "domain:code.jivosite.com",
         "domain:ddos-guard.net",
         "domain:googleads.g.doubleclick.net",
+        "domain:j.clarity.ms",
         "domain:k.clarity.ms",
         "domain:mc.yandex.ru",
         "domain:mdd.yandex.net",
@@ -231,15 +239,33 @@
         "domain:www.google.com",
         "domain:www.google.ru",
         "domain:www.googletagmanager.com"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "ddp-mobile.online.sberbank.ru",
+      "domain": [
+        "domain:ddp-mobile.online.sberbank.ru"
+      ]
+    },
+    {
+      "ruleTag": "dns-shop.ru",
+      "domain": [
+        "domain:dns-shop.ru"
+      ]
+    },
+    {
+      "ruleTag": "esia.gosuslugi.ru",
+      "domain": [
+        "domain:esia.gosuslugi.ru",
+        "domain:sfd.gosuslugi.ru",
+        "domain:www.gosuslugi.ru"
+      ]
     },
     {
       "ruleTag": "esmdtpep.vtb.ru",
       "domain": [
         "domain:esmdtpep.vtb.ru"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "fornex.com",
@@ -247,16 +273,28 @@
         "domain:app.termly.io",
         "domain:client.crisp.chat",
         "domain:fornex.com",
+        "domain:pagead2.googlesyndication.com",
         "domain:ru.fornex.com"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "gosuslugi.ru",
+      "domain": [
+        "domain:gosuslugi.ru",
+        "domain:gu-st.ru"
+      ]
+    },
+    {
+      "ruleTag": "gov.ru",
+      "domain": [
+        "domain:gov.ru"
+      ]
     },
     {
       "ruleTag": "h2.vtb.ru",
       "domain": [
         "domain:h2.vtb.ru"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "ihc.ru",
@@ -280,8 +318,7 @@
         "domain:vi-sber1-24.jivosite.com",
         "domain:vk.com",
         "domain:www.ihc.ru"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "landvps.ru",
@@ -292,8 +329,14 @@
         "domain:mc.yandex.ru",
         "domain:mdd.yandex.net",
         "domain:my.landvps.ru"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "lk.megafon.ru",
+      "domain": [
+        "domain:api.megafon.ru",
+        "domain:lk.megafon.ru"
+      ]
     },
     {
       "ruleTag": "majordomo.ru",
@@ -311,19 +354,38 @@
         "domain:uaas.yandex.ru",
         "domain:vk.com",
         "domain:www.majordomo.ru"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "max.ru",
+      "domain": [
+        "domain:max.ru"
+      ]
     },
     {
       "ruleTag": "mb.vtb.ru",
       "domain": [
         "domain:mb.vtb.ru"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "mpsbol.ant.sberbank.ru",
+      "domain": [
+        "domain:mpsbol.ant.sberbank.ru"
+      ]
+    },
+    {
+      "ruleTag": "mvideo.ru",
+      "domain": [
+        "domain:mvideo.ru",
+        "domain:static.mvideo.ru",
+        "domain:www.mvideo.ru"
+      ]
     },
     {
       "ruleTag": "mws.ru",
       "domain": [
+        "domain:5817185321794261790587.cm.a.mts.ru",
         "domain:5882964711793495484340.cm.a.mts.ru",
         "domain:6790708701793721784494.cm.a.mts.ru",
         "domain:abt.s3.yandex.net",
@@ -345,15 +407,43 @@
         "domain:top-fwz1.mail.ru",
         "domain:uaas.yandex.ru",
         "domain:web-static.s.mindbox.ru"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "nalog.gov.ru",
+      "domain": [
+        "domain:chat-bot.nalog.ru",
+        "domain:cnt.sputnik.ru",
+        "domain:data.nalog.ru",
+        "domain:nalog.gov.ru",
+        "domain:pos.gosuslugi.ru",
+        "domain:stat.sputnik.ru",
+        "domain:vashkontrol.ru",
+        "domain:www.nalog.gov.ru"
+      ]
+    },
+    {
+      "ruleTag": "nuc-cdp.digital.gov.ru",
+      "domain": [
+        "domain:nuc-cdp.digital.gov.ru"
+      ]
     },
     {
       "ruleTag": "online.vtb.ru",
       "domain": [
         "domain:online.vtb.ru"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "raiffeisen.ru",
+      "domain": [
+        "domain:cdn-rf.raiffeisen.ru",
+        "domain:oapi.raiffeisen.ru",
+        "domain:r-chat.raiffeisen.ru",
+        "domain:raiffeisen.ru",
+        "domain:ru.id.facct.ru",
+        "domain:www.raiffeisen.ru"
+      ]
     },
     {
       "ruleTag": "reg.ru",
@@ -372,8 +462,13 @@
         "domain:www.reg.ru",
         "domain:yandex.ru",
         "domain:yastatic.net"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "rostics.ru",
+      "domain": [
+        "domain:rostics.ru"
+      ]
     },
     {
       "ruleTag": "ruvds.com",
@@ -414,15 +509,19 @@
         "domain:www.google.ru",
         "domain:www.googletagmanager.com",
         "domain:yekat-ping-test.ruvds.com"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "s2.vtb.ru",
       "domain": [
         "domain:s2.vtb.ru"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "sberbank.ru",
+      "domain": [
+        "domain:sberbank.ru"
+      ]
     },
     {
       "ruleTag": "selectel.ru",
@@ -446,8 +545,7 @@
         "domain:vk.com",
         "domain:web-static.s.mindbox.ru",
         "domain:widgets.mango-office.ru"
-      ],
-      "outboundTag": "direct"
+      ]
     },
     {
       "ruleTag": "smartape.ru",
@@ -462,15 +560,74 @@
         "domain:widgets-mcw.mango-office.ru",
         "domain:widgets.mango-office.ru",
         "domain:www.smartape.ru"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "spb.megafon.ru",
+      "domain": [
+        "domain:ducip.megafon.ru",
+        "domain:fp-back.facct.ru",
+        "domain:ru.id.facct.ru",
+        "domain:spb.megafon.ru",
+        "domain:static.popmechanic.ru"
+      ]
+    },
+    {
+      "ruleTag": "spb.mts.ru",
+      "domain": [
+        "domain:4394285141794261891524.cm.a.mts.ru",
+        "domain:bs.serving-sys.ru",
+        "domain:cdn.mtscdn.ru",
+        "domain:dtm-dre.platform.hicloud.com",
+        "domain:identitystatic.mts.ru",
+        "domain:login.mts.ru",
+        "domain:mts.ru",
+        "domain:mtsopros.mts.ru",
+        "domain:pn.mts.ru",
+        "domain:qp-storage.media.mts.ru",
+        "domain:sentry.obs.mts.ru",
+        "domain:serving.a.mts.ru",
+        "domain:spb.mts.ru",
+        "domain:static.mts.ru"
+      ]
     },
     {
       "ruleTag": "sso-mb.vtb.ru",
       "domain": [
         "domain:sso-mb.vtb.ru"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "tbank-online.com",
+      "domain": [
+        "domain:2w.ru",
+        "domain:9501822521794261904662.cm.a.mts.ru",
+        "domain:api-common.tbank-online.com",
+        "domain:api-common.tinkoff.ru",
+        "domain:as.tbank-online.com",
+        "domain:as.tbank.ru",
+        "domain:cdn.tbank-online.com",
+        "domain:cobrowsing-cdn.tbank.ru",
+        "domain:dss.hybrid.ai",
+        "domain:es.tbank.ru",
+        "domain:eye.targetads.io",
+        "domain:fingerprint.t-static-online.com",
+        "domain:freessl.tbank.ru",
+        "domain:hrc.tbank.ru",
+        "domain:id.tbank-online.com",
+        "domain:id.tbank.ru",
+        "domain:imgproxy-cdn.tbank-online.com",
+        "domain:le.tbank.ru",
+        "domain:mddc.tbank.ru",
+        "domain:polls-media.t-static-online.com",
+        "domain:rap.skcrtxr.com",
+        "domain:sso-forms-prod.t-static.ru",
+        "domain:statad.ru",
+        "domain:tbank-online.com",
+        "domain:web2web.tbank-online.com",
+        "domain:www.cdn-tinkoff.ru",
+        "domain:www.tbank-online.com"
+      ]
     },
     {
       "ruleTag": "timeweb.cloud",
@@ -485,8 +642,41 @@
         "domain:sentry.timeweb.cloud",
         "domain:timeweb.cloud",
         "domain:web-static.mindbox.ru"
-      ],
-      "outboundTag": "direct"
+      ]
+    },
+    {
+      "ruleTag": "vk.com",
+      "domain": [
+        "domain:ads.vk.com",
+        "domain:ads.vk.ru",
+        "domain:akashi.vk-portal.net",
+        "domain:api.vk.ru",
+        "domain:id.vk.com",
+        "domain:id.vk.ru",
+        "domain:login.vk.ru",
+        "domain:mincifry-cert.vk.ru",
+        "domain:r0.mradx.net",
+        "domain:r3-test.vk.ru",
+        "domain:st.vk.ru",
+        "domain:st1-94.vk.ru",
+        "domain:stats.vk-portal.net",
+        "domain:tns-counter.ru",
+        "domain:vk.ru",
+        "domain:web.api.vk.ru",
+        "domain:www.tns-counter.ru"
+      ]
+    },
+    {
+      "ruleTag": "vkusnoitochka.ru",
+      "domain": [
+        "domain:vkusnoitochka.ru"
+      ]
+    },
+    {
+      "ruleTag": "vtb.ru",
+      "domain": [
+        "domain:vtb.ru"
+      ]
     }
   ]
 }
