@@ -35,6 +35,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert 'IPv4: **3**, IPv6: **1**' in report
     assert 'анонсы **3** ASN' in report
     assert sha256(ip_file.read_bytes()).hexdigest() in report
+    assert '[IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/IP.json)' in report
     assert '| AS100 | Example &#124; Inc. | 2 / 2 |' in report
     assert '| AS101 | Other origin | 2 / 2 |' in report
     assert '| AS103 | — | 1 / 1 |' in report

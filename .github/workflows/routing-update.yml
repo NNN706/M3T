@@ -15,6 +15,7 @@ on:
     paths:
       - 'source/routing/sites.txt'
       - 'source/routing/ASN.txt'
+      - 'source/routing/exclude'
 permissions:
   contents: write
   actions: read
@@ -101,7 +102,7 @@ jobs:
           python3 source/tests/test_global_routing.py
           python3 source/tests/test_json_routing.py
           python3 source/tests/test_asn_routes.py
-          python3 source/tests/test_cloudflare_routing.py
+          python3 source/tests/test_exclusion_routing.py
           python3 source/tests/test_incremental_routing.py
           python3 source/tests/test_publish_routing.py
       - name: Scan sites and compact prefixes
@@ -113,7 +114,7 @@ jobs:
           mkdir -p "$ROUTING_EVIDENCE"
           resume=()
           if [ -n "$RESUME_RUN_ID" ]; then resume=(--resume "$ROUTING_RESUME"); fi
-          timeout --verbose --kill-after=10s 105m python3 source/routing/update_routing.py --incremental --exclude-cloudflare --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
+          timeout --verbose --kill-after=10s 105m python3 source/routing/update_routing.py --incremental --exclude-asns --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
           if ! python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["complete"])' "$ROUTING_EVIDENCE/completeness.json"; then
             echo '::warning::Неполный сбор: доступные подсети и обнаруженные домены подготовлены к публикации; прежние записи сохранены. См. routing-evidence.'
           fi

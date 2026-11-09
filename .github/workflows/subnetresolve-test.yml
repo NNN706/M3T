@@ -7,7 +7,8 @@ on:
       - 'source/tests/**'
       - 'source/routing/update_routing.py'
       - 'source/routing/asn_routes.py'
-      - 'source/routing/cloudflare.py'
+      - 'source/routing/exclusion_policy.py'
+      - 'source/routing/exclude'
       - 'source/routing/publish_routing.py'
       - '.github/workflows/subnetresolve-test.yml'
   workflow_dispatch:
@@ -76,7 +77,7 @@ jobs:
           python3 source/tests/test_global_routing.py 2>&1 | tee "$TEST_ARTIFACTS/global-routing.log"
           python3 source/tests/test_json_routing.py 2>&1 | tee "$TEST_ARTIFACTS/json-routing.log"
           python3 source/tests/test_asn_routes.py 2>&1 | tee "$TEST_ARTIFACTS/asn-routes.log"
-          python3 source/tests/test_cloudflare_routing.py 2>&1 | tee "$TEST_ARTIFACTS/cloudflare-routing.log"
+          python3 source/tests/test_exclusion_routing.py 2>&1 | tee "$TEST_ARTIFACTS/exclusion-routing.log"
           python3 source/tests/test_incremental_routing.py 2>&1 | tee "$TEST_ARTIFACTS/incremental-routing.log"
           python3 source/tests/test_publish_routing.py 2>&1 | tee "$TEST_ARTIFACTS/publish-routing.log"
           python3 source/tests/test_routing.py 2>&1 | tee "$TEST_ARTIFACTS/routing.log"

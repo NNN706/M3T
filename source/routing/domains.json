@@ -47,7 +47,6 @@
         "domain:api.sypexgeo.net",
         "domain:api.yadrocrm.ru",
         "domain:cdnvideo.com",
-        "domain:code.jquery.com",
         "domain:extreme-ip-lookup.com",
         "domain:www.cdnvideo.com"
       ]
@@ -84,7 +83,6 @@
         "domain:crm.deepcall.ru",
         "domain:crm.info-it-data.ru",
         "domain:crm.viva-lead.ru",
-        "domain:cs.alfasense.com",
         "domain:dm.hybrid.ai",
         "domain:dmg.digitaltarget.ru",
         "domain:dmp.sbermarketing.ru",
@@ -214,28 +212,20 @@
         "domain:abt.s3.yandex.net",
         "domain:ad.doubleclick.net",
         "domain:analytics.google.com",
-        "domain:b.clarity.ms",
-        "domain:c.bing.com",
-        "domain:c.clarity.ms",
         "domain:captcha.ddos-guard.net",
         "domain:code.jivo.ru",
         "domain:code.jivosite.com",
         "domain:ddos-guard.net",
         "domain:googleads.g.doubleclick.net",
-        "domain:j.clarity.ms",
-        "domain:k.clarity.ms",
         "domain:mc.yandex.ru",
         "domain:mdd.yandex.net",
         "domain:node-sber1-az1-23.jivosite.com",
-        "domain:px.ads.linkedin.com",
-        "domain:scripts.clarity.ms",
         "domain:snap.licdn.com",
         "domain:stats.g.doubleclick.net",
         "domain:tcd.mng.tl",
         "domain:uaas.yandex.ru",
         "domain:vi-sber1-25.jivosite.com",
         "domain:widgets.mango-office.ru",
-        "domain:www.clarity.ms",
         "domain:www.google.com",
         "domain:www.google.ru",
         "domain:www.googletagmanager.com"
@@ -270,9 +260,6 @@
     {
       "ruleTag": "fornex.com",
       "domain": [
-        "domain:app.termly.io",
-        "domain:client.crisp.chat",
-        "domain:fornex.com",
         "domain:pagead2.googlesyndication.com",
         "domain:ru.fornex.com"
       ]
@@ -299,10 +286,7 @@
     {
       "ruleTag": "ihc.ru",
       "domain": [
-        "domain:cdn.jsdelivr.net",
         "domain:code.jivosite.com",
-        "domain:d-ipv6.mmapiws.com",
-        "domain:device.maxmind.com",
         "domain:dp.speed.ihc.ru",
         "domain:hk.speed.ihc.ru",
         "domain:ihc.ru",
@@ -539,7 +523,6 @@
         "domain:privacy-cs.mail.ru",
         "domain:relay.selectel.ru",
         "domain:selectel.ru",
-        "domain:statuspal.io",
         "domain:tcd.mng.tl",
         "domain:top-fwz1.mail.ru",
         "domain:vk.com",
@@ -633,7 +616,6 @@
       "ruleTag": "timeweb.cloud",
       "domain": [
         "domain:api.mindbox.ru",
-        "domain:cllctr.roistat.com",
         "domain:cloud.roistat.com",
         "domain:content.timeweb.com",
         "domain:mc.yandex.ru",

@@ -834,7 +834,7 @@ jq -r --slurpfile excluded "$tmp/excluded-ips.json" \
   '([.[].ip] | unique) - ($excluded[0] // []) | .[]' "$tmp/observations.json" > "$tmp/ips"
 stage_name='Этап 4/4: BGP'
 if [ "$filter_ipv4" -eq 1 ]; then
-  progress "Cloudflare: пропущено IPv4 перед WHOIS — $(jq 'length' "$tmp/excluded-ips.json")"
+  progress "Исключения ASN: пропущено IPv4 перед WHOIS — $(jq 'length' "$tmp/excluded-ips.json")"
 fi
 if [ -s "$tmp/ips" ]; then
   # Keep DNS data even if the process is interrupted during WHOIS.

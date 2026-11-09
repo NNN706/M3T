@@ -1,10 +1,10 @@
 # Общее покрытие ASN правилами маршрутизации
 
-Опубликовано **800** уникальных подсетей (IPv4: **759**, IPv6: **41**). С ними пересекаются анонсы **560** ASN.
+Опубликовано **785** уникальных подсетей (IPv4: **744**, IPv6: **41**). С ними пересекаются анонсы **557** ASN.
 
-Источник правил — [IP.json](IP.json). Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).
+Источник правил — [IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/IP.json). Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).
 
-SHA-256 файла IP.json: `2c347ce5335276187a7ab6156e4d687e235259992a5eac47c2bcae8ff189138d`.
+SHA-256 файла IP.json: `f740b2352f16b5d5ee9081b4704c76fe74cc6bb1faa79f5300a63a06702ad92a`.
 
 «Затронуто» — анонсы ASN, которые хотя бы частично пересекаются с правилами. «Всего» — все анонсы этого ASN в снимке. Один префикс может учитываться у нескольких ASN, если они его анонсируют.
 
@@ -29,8 +29,6 @@ SHA-256 файла IP.json: `2c347ce5335276187a7ab6156e4d687e235259992a5eac47c2b
 | AS6878 | T-Systems International GmbH | 1 / 51 |
 | AS7377 | University of California, San Diego | 1 / 20 |
 | AS7979 | Servers.com, Inc. | 10 / 1929 |
-| AS8068 | Microsoft Corporation | 2 / 70 |
-| AS8075 | Microsoft Corporation | 15 / 1361 |
 | AS8193 | "Uzbektelekom" Joint Stock Company | 1 / 105 |
 | AS8291 | The Federal Guard Service of the Russian Federation | 15 / 15 |
 | AS8342 | JSC RTComm.RU | 4 / 100 |
@@ -272,7 +270,6 @@ SHA-256 файла IP.json: `2c347ce5335276187a7ab6156e4d687e235259992a5eac47c2b
 | AS51994 | "Group of companies "RUSAGRO"' Limited Liability Company" | 1 / 1 |
 | AS52007 | LLC AdRiver | 2 / 5 |
 | AS52016 | JSC ADFACT | 1 / 6 |
-| AS54113 | Fastly, Inc. | 5 / 1791 |
 | AS55286 | B2 Net Solutions Inc. | 3 / 890 |
 | AS56336 | JSC NII "Vektor" | 1 / 1 |
 | AS56340 | Grand Ltd | 2 / 36 |

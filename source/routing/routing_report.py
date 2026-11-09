@@ -59,7 +59,7 @@ def build_report(path):
         f'(IPv4: **{counts[4]}**, IPv6: **{counts[6]}**). '
         f'С ними пересекаются анонсы **{len(rows)}** ASN.',
         '',
-        'Источник правил — [IP.json](IP.json). '
+        'Источник правил — [IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/IP.json). '
         'Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).',
         '',
         f'SHA-256 файла IP.json: `{sha256(data).hexdigest()}`.',

@@ -6,7 +6,7 @@ import subprocess
 import tempfile
 
 LISTS = ['source/routing/sites.txt', 'source/routing/ASN.txt']
-INPUTS = ['source/routing/cloudflare.py', 'source/routing/asn_routes.py', 'source/SubnetResolve.sh',
+INPUTS = ['source/routing/exclusion_policy.py', 'source/routing/exclude', 'source/routing/asn_routes.py', 'source/SubnetResolve.sh',
           'source/routing/update_routing.py', 'source/routing/domains.json', 'source/routing/sources.json', 'source/routing/IP.json']
 OUTPUT = 'source/routing/IP.json'
 REPORT = 'source/routing/asn-report.md'
