@@ -1,5 +1,6 @@
 """Scan services and atomically write deduplicated Xray rule fragments (Python stdlib)."""
 import argparse
+from collections import Counter
 import ipaddress
 import json
 import os
@@ -35,10 +36,36 @@ def services(path, parse_asn=None):
     return result
 
 
+def validate_rule_tags(data, expected, context):
+    rules = data.get('rules') if isinstance(data, dict) else None
+    if not isinstance(rules, list):
+        raise ValueError(f'{context}: поле rules должно быть массивом')
+    tags = []
+    for index, rule in enumerate(rules):
+        tag = rule.get('ruleTag') if isinstance(rule, dict) else None
+        if not isinstance(tag, str) or not tag.strip():
+            raise ValueError(f'{context}: rules[{index}].ruleTag должен быть непустой строкой, получено {tag!r}')
+        tags.append(tag)
+
+    counts = Counter(tags)
+    required = set(expected)
+    issues = []
+    for label, values in (
+        ('нет тегов', sorted(required - counts.keys())),
+        ('лишние теги', sorted(counts.keys() - required)),
+        ('повторяющиеся теги', sorted(tag for tag, count in counts.items() if count > 1)),
+    ):
+        if values:
+            issues.append(f'{label}: {", ".join(map(repr, values))}')
+    if issues:
+        raise ValueError(f'{context}: ' + '; '.join(issues))
+    if tags != sorted(tags):
+        raise ValueError(f'{context}: ruleTag должны идти по алфавиту, получено {tags!r}')
+    return rules
+
+
 def compact_rules(data, expected, dual_stack=False):
-    rules = data['rules']
-    if not isinstance(rules, list) or [r['ruleTag'] for r in rules] != sorted(expected):
-        raise ValueError('Unexpected service tags in scanner result')
+    rules = validate_rule_tags(data, expected, 'Правила IP')
     result = []
     for rule in rules:
         if not isinstance(rule['ip'], list):
@@ -82,9 +109,7 @@ def global_rules(data):
 
 def domain_rules(data, expected):
     import re
-    rules = data['rules']
-    if [r['ruleTag'] for r in rules] != sorted(expected):
-        raise ValueError('Unexpected domain service tags')
+    rules = validate_rule_tags(data, expected, 'Правила доменов')
     result = []
     for rule in rules:
         values = rule.get('domain', ['domain:' + rule['ruleTag']])

@@ -31,6 +31,16 @@ with tempfile.TemporaryDirectory() as directory:
     assert legacy in json.loads(output.read_text())['rules']
     assert 'domain:old.a.example' not in json.loads(domain_file.read_text())['rules'][0]['domain']
     old_ip=output.read_text();old_domains=domain_file.read_text()
+    sites.write_text('a.example c.example\n')
+    raw['rules'].append(raw['rules'][1])
+    result = run(0)
+    assert result.returncode != 0
+    for detail in ("нет тегов: 'c.example'", "лишние теги: 'b.example'",
+                   "повторяющиеся теги: 'b.example'"):
+        assert detail in result.stderr, result.stderr
+    assert output.read_text() == old_ip and domain_file.read_text() == old_domains
+    raw['rules'].pop()
+    sites.write_text('a.example b.example\n')
     raw['rules'][0]['domain']=['https://invalid.example/path']
     result=run(0);assert result.returncode!=0
     assert output.read_text()==old_ip and domain_file.read_text()==old_domains
@@ -42,8 +52,10 @@ for rule in ips:
     assert len(nets)==len(set(nets))
     assert nets==[n for version in (4,6) for n in ipaddress.collapse_addresses(n for n in nets if n.version==version)]
 current_domains=json.loads((root/'domains.json').read_text())
-entries=routing.services(root/'sites.txt')
-assert current_domains==routing.domain_rules(current_domains,[host for host,_ in entries])
+# The committed JSON describes the previous scan. sites.txt may already have changed.
+assert current_domains == routing.domain_rules(
+    current_domains, [rule['ruleTag'] for rule in current_domains['rules']]
+)
 assert (root/'ASN.txt').exists()
 assert not (root/'IP.txt').exists()
 assert not (root.parent/'ip/IP.txt').exists()
