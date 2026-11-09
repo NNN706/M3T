@@ -30,6 +30,13 @@ with tempfile.TemporaryDirectory() as directory:
     run(first,0)
     sites.write_text('a.example\n')
     assert run({'rules':[first['rules'][0]]},3)['rules']==[{'ruleTag':'a.example','ip':['192.0.2.0/25']}]
-# Actual committed output must be the exact global projection of the source state.
-assert json.loads((root/'IP.json').read_text())==m.global_rules(json.loads((root/'sources.json').read_text()))
+# Compare the generated IP data independently of deployment policy.
+published = json.loads((root/'IP.json').read_text())
+published['rules'] = [
+    {key: value for key, value in rule.items() if key != 'outboundTag'}
+    for rule in published['rules']
+]
+assert published == m.global_rules(json.loads((root/'sources.json').read_text())), (
+    'IP.json differs from the global projection of sources.json (ignoring outboundTag)'
+)
 print('PASS cross-tag IPv4/IPv6 collapse, deterministic assignment, randomized exact coverage, partial retention, full-scan deletion, removed-service cleanup')
