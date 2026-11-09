@@ -52,7 +52,7 @@ def cached_export(filename, max_age, read):
             temporary.unlink(missing_ok=True)
 
 
-def table_prefixes(path, origins=None):
+def table_prefixes(path, origins):
     selected = defaultdict(set)
     families = set()
     count = 0
@@ -69,7 +69,7 @@ def table_prefixes(path, origins=None):
             except (ValueError, KeyError, TypeError) as error:
                 raise ValueError(f'BGP.tools table.jsonl, строка {count}: {error}') from error
             families.add(prefix.version)
-            if origins is None or origin in origins:
+            if origin in origins:
                 selected[origin].add(str(prefix))
     if count < MIN_TABLE_ROWS or families != {4, 6}:
         raise ValueError(f'BGP.tools table.jsonl: неполная таблица, строк {count}, семейства IP {sorted(families)}')

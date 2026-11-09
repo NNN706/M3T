@@ -43,7 +43,9 @@ def build_report(path):
     counts = Counter(network.version for network in prefixes)
     rows = {}
     if prefixes:
-        snapshot = cached_export('table.jsonl', 7200, table_prefixes)
+        # A range tests membership in constant space across all 32-bit ASN values.
+        all_asns = range(1, 2**32)
+        snapshot = cached_export('table.jsonl', 7200, lambda path: table_prefixes(path, all_asns))
         rows = summarize(prefixes, snapshot)
     names = {}
     if rows:
