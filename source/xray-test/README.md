@@ -9,7 +9,7 @@ Workflow **Xray RU Direct deployment and browser test** работает в `tes
 
 ## Настройка
 
-На Admiralteskiy нужен работающий Docker и доступ к нему для пользователя раннера. Проверьте под этим пользователем командой `docker info`. Workflow скачивает официальный образ XTLS, закреплённый версией и digest в `xray-routing-test.yml`. Конфиг берётся из репозитория. GitHub Environment, SSH и VLESS-ключ для запуска не требуются.
+На Admiralteskiy workflow обращается к Docker через `sudo -n docker`. Проверьте под пользователем раннера командой `sudo -n docker info`. Workflow скачивает официальный образ XTLS, закреплённый версией и digest в `xray-routing-test.yml`. Конфиг берётся из репозитория. GitHub Environment, SSH и VLESS-ключ для запуска не требуются.
 
 Контейнер удаляется после теста, журнал сохраняется в артефакте. При недоступном Docker задание завершается с ошибкой.
 

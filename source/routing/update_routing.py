@@ -118,15 +118,16 @@ def domain_rules(data, expected, *, include_seed=True):
         values = rule.get('domain', ['domain:' + rule['ruleTag']] if include_seed else None)
         if not isinstance(values, list):
             raise ValueError('Expected domain array')
-        hosts = {rule['ruleTag']} if include_seed else set()
+        matchers = {'domain:' + rule['ruleTag']} if include_seed else set()
         for value in values:
-            if not isinstance(value, str) or not value.startswith('domain:'):
+            if not isinstance(value, str) or not value.startswith(('domain:', 'full:')):
                 raise ValueError('Invalid domain matcher')
-            host = value[len('domain:'):].lower().rstrip('.')
+            kind, host = value.split(':', 1)
+            host = host.lower().rstrip('.')
             if len(host)>253 or len(host.split('.'))<2 or any(not re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?', label) for label in host.split('.')):
                 raise ValueError('Invalid domain matcher')
-            hosts.add(host)
-        result.append({'ruleTag':rule['ruleTag'], 'domain':['domain:'+host for host in sorted(hosts)]})
+            matchers.add(f'{kind}:{host}')
+        result.append({'ruleTag':rule['ruleTag'], 'domain':sorted(matchers)})
     return {'rules':result}
 
 
@@ -135,7 +136,7 @@ def routing_fingerprint(paths):
             for name, path in paths.items()}
 
 
-def incremental_update(args, entries, explicit, collect):
+def incremental_update(args, entries, explicit, collect, cloudflare=None):
     """Workflow mode. Append verified discoveries to the published baseline."""
     resume = getattr(args, 'resume', None)
     outputs = {'IP.json': args.output, 'domains.json': args.domains_output, 'sources.json': args.sources_output}
@@ -170,7 +171,7 @@ def incremental_update(args, entries, explicit, collect):
             raise RuntimeError(f'Контрольная точка несовместима. Изменились: {detail}.')
     if args.evidence:
         write_json(args.evidence / 'checkpoint.json', manifest)
-    if resume and saved == manifest and (resume / 'prepared.json').is_file():
+    if cloudflare is None and resume and saved == manifest and (resume / 'prepared.json').is_file():
         prepared = json.loads((resume / 'prepared.json').read_text())
         files = [*outputs, 'asn-report.md', 'completeness.json']
         saved_files = {name: resume / name for name in files}
@@ -196,8 +197,8 @@ def incremental_update(args, entries, explicit, collect):
     previous_domains = domain_rules(previous_domains, previous_tags, include_seed=False)
     domain_groups = {r['ruleTag']: set(r['domain']) for r in previous_domains['rules']}
     source_groups = {r['ruleTag']: set(r['ip']) for r in previous_sources['rules']}
-    known = {matcher.lower().rstrip('.') for group in domain_groups.values()
-             for matcher in group if matcher.startswith('domain:')}
+    known = {matcher.split(':', 1)[1] for group in domain_groups.values() for matcher in group}
+    excluded = set(previous_sources.get('excluded_cloudflare_domains', [])) if cloudflare else set()
     retry_names = set(previous_sources.get('pending_dns', []))
     discovery = {'domains': [], 'pages': [], 'complete': True}
     browser_entries = entries
@@ -232,7 +233,8 @@ def incremental_update(args, entries, explicit, collect):
                                   {host for page in discovery['pages'] for host in page['domains']})
     tags = {host for host, _ in entries}
     candidates = {
-        host: {host} | {matcher[7:] for matcher in domain_groups.get(host, ()) if matcher[7:] in retry_names}
+        host: {host} | {name for matcher in domain_groups.get(host, ())
+                        if (name := matcher.split(':', 1)[1]) in retry_names}
         for host in tags
     }
     for page in discovery['pages']:
@@ -241,7 +243,7 @@ def incremental_update(args, entries, explicit, collect):
             message = error.removesuffix('; домен будет проверен через DNS/BGP')
             print(f"[{page['site']}] {message}", file=sys.stderr)
     discovered = set().union(*candidates.values())
-    pending = sorted(host for host in discovered if 'domain:' + host not in known or host in retry_names)
+    pending = sorted(host for host in discovered - excluded if host not in known or host in retry_names)
     print(f'DNS Check-Host: на проверку {len(pending)}, пропущено известных {len(discovered)-len(pending)}.', flush=True)
     observations = []
     responses = {}
@@ -299,7 +301,14 @@ def incremental_update(args, entries, explicit, collect):
         if row['results']:
             resolved[host] = {str(ipaddress.ip_network(route['prefix'])) for route in row['results']}
             observations.extend(row['results'])
-    unresolved = sorted(host for host in pending if host not in resolved or responses[host]['complete'] is not True)
+    if cloudflare:
+        excluded = cloudflare.excluded_hosts(known | discovered, excluded, responses)
+        explicit = set(explicit) - cloudflare.asns
+        observations = [row for row in observations if row['asn'] not in cloudflare.asns]
+        print(f'Cloudflare: исключено доменов {len(excluded & (known | discovered))}; ASN: '
+              + ', '.join(sorted(cloudflare.asns)), flush=True)
+    unresolved = sorted(host for host in set(pending) - excluded
+                        if host not in resolved or responses[host]['complete'] is not True)
     if unresolved:
         print('DNS/BGP без полного результата. Домены остаются на повтор: ' + ', '.join(unresolved), file=sys.stderr)
     if args.evidence:
@@ -317,16 +326,20 @@ def incremental_update(args, entries, explicit, collect):
         if rule['ip']:
             source_groups.setdefault(rule['ruleTag'], set()).update(rule['ip'])
     for tag, hosts in candidates.items():
-        new_matchers = {'domain:' + host for host in hosts if 'domain:' + host not in known}
+        new_matchers = {'domain:' + host for host in hosts - known - excluded}
         if new_matchers:
             domain_groups.setdefault(tag, set()).update(new_matchers)
-        for host in sorted(hosts & resolved.keys()):
+        for host in sorted((hosts & resolved.keys()) - excluded):
             source_groups.setdefault(tag, set()).update(resolved[host])
     sources = {'rules': [{'ruleTag': tag, 'ip': sorted(values)} for tag, values in sorted(source_groups.items())]}
-    sources = compact_rules(sources, source_groups, dual_stack=True)
-    sources['pending_dns'] = sorted((retry_names - set(pending)) | set(unresolved))
     domains = {'rules': [{'ruleTag': tag, 'domain': sorted(values)} for tag, values in sorted(domain_groups.items())]}
     domains = domain_rules(domains, domain_groups, include_seed=False)
+    if cloudflare:
+        sources, domains = cloudflare.filter_rules(sources, domains, excluded)
+    sources = compact_rules(sources, [rule['ruleTag'] for rule in sources['rules']], dual_stack=True)
+    sources['pending_dns'] = sorted((retry_names - set(pending) - excluded) | set(unresolved))
+    if cloudflare:
+        sources['excluded_cloudflare_domains'] = sorted(excluded)
     result = global_rules(sources)
     complete = discovery['complete'] and not unresolved and not as_missing and not invalid and asn_error is None
     if args.evidence:
@@ -335,7 +348,8 @@ def incremental_update(args, entries, explicit, collect):
             'complete': complete, 'mode': 'incremental', 'invalid_sites': invalid, 'dns_requested': len(pending),
             'dns_skipped_existing': len(discovered) - len(pending),
             'domains_without_complete_dns_bgp': unresolved,
-            'domains_without_any_prefix': sorted(set(pending) - resolved.keys()),
+            'domains_without_any_prefix': sorted(set(pending) - resolved.keys() - excluded),
+            'domains_excluded_cloudflare': sorted(excluded & (known | discovered)),
             'asns_without_prefixes': as_missing,
             'asn_export_error': asn_error,
             'services_written': len(result['rules']),
@@ -370,6 +384,7 @@ def main():
     parser.add_argument('--sources-output', type=Path, help='Original per-service prefixes before global grouping')
     parser.add_argument('--domains-output', type=Path, help='Defaults to domains.json beside IP.json')
     parser.add_argument('--resume', type=Path, help='Resume incremental routing from an evidence directory')
+    parser.add_argument('--exclude-cloudflare', action='store_true', help='Exclude Cloudflare destinations from direct rules')
     parser.add_argument('--incremental', action='store_true', help='Resolve only names absent from published domain rules')
     parser.add_argument('--allow-partial', action='store_true', help='Keep available prefixes and union previous entries on incomplete scans')
     parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed scanner stages on stderr')
@@ -396,8 +411,18 @@ def main():
         args.sources_output = args.output.with_name('sources.json')
     if args.domains_output is None:
         args.domains_output = args.output.with_name('domains.json')
+    if args.exclude_cloudflare and not args.incremental:
+        parser.error('--exclude-cloudflare requires --incremental')
     if args.incremental:
-        incremental_update(args, entries, explicit, collect)
+        policy = None
+        if args.exclude_cloudflare:
+            from cloudflare import CloudflarePolicy
+            try:
+                policy = CloudflarePolicy.load()
+            except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
+                parser.exit(1, f'Cloudflare: не удалось загрузить ASN и префиксы. '
+                               f'Сбор и публикация не запущены. {error}\n')
+        incremental_update(args, entries, explicit, collect, policy)
         return
     with tempfile.TemporaryDirectory(prefix='routing-bgp-') as directory:
         metadata = Path(directory) / 'observations.json'

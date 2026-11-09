@@ -32,6 +32,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$RUNNER_NAME" = Admiralteskiy
+          df -h / /var "$GITHUB_WORKSPACE" "$RUNNER_TEMP"
           npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install --only-shell chromium
           bash -n deploy.sh
@@ -55,11 +56,13 @@ jobs:
         run: |
           set -euo pipefail
           test "$RUNNER_NAME" = Admiralteskiy
+          df -h / /var "$GITHUB_WORKSPACE" "$RUNNER_TEMP"
           npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install --only-shell chromium
       - name: Run Xray and verify routing through local SOCKS
         shell: bash
         env:
+          XRAY_DOCKER_SUDO: '1'
           XRAY_IMAGE: ghcr.io/xtls/xray-core:26.10.31@sha256:ceabeac03a89d991d2a247361825c1d1d2e9c91cd5dc010f298c7dc0c2f325c9
           XRAY_EVIDENCE: ${{ runner.temp }}/xray-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/xray-test-browsers

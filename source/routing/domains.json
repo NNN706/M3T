@@ -75,7 +75,6 @@
         "domain:creatives.al-adtech.com",
         "domain:crm.info-it-data.ru",
         "domain:crm.viva-lead.ru",
-        "domain:cs.alfasense.com",
         "domain:dm.hybrid.ai",
         "domain:dmg.digitaltarget.ru",
         "domain:dmp.sbermarketing.ru",
@@ -219,7 +218,6 @@
         "domain:mc.yandex.ru",
         "domain:mdd.yandex.net",
         "domain:node-sber1-az1-23.jivosite.com",
-        "domain:px.ads.linkedin.com",
         "domain:scripts.clarity.ms",
         "domain:snap.licdn.com",
         "domain:stats.g.doubleclick.net",
@@ -244,9 +242,6 @@
     {
       "ruleTag": "fornex.com",
       "domain": [
-        "domain:app.termly.io",
-        "domain:client.crisp.chat",
-        "domain:fornex.com",
         "domain:ru.fornex.com"
       ],
       "outboundTag": "direct"
@@ -261,10 +256,7 @@
     {
       "ruleTag": "ihc.ru",
       "domain": [
-        "domain:cdn.jsdelivr.net",
         "domain:code.jivosite.com",
-        "domain:d-ipv6.mmapiws.com",
-        "domain:device.maxmind.com",
         "domain:dp.speed.ihc.ru",
         "domain:hk.speed.ihc.ru",
         "domain:ihc.ru",
@@ -440,7 +432,6 @@
         "domain:privacy-cs.mail.ru",
         "domain:relay.selectel.ru",
         "domain:selectel.ru",
-        "domain:statuspal.io",
         "domain:tcd.mng.tl",
         "domain:top-fwz1.mail.ru",
         "domain:vk.com",
@@ -476,7 +467,6 @@
       "ruleTag": "timeweb.cloud",
       "domain": [
         "domain:api.mindbox.ru",
-        "domain:cllctr.roistat.com",
         "domain:cloud.roistat.com",
         "domain:content.timeweb.com",
         "domain:mc.yandex.ru",

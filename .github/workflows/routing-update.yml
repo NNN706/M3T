@@ -27,6 +27,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$RUNNER_NAME" = Admiralteskiy
+          df -h / /var "$GITHUB_WORKSPACE" "$RUNNER_TEMP" "$HOME"
           echo "XDG_CACHE_HOME=$HOME/.cache/m3t-routing" >> "$GITHUB_ENV"
           echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/m3t-routing/chromium" >> "$GITHUB_ENV"
           echo "ROUTING_EVIDENCE=$RUNNER_TEMP/routing-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
@@ -96,6 +97,7 @@ jobs:
           python3 source/tests/test_global_routing.py
           python3 source/tests/test_json_routing.py
           python3 source/tests/test_asn_routes.py
+          python3 source/tests/test_cloudflare_routing.py
           python3 source/tests/test_incremental_routing.py
           python3 source/tests/test_publish_routing.py
       - name: Scan sites and compact prefixes
@@ -107,7 +109,7 @@ jobs:
           mkdir -p "$ROUTING_EVIDENCE"
           resume=()
           if [ -n "$RESUME_RUN_ID" ]; then resume=(--resume "$ROUTING_RESUME"); fi
-          timeout --verbose --kill-after=10s 105m python3 source/routing/update_routing.py --incremental --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
+          timeout --verbose --kill-after=10s 105m python3 source/routing/update_routing.py --incremental --exclude-cloudflare --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
           if ! python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["complete"])' "$ROUTING_EVIDENCE/completeness.json"; then
             echo '::warning::Неполный сбор: доступные подсети и обнаруженные домены подготовлены к публикации; прежние записи сохранены. См. routing-evidence.'
           fi
