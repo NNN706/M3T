@@ -73,6 +73,15 @@ with tempfile.TemporaryDirectory() as directory:
     assert '`resume.example` (`2001:db8::7`)' in details
     assert '198.51.100.220' not in details and '192.0.4.1' not in details
 
+    (evidence / 'IP.json').write_bytes(ip_file.read_bytes())
+    status = evidence / 'completeness.json'
+    status.write_text('{"mode":"full-refresh","complete":false}')
+    assert 'old.example' in read_provenance(ip_file, previous, [evidence])
+    status.write_text('{"mode":"full-refresh","complete":true}')
+    assert 'old.example' not in read_provenance(ip_file, previous, [evidence])
+    (evidence / 'IP.json').write_text('{"rules":[]}')
+    assert 'old.example' in read_provenance(ip_file, previous, [evidence])
+
     ip_file.write_text('{"rules":[]}')
     with patch('routing_report.cached_export') as download:
         assert 'анонсы **0** ASN' in build_report(ip_file)

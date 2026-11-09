@@ -12,7 +12,7 @@ OUTPUT = 'source/routing/IP.json'
 REPORT = 'source/routing/asn-report.md'
 REPORT_VERBOSE = 'source/routing/asn-report-verbose.md'
 PROVENANCE = 'source/routing/dns-provenance.json'
-REPORT_INPUTS = [OUTPUT, REPORT, REPORT_VERBOSE, PROVENANCE, 'source/routing/routing_report.py', 'source/routing/asn_routes.py']
+REPORT_INPUTS = [OUTPUT, 'source/routing/sources.json', REPORT, REPORT_VERBOSE, PROVENANCE, 'source/routing/routing_report.py', 'source/routing/asn_routes.py']
 
 def git(repo, *args, check=True):
     return subprocess.run(['git', '-C', str(repo), *args], text=True,

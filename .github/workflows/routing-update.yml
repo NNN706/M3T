@@ -10,6 +10,10 @@ on:
         description: Построить общий отчёт из опубликованного IP.json без нового сканирования
         type: boolean
         default: false
+      full_refresh:
+        description: Перепроверить все сайты и ASN
+        type: boolean
+        default: false
   push:
     branches: [test]
     paths:
@@ -26,7 +30,7 @@ jobs:
   update:
     if: github.ref == 'refs/heads/test' && !inputs.report_only
     runs-on: [self-hosted, Linux, X64]
-    timeout-minutes: 120
+    timeout-minutes: ${{ inputs.full_refresh && 260 || 120 }}
     steps:
       - name: Verify runner
         run: |
@@ -109,12 +113,19 @@ jobs:
         shell: bash
         env:
           RESUME_RUN_ID: ${{ inputs.resume_run_id }}
+          FULL_REFRESH: ${{ inputs.full_refresh }}
         run: |
           set -euo pipefail
           mkdir -p "$ROUTING_EVIDENCE"
           resume=()
           if [ -n "$RESUME_RUN_ID" ]; then resume=(--resume "$ROUTING_RESUME"); fi
-          timeout --verbose --kill-after=10s 105m python3 source/routing/update_routing.py --incremental --exclude-asns --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
+          refresh=()
+          scan_timeout=105m
+          if [ "$FULL_REFRESH" = true ]; then
+            refresh=(--full-refresh)
+            scan_timeout=245m
+          fi
+          timeout --verbose --kill-after=10s "$scan_timeout" python3 source/routing/update_routing.py --incremental --exclude-asns --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" "${refresh[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
           if ! python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["complete"])' "$ROUTING_EVIDENCE/completeness.json"; then
             echo '::warning::Неполный сбор: доступные подсети и обнаруженные домены подготовлены к публикации; прежние записи сохранены. См. routing-evidence.'
           fi
@@ -174,7 +185,7 @@ jobs:
           done
           python3 source/tests/test_routing_report.py
           python3 source/routing/routing_report.py source/routing/IP.json "$output/asn-report.md" \
-            --verbose-output "$output/asn-report-verbose.md" \
+            --verbose-output "$output/asn-report-verbose.md" --sources source/routing/sources.json \
             --previous-provenance source/routing/dns-provenance.json \
             --provenance-output "$output/dns-provenance.json" "${evidence[@]}"
           cat "$output/asn-report.md" >> "$GITHUB_STEP_SUMMARY"

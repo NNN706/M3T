@@ -140,6 +140,7 @@ def routing_fingerprint(paths):
 def incremental_update(args, entries, explicit, collect, exclusion=None):
     """Workflow mode. Append verified discoveries to the published baseline."""
     resume = getattr(args, 'resume', None)
+    full_refresh = getattr(args, 'full_refresh', False)
     outputs = {'IP.json': args.output, 'domains.json': args.domains_output, 'sources.json': args.sources_output}
     invalid = sorted(host for host, _ in entries if len(host) > 253 or '.' not in host
                      or not all(re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?', label)
@@ -158,6 +159,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         'sites': [list(entry) for entry in entries],
         'asns': sorted(explicit),
     }
+    if full_refresh:
+        manifest['full_refresh'] = True
     if ipv4_index is not None:
         manifest['ipv4_exclusions'] = sha256(json.dumps(ipv4_index, sort_keys=True).encode()).hexdigest()
     implementation = routing_fingerprint({
@@ -170,7 +173,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         saved = json.loads((resume / 'checkpoint.json').read_text())
         changed = [name for name, digest in manifest['inputs'].items()
                    if name not in ('sites', 'asn_file') and saved.get('inputs', {}).get(name) != digest]
-        if saved.get('version') != manifest['version'] or changed:
+        if (saved.get('version') != manifest['version'] or changed
+                or saved.get('full_refresh', False) != full_refresh):
             detail = ', '.join(changed) or 'версия формата'
             raise RuntimeError(f'Контрольная точка несовместима. Изменились: {detail}.')
     if args.evidence:
@@ -241,7 +245,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
     tags = {host for host, _ in entries}
     candidates = {
         host: {host} | {name for matcher in domain_groups.get(host, ())
-                        if (name := matcher.split(':', 1)[1]) in retry_names}
+                        if not full_refresh and (name := matcher.split(':', 1)[1]) in retry_names}
         for host in tags
     }
     for page in discovery['pages']:
@@ -250,9 +254,10 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
             message = error.removesuffix('; домен будет проверен через DNS/BGP')
             print(f"[{page['site']}] {message}", file=sys.stderr)
     discovered = set().union(*candidates.values())
-    pending = sorted(host for host in discovered
-                     if host in retry_names or host not in known | previous_excluded)
-    print(f'DNS Check-Host: на проверку {len(pending)}, пропущено известных {len(discovered)-len(pending)}.', flush=True)
+    pending = sorted(discovered | known) if full_refresh else sorted(
+        host for host in discovered if host in retry_names or host not in known | previous_excluded
+    )
+    print(f'DNS Check-Host: на проверку {len(pending)}, пропущено известных {len(discovered - set(pending))}.', flush=True)
     observations = []
     responses = {}
     if args.evidence:
@@ -269,7 +274,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         responses.update({host: row for host, row in saved_dns.items() if host in pending})
         print(f'DNS/BGP: восстановлено доменов {len(responses)}.', flush=True)
     remaining = [host for host in pending if host not in responses]
-    deadline = time.monotonic() + 6600
+    deadline = time.monotonic() + (14400 if full_refresh else 6600)
     if args.evidence:
         write_json(args.evidence / 'dns-checkpoint.json', responses)
     for start in range(0, len(remaining), 32):
@@ -323,7 +328,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         excluded_ips.update(row.get('excluded_ips', []))
     excluded_domains = set()
     if exclusion:
-        excluded_domains = exclusion.excluded_domains(known | discovered, previous_excluded, responses)
+        excluded_domains = exclusion.excluded_domains(known | discovered, set() if full_refresh else previous_excluded, responses)
         print(f'Исключения ASN: исключено доменов — {len(excluded_domains & (known | discovered))}; '
               f'пропущено уникальных IPv4 перед WHOIS — {len(excluded_ips)}.', flush=True)
     unresolved = [host for host in pending if host not in responses or responses[host]['complete'] is not True]
@@ -340,6 +345,20 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         print(f'Выгрузка ASN недоступна: {error}. Сохраняем прежние ASN и результаты по доменам.', file=sys.stderr)
         report = '## Покрытие ASN\n\nВыгрузка BGP.tools недоступна. См. журнал запуска.\n'
     print(report, flush=True)
+    complete = discovery['complete'] and not unresolved and not as_missing and not invalid and asn_error is None
+    if full_refresh:
+        # Old names are queried to backfill evidence, even if no current site
+        # requests them. Only the active discoveries can veto replacement.
+        complete = (discovery['complete'] and not (discovered & set(unresolved))
+                    and not as_missing and not invalid and asn_error is None)
+        if complete:
+            source_groups = {tag: prefixes for tag, prefixes in source_groups.items() if tag == 'legacy'}
+            domain_groups = {tag: matchers for tag, matchers in domain_groups.items() if tag == 'legacy'}
+            known = set()
+            retry_names = set()
+            unresolved = sorted(discovered & set(unresolved))
+        else:
+            excluded_domains |= previous_excluded
     for rule in as_rules:
         if rule['ip']:
             source_groups.setdefault(rule['ruleTag'], set()).update(rule['ip'])
@@ -361,11 +380,10 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         sources['excluded_asns'] = sorted(excluded_asns)
         sources['excluded_domains'] = sorted(excluded_domains)
     result = global_rules(sources)
-    complete = discovery['complete'] and not unresolved and not as_missing and not invalid and asn_error is None
     if args.evidence:
         (args.evidence / 'asn-report.md').write_text(report)
         write_json(args.evidence / 'completeness.json', {
-            'complete': complete, 'mode': 'incremental', 'invalid_sites': invalid, 'dns_requested': len(pending),
+            'complete': complete, 'mode': 'full-refresh' if full_refresh else 'incremental', 'invalid_sites': invalid, 'dns_requested': len(pending),
             'dns_skipped_existing': len(discovered) - len(pending),
             'domains_without_complete_dns_bgp': unresolved,
             'domains_without_any_prefix': sorted(set(pending) - resolved.keys()),
@@ -408,11 +426,14 @@ def main():
     parser.add_argument('--exclude-asns', '--exclude-cloudflare', action='store_true',
                         help='Exclude ASNs listed in source/routing/exclude from direct rules')
     parser.add_argument('--incremental', action='store_true', help='Resolve only names absent from published domain rules')
+    parser.add_argument('--full-refresh', action='store_true', help='Rescan all domains and replace generated rules after a complete scan')
     parser.add_argument('--allow-partial', action='store_true', help='Keep available prefixes and union previous entries on incomplete scans')
     parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed scanner stages on stderr')
     parser.add_argument('--evidence', type=Path, help='Directory for raw scan output and completeness report')
     parser.add_argument('--scanner', type=Path, default=root.parent / 'SubnetResolve.sh')
     args = parser.parse_args()
+    if args.full_refresh and not args.incremental:
+        parser.error('--full-refresh requires --incremental')
     if args.resume and (not args.incremental or not args.evidence):
         parser.error('--resume requires --incremental and --evidence')
     entries = services(args.sites, asn)

@@ -37,7 +37,20 @@ def summarize(prefixes, snapshot):
 
 
 def read_provenance(ip_path, previous, evidence_dirs):
-    rules = json.loads(ip_path.read_bytes())['rules']
+    published = ip_path.read_bytes()
+    rules = json.loads(published)['rules']
+    full_evidence = []
+    for directory in evidence_dirs:
+        status = directory / 'completeness.json'
+        snapshot = directory / 'IP.json'
+        if status.is_file() and snapshot.is_file() and snapshot.read_bytes() == published:
+            metadata = json.loads(status.read_bytes())
+            if metadata.get('mode') == 'full-refresh' and metadata.get('complete') is True:
+                full_evidence.append(directory)
+    if full_evidence:
+        # Replace previous observations only for a complete scan whose routes were published.
+        previous = None
+        evidence_dirs = full_evidence
     networks = [ipaddress.ip_network(prefix) for rule in rules for prefix in rule['ip']]
     records = defaultdict(lambda: defaultdict(set))
     if previous is not None and previous.is_file():
@@ -85,7 +98,7 @@ def read_provenance(ip_path, previous, evidence_dirs):
     return result
 
 
-def write_verbose(output, report, rows, names, prefixes, provenance):
+def write_verbose(output, report, rows, names, prefixes, provenance, explicit_prefixes):
     evidence = defaultdict(list)
     for domain, origins in provenance.items():
         for origin, addresses in origins.items():
@@ -110,6 +123,11 @@ def write_verbose(output, report, rows, names, prefixes, provenance):
             matched.update(published)
             hosts = sorted({f'`{domain}` (`{address}`)' for domain, address in evidence[origin]
                             if address in network and any(address in prefix for prefix in published)})
+            if not hosts:
+                explicit = sorted({tag for tag, original in explicit_prefixes
+                                   if original.version == network.version and original.overlaps(network)
+                                   and any(prefix.overlaps(original) for prefix in published)})
+                hosts = ['Ручной импорт' if tag == 'legacy' else f'Входной ASN `{tag}`' for tag in explicit]
             published_text = ', '.join(f'`{prefix}`' for prefix in published)
             text.append(f'| `{network}` | {published_text} | {", ".join(hosts) or "Нет наблюдений"} |')
         text.append('')
@@ -120,7 +138,7 @@ def write_verbose(output, report, rows, names, prefixes, provenance):
     output.write_text('\n'.join(text) + '\n', encoding='utf-8')
 
 
-def build_report(path, *, verbose_output=None, provenance=None):
+def build_report(path, *, verbose_output=None, provenance=None, sources=None):
     data = path.read_bytes()
     rules = json.loads(data)['rules']
     prefixes = {ipaddress.ip_network(prefix) for rule in rules for prefix in rule['ip']}
@@ -161,7 +179,13 @@ def build_report(path, *, verbose_output=None, provenance=None):
         name = ' '.join(names.get(origin, '—').split()).replace('|', '&#124;').replace('<', '&lt;')
         report.append(f'| {origin} | {name} | {len(touched)} / {total} |')
     if verbose_output is not None:
-        write_verbose(verbose_output, report, rows, names, prefixes, provenance or {})
+        explicit_prefixes = []
+        if sources is not None:
+            for rule in json.loads(sources.read_bytes())['rules']:
+                tag = rule['ruleTag']
+                if tag == 'legacy' or re.fullmatch(r'AS[0-9]+', tag):
+                    explicit_prefixes.extend((tag, ipaddress.ip_network(prefix)) for prefix in rule['ip'])
+        write_verbose(verbose_output, report, rows, names, prefixes, provenance or {}, explicit_prefixes)
     return '\n'.join(report) + '\n'
 
 
@@ -169,6 +193,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('ip_json', type=Path)
     parser.add_argument('output', type=Path)
+    parser.add_argument('--sources', type=Path)
     parser.add_argument('--verbose-output', type=Path)
     parser.add_argument('--previous-provenance', type=Path)
     parser.add_argument('--provenance-output', type=Path)
@@ -181,7 +206,7 @@ if __name__ == '__main__':
         if args.verbose_output:
             provenance = read_provenance(args.ip_json, args.previous_provenance, args.evidence)
             args.provenance_output.write_text(json.dumps(provenance, indent=2) + '\n', encoding='utf-8')
-        report = build_report(args.ip_json, verbose_output=args.verbose_output, provenance=provenance)
+        report = build_report(args.ip_json, verbose_output=args.verbose_output, provenance=provenance, sources=args.sources)
         args.output.write_text(report, encoding='utf-8')
     except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
         parser.exit(1, f'Не удалось сформировать общий отчёт ASN. {error}\n')

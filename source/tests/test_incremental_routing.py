@@ -140,3 +140,37 @@ with tempfile.TemporaryDirectory() as directory:
     assert json.loads(args.output.read_text()) == result
 
 print('PASS incremental routing keeps old rules, skips exact names, resolves service hosts and retries unresolved names')
+
+with tempfile.TemporaryDirectory() as directory:
+    tmp = Path(directory)
+    args = argparse.Namespace(scanner=root / 'SubnetResolve.sh', verbose=False, allow_partial=True,
+                              full_refresh=True, domains_output=tmp / 'domains.json',
+                              sources_output=tmp / 'sources.json', output=tmp / 'IP.json',
+                              evidence=tmp / 'evidence')
+    sources = {'rules': [{'ruleTag': 'site.example', 'ip': ['192.0.2.0/24']},
+                         {'ruleTag': 'legacy', 'ip': ['198.51.100.0/24']}]}
+    domains = {'rules': [{'ruleTag': 'site.example',
+                          'domain': ['domain:old.site.example', 'domain:site.example']}]}
+    for success in (True, False):
+        write_json(args.sources_output, sources)
+        write_json(args.domains_output, domains)
+        scan = {'domains': [
+            {'domain': 'site.example', 'complete': success, 'results': [
+                {'prefix': '203.0.113.0/24', 'asn': 'AS123'}]},
+            {'domain': 'old.site.example', 'complete': False, 'results': []},
+        ]}
+        discovery = {'pages': [{'site': 'site.example', 'domains': [], 'errors': []}]}
+        with patch('update_routing.subprocess.run', side_effect=[
+            subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+            subprocess.CompletedProcess([], 3, json.dumps(scan)),
+        ]) as run:
+            incremental_update(args, [('site.example', 'https://site.example')], set(), lambda *_: ([], [], ''))
+            assert run.call_args.args[0][-2:] == ['old.site.example', 'site.example']
+        saved = json.loads(args.sources_output.read_text())
+        prefixes = {prefix for rule in saved['rules'] for prefix in rule['ip']}
+        assert {'198.51.100.0/24', '203.0.113.0/24'} <= prefixes
+        assert ('192.0.2.0/24' in prefixes) is not success
+        assert ('old.site.example' in args.domains_output.read_text()) is not success
+        status = json.loads((args.evidence / 'completeness.json').read_text())
+        assert status['mode'] == 'full-refresh' and status['complete'] is success
+print('PASS daily full refresh replaces generated rules only after complete active discovery and keeps legacy')
