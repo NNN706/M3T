@@ -171,6 +171,7 @@ def main():
     if args.evidence:
         args.evidence.mkdir(parents=True, exist_ok=True)
         (args.evidence / 'scanner-output.json').write_text(scan.stdout)
+        write_json(args.evidence / 'bgp-observations.json', observations)
     if scan.returncode not in (0, 3):
         raise RuntimeError('Domain scan failed; existing routing files retained.')
     data = json.loads(scan.stdout)
