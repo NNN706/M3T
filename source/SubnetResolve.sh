@@ -461,8 +461,18 @@ bgp_exchange() {
       rc=0; timed_out=0; reply_complete=0
       { printf 'begin\nverbose\n'; cat "$batch/bgp-request"; printf 'end\n'; } > "$batch/bgp-payload"
       : > "$batch/bgp-attempt"
-      nc -w 10 bgp.tools 43 < "$batch/bgp-payload" > "$batch/bgp-attempt" 2> "$batch/bgp-error" &
-      ncpid=$!
+      if [[ "${OSTYPE:-}" == darwin* ]]; then
+        # Apple's nc exits on stdin EOF before a delayed WHOIS reply arrives.
+        # Keep stdin open through the response; the WHOIS "end" line terminates the request.
+        if [ ! -p "$batch/bgp-stdin" ]; then mkfifo "$batch/bgp-stdin" || return 1; fi
+        exec 8<>"$batch/bgp-stdin" || return 1
+        nc -w 10 bgp.tools 43 8>&- < "$batch/bgp-stdin" > "$batch/bgp-attempt" 2> "$batch/bgp-error" &
+        ncpid=$!
+        cat "$batch/bgp-payload" >&8
+      else
+        nc -w 10 bgp.tools 43 < "$batch/bgp-payload" > "$batch/bgp-attempt" 2> "$batch/bgp-error" &
+        ncpid=$!
+      fi
       began=$SECONDS; last_data=$SECONDS; last_size=0
       transport_reason='тайм-аут ожидания WHOIS-ответа'
       while kill -0 "$ncpid" 2>/dev/null; do
@@ -487,6 +497,7 @@ bgp_exchange() {
         sleep 0.1
       done
       wait "$ncpid" 2>/dev/null || rc=$?
+      if [[ "${OSTYPE:-}" == darwin* ]]; then exec 8>&-; fi
       ncpid=''
       if [ "$reply_complete" -eq 1 ]; then rc=0; fi
       # Some nc variants return success on their own idle timeout.
