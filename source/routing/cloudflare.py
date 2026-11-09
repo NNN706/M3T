@@ -68,9 +68,11 @@ class CloudflarePolicy:
     def excluded_hosts(self, hosts, previous, responses):
         excluded = set(previous) | EXCLUDED_HOSTS
         for host, row in responses.items():
-            if any(route.get('asn') in self.asns or
-                   any(self._contains(ip) for ip in route.get('ips', []))
-                   for route in row['results']):
+            routes = row['results']
+            addresses = {ip for route in routes for ip in route.get('ips', [])}
+            addresses.update(error['ip'] for error in row.get('errors', []) if 'ip' in error)
+            if (any(route.get('asn') in self.asns for route in routes)
+                    or any(self._contains(ip) for ip in addresses)):
                 excluded.add(host)
 
         # Supplement Check-Host's IPv4 observations with the runner's A/AAAA

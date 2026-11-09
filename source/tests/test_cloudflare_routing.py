@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory() as directory:
         {'ruleTag': 'legacy', 'ip': ['192.0.2.0/24', '2001:db8::/47']},
     ]})
     discovery = {'pages': [
-        {'site': 'example.com', 'domains': ['fresh.example.com', 'openai.com', 'auth.openai.com'], 'errors': []}
+        {'site': 'example.com', 'domains': ['fresh.example.com', 'openai.com', 'auth.openai.com', 'whois.example.com'], 'errors': []}
     ]}
     rows = {'domains': [
         {'domain': 'auth.openai.com', 'complete': False, 'results': []},
@@ -40,6 +40,8 @@ with tempfile.TemporaryDirectory() as directory:
             {'prefix': '198.51.100.0/24', 'asn': 'AS1', 'ips': ['198.51.100.1']},
             {'prefix': '192.0.2.128/25', 'asn': 'AS209242', 'ips': ['192.0.2.129']},
         ]},
+        {'domain': 'whois.example.com', 'complete': False, 'results': [],
+         'errors': [{'ip': '192.0.2.130'}]},
         {'domain': 'openai.com', 'complete': True, 'results': [
             {'prefix': '198.51.100.0/24', 'asn': 'AS1', 'ips': ['198.51.100.1']},
         ]},
@@ -55,7 +57,9 @@ with tempfile.TemporaryDirectory() as directory:
     domains = json.loads(args.domains_output.read_text())
     assert domains['rules'][0]['domain'] == ['domain:cdn.example.com', 'full:example.com', 'full:openai.com'], domains
     sources = json.loads(args.sources_output.read_text())
-    assert sources['excluded_cloudflare_domains'] == ['auth.openai.com', 'fresh.example.com', 'history.example.com']
+    assert sources['excluded_cloudflare_domains'] == [
+        'auth.openai.com', 'fresh.example.com', 'history.example.com', 'whois.example.com',
+    ]
     assert sources['pending_dns'] == []
     assert {r['ruleTag']:r['ip'] for r in sources['rules']} == {
         'example.com': ['198.51.100.0/24'], 'legacy': ['192.0.2.0/25', '2001:db8::/48'],
