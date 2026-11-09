@@ -1,10 +1,10 @@
 # Общее покрытие ASN правилами маршрутизации
 
-Опубликовано **785** уникальных подсетей (IPv4: **744**, IPv6: **41**). С ними пересекаются анонсы **557** ASN.
+Опубликовано **787** уникальных подсетей (IPv4: **746**, IPv6: **41**). С ними пересекаются анонсы **557** ASN.
 
 Источник правил — [IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/IP.json). Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).
 
-SHA-256 файла IP.json: `f740b2352f16b5d5ee9081b4704c76fe74cc6bb1faa79f5300a63a06702ad92a`.
+SHA-256 файла IP.json: `29bd325b5bcab4c358ad6b30aa53e7d110b55c23e8797623eb9d2dd702774e3c`.
 
 «Затронуто» — анонсы ASN, которые хотя бы частично пересекаются с правилами. «Всего» — все анонсы этого ASN в снимке. Один префикс может учитываться у нескольких ASN, если они его анонсируют.
 
@@ -245,7 +245,7 @@ SHA-256 файла IP.json: `f740b2352f16b5d5ee9081b4704c76fe74cc6bb1faa79f5300a
 | AS50276 | Federal State Budgetary Educational Institution of Higher Education "Russian University of Chemical Technology named after D.I. Mendeleev" | 2 / 2 |
 | AS50282 | Gosudarstvennoe kazennoe uchrezhdenie Novosibirskoj oblasti "Regional'nyj informatsionnyj tsentr" | 1 / 1 |
 | AS50339 | Joint-stock company "National system of payment cards" | 1 / 2 |
-| AS50340 | Selectel - Moscow | 122 / 566 |
+| AS50340 | Selectel - Moscow | 124 / 566 |
 | AS50374 | Siberian Internet Company LLC | 1 / 4 |
 | AS50416 | PUBLIC JOINT STOCK COMPANY "TRANSCAPITALBANK" | 1 / 1 |
 | AS50451 | Ministry of Digital Development and Communications of the Novosibirsk Region | 1 / 2 |
