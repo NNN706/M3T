@@ -5,7 +5,8 @@ import shutil
 import subprocess
 import tempfile
 
-INPUTS = ['source/routing/sites.txt', 'source/routing/ASN.txt', 'source/routing/asn_routes.py', 'source/SubnetResolve.sh',
+LISTS = ['source/routing/sites.txt', 'source/routing/ASN.txt']
+INPUTS = ['source/routing/asn_routes.py', 'source/SubnetResolve.sh',
           'source/routing/update_routing.py', 'source/routing/domains.json', 'source/routing/sources.json', 'source/routing/IP.json']
 OUTPUT = 'source/routing/IP.json'
 
@@ -24,8 +25,13 @@ def publish(repo, output, base, branch='test', domains=None, sources=None):
     for attempt in range(3):
         git(repo, 'fetch', 'origin', 'refs/heads/test')
         head = git(repo, 'rev-parse', 'FETCH_HEAD').stdout.strip()
-        if git(repo, 'diff', '--quiet', base, head, '--', *INPUTS, check=False).returncode:
-            raise RuntimeError('Routing inputs or previous IP.json changed during scan; result retained in artifacts. Run update again.')
+        guarded = git(repo, 'diff', '--name-only', base, head, '--', *INPUTS).stdout.splitlines()
+        if guarded:
+            raise RuntimeError('Routing code or published JSON changed during scan: '
+                               + ', '.join(guarded) + '. Results retained in artifacts.')
+        changed_lists = git(repo, 'diff', '--name-only', base, head, '--', *LISTS).stdout.splitlines()
+        if changed_lists:
+            print('Publishing collected data without changing newer lists: ' + ', '.join(changed_lists))
         with tempfile.TemporaryDirectory(prefix='routing-publish-') as directory:
             worktree = Path(directory) / 'checkout'
             git(repo, 'worktree', 'add', '--detach', str(worktree), head)

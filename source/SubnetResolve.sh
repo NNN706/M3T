@@ -859,7 +859,9 @@ jq -n --arg domain "$domain" --argjson verbose "$verbose" \
      {ips: ([$group[].ip] | unique), check_host: ([$group[].node] | unique),
       resolutions: ($group | group_by(.ip) | map({ip: .[0].ip, check_host: ([.[].node] | unique)}))} +
      (if $verbose == 1 then {check_host_details: ([$group[].node] | unique | map(. as $node | {key: $node, value: $c[0].nodes[$node]}) | from_entries)} else {} end))),
-   errors: ((if $c[0].request_error then [{error: "Не удалось запустить DNS-проверку", message: $c[0].request_error}] else [] end) + [$n[0][] | select(.ips | length == 0) |
+   errors: ((if $c[0].request_error then [{error: "Не удалось запустить DNS-проверку", message: $c[0].request_error}] else [] end) +
+     (if $c[0].poll_error then [{error: "Не удалось получить DNS-отчёт", message: $c[0].poll_error}] else [] end) +
+     [$n[0][] | select(.ips | length == 0) |
        . as $n | ($c[0].nodes[.node]) as $details |
        ([.response | .. | objects | (.message?, .error?) | strings] | unique) as $messages |
        {check_host: .node, country: $details[1], city: $details[2],
@@ -871,7 +873,8 @@ jq -n --arg domain "$domain" --argjson verbose "$verbose" \
                   else "Узел ответил, но не вернул IPv4 A-записи" end), response: .response}] +
      ([$o[0][].ip] | unique | map(. as $ip | select(all($routes[]; .ip != $ip)) | ([$be[0][] | select(.ip==$ip)] | first // {ip:$ip,error:"Не получены BGP-префикс и ASN",message:"BGP.tools не прислал данные для этого IP"})))),
    permanent_link: $c[0].permanent_link} |
-  . + {complete: (.errors | length == 0)}
+  . + {complete: ((.results | length > 0) and
+                   all(.errors[]; .check_host != null))}
 ' > "$tmp/full.json"
   full_files+=("$tmp/full.json")
 done
@@ -888,16 +891,21 @@ fi
 if ! jq -e .complete "$tmp/batch.json" >/dev/null; then
   status=3
   finish_progress
-  if [ "$verbose" -eq 1 ] || jq -e '[.domains[].errors[] | select(.check_host == null)] | length>0' "$tmp/batch.json" >/dev/null; then
   printf 'Для части доменов или IP не удалось получить DNS/BGP-данные:\n' >&2
-  jq -r --argjson verbose "$verbose" '.domains[] | .domain as $d | .errors[] | select($verbose == 1 or .check_host == null) |
-    "[\($d)] \(.check_host // .ip // "Check-Host")" +
-    (if .country != null or .city != null then " [\(.country // "—"), \(.city // "—")]" else "" end) +
-    ": \(.error)" + (if .message != null and .message != .error then " — \(.message)" else "" end)' "$tmp/batch.json" >&2
-  fi
-  if [ "$verbose" -eq 1 ]; then
-    jq -c '.domains[] | .domain as $d | .errors[] | {domain: $d} + .' "$tmp/batch.json" >&2
-  fi
+  jq -r '.domains[] | .domain as $d |
+    (if (.results | length == 0) and all(.errors[]; .check_host != null) then
+       "[\($d)] Check-Host: ни один узел не вернул IPv4 A-запись."
+     else empty end),
+    (.errors[] | select(.check_host == null) |
+     "[\($d)] \(.ip // "Check-Host"): \(.error)" +
+     (if .message != null and .message != .error then " — \(.message)" else "" end))' "$tmp/batch.json" >&2
+fi
+if [ "$verbose" -eq 1 ] && jq -e 'any(.domains[].errors[]; .check_host != null)' "$tmp/batch.json" >/dev/null; then
+  finish_progress
+  jq -r '.domains[] | .domain as $d | .errors[] | select(.check_host != null) |
+    "[\($d)] \(.check_host) [\(.country // "—"), \(.city // "—")]: \(.error)" +
+    (if .message != null and .message != .error then " — \(.message)" else "" end)' "$tmp/batch.json" >&2
+  jq -c '.domains[] | .domain as $d | .errors[] | {domain: $d} + .' "$tmp/batch.json" >&2
 fi
 if [ "${#domains[@]}" -eq 1 ]; then
   jq '.domains[0]' "$tmp/batch.json" > "$tmp/full.json"

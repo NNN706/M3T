@@ -109,7 +109,7 @@ jobs:
           if [ -n "$RESUME_RUN_ID" ]; then resume=(--resume "$ROUTING_RESUME"); fi
           timeout --verbose --kill-after=10s 105m python3 source/routing/update_routing.py --incremental --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
           if ! python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["complete"])' "$ROUTING_EVIDENCE/completeness.json"; then
-            echo '::warning::Неполный сбор: опубликованы доступные подсети; прежние записи сохранены. См. routing-evidence.'
+            echo '::warning::Неполный сбор: доступные подсети и обнаруженные домены подготовлены к публикации; прежние записи сохранены. См. routing-evidence.'
           fi
           {
             cat "$ROUTING_EVIDENCE/asn-report.md"

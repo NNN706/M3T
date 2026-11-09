@@ -5,6 +5,7 @@ from hashlib import sha256
 import ipaddress
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import tempfile
@@ -138,6 +139,12 @@ def incremental_update(args, entries, explicit, collect):
     """Workflow mode. Append verified discoveries to the published baseline."""
     resume = getattr(args, 'resume', None)
     outputs = {'IP.json': args.output, 'domains.json': args.domains_output, 'sources.json': args.sources_output}
+    invalid = sorted(host for host, _ in entries if len(host) > 253 or '.' not in host
+                     or not all(re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?', label)
+                                for label in host.split('.')))
+    for host in invalid:
+        print(f'Некорректное DNS-имя в sites.txt: {host!r}. Остальные записи будут обработаны.', file=sys.stderr)
+    entries = [(host, url) for host, url in entries if host not in invalid]
     manifest = {
         'version': 1,
         'inputs': routing_fingerprint({
@@ -151,18 +158,19 @@ def incremental_update(args, entries, explicit, collect):
     implementation = routing_fingerprint({
         'generator': Path(__file__), 'asn_routes': Path(__file__).with_name('asn_routes.py'),
     })
+    saved = None
     if resume:
         if not (resume / 'checkpoint.json').is_file():
             raise RuntimeError('В артефакте нет checkpoint.json. Этот запуск нельзя продолжить автоматически.')
         saved = json.loads((resume / 'checkpoint.json').read_text())
-        if saved != manifest:
-            changed = [name for name, digest in manifest['inputs'].items()
-                       if saved.get('inputs', {}).get(name) != digest]
-            detail = ', '.join(changed) or 'версия формата или список входных данных'
+        changed = [name for name, digest in manifest['inputs'].items()
+                   if name not in ('sites', 'asn_file') and saved.get('inputs', {}).get(name) != digest]
+        if saved.get('version') != manifest['version'] or changed:
+            detail = ', '.join(changed) or 'версия формата'
             raise RuntimeError(f'Контрольная точка несовместима. Изменились: {detail}.')
     if args.evidence:
         write_json(args.evidence / 'checkpoint.json', manifest)
-    if resume and (resume / 'prepared.json').is_file():
+    if resume and saved == manifest and (resume / 'prepared.json').is_file():
         prepared = json.loads((resume / 'prepared.json').read_text())
         files = [*outputs, 'asn-report.md', 'completeness.json']
         saved_files = {name: resume / name for name in files}
@@ -170,7 +178,8 @@ def incremental_update(args, entries, explicit, collect):
             if prepared.get('files') != routing_fingerprint(saved_files) or not all(p.is_file() for p in saved_files.values()):
                 raise RuntimeError('Контрольная точка публикации повреждена: файлы не совпадают с контрольными суммами.')
             status = json.loads(saved_files['completeness.json'].read_text())
-            if not status['domains_without_complete_dns_bgp'] and not status['asns_without_prefixes']:
+            if not any(status.get(key) for key in ('domains_without_complete_dns_bgp',
+                                                    'asns_without_prefixes', 'asn_export_error')):
                 for name, path in outputs.items():
                     write_json(path, json.loads(saved_files[name].read_text()))
                 for name in ('asn-report.md', 'completeness.json', 'discovery.json', 'dns-checkpoint.json'):
@@ -189,12 +198,20 @@ def incremental_update(args, entries, explicit, collect):
     source_groups = {r['ruleTag']: set(r['ip']) for r in previous_sources['rules']}
     known = {matcher.lower().rstrip('.') for group in domain_groups.values()
              for matcher in group if matcher.startswith('domain:')}
+    retry_names = set(previous_sources.get('pending_dns', []))
     discovery = {'domains': [], 'pages': [], 'complete': True}
+    browser_entries = entries
     flags = ['-v'] if args.verbose else []
     if resume and (resume / 'discovery.json').is_file():
-        discovery = json.loads((resume / 'discovery.json').read_text())
-        print('Chromium: восстановлен список доменов из артефакта.', flush=True)
-    elif entries:
+        old_discovery = json.loads((resume / 'discovery.json').read_text())
+        saved_sites = dict(saved['sites'])
+        current_sites = dict(entries)
+        discovery['pages'] = [page for page in old_discovery['pages']
+                              if page['site'] in current_sites and saved_sites.get(page['site']) == current_sites[page['site']]]
+        restored = {page['site'] for page in discovery['pages']}
+        browser_entries = [(host, url) for host, url in entries if host not in restored]
+        print(f'Chromium: восстановлено страниц {len(restored)}, новых запросов {len(browser_entries)}.', flush=True)
+    if browser_entries:
         # Reuse the production curl/Chromium phase without executing its DNS phase.
         # Fail closed if SubnetResolve changes its phase boundary.
         marker = "\nunset inputs\nstage_name='Этап 3/4: DNS'\n"
@@ -202,20 +219,30 @@ def incremental_update(args, entries, explicit, collect):
         if scanner.count(marker) != 1:
             raise RuntimeError('Не найдена граница этапов Chromium и DNS в SubnetResolve.sh.')
         browser_phase = scanner.split(marker, 1)[0] + '\nfinish_progress\ncat "$batch/discovery.json"\n'
-        browser = subprocess.run(['bash', '-c', browser_phase, str(args.scanner), '-parse', '-s',
-                                  *flags, '--', *[url for _, url in entries]],
-                                 stdout=subprocess.PIPE, text=True, timeout=6600, check=True)
-        discovery = json.loads(browser.stdout)
+        try:
+            browser = subprocess.run(['bash', '-c', browser_phase, str(args.scanner), '-parse', '-s',
+                                      *flags, '--', *[url for _, url in browser_entries]],
+                                     stdout=subprocess.PIPE, text=True, timeout=6600, check=True)
+            discovery['pages'].extend(json.loads(browser.stdout)['pages'])
+        except (subprocess.SubprocessError, ValueError) as error:
+            print(f'Chromium: сбор страниц не завершён ({error.__class__.__name__}). Исходные домены сохранены.', file=sys.stderr)
+            discovery['complete'] = False
+    discovery['complete'] = discovery['complete'] and all(not page['errors'] for page in discovery['pages'])
+    discovery['domains'] = sorted({host for host, _ in entries} |
+                                  {host for page in discovery['pages'] for host in page['domains']})
     tags = {host for host, _ in entries}
-    candidates = {host: {host} for host in tags}
+    candidates = {
+        host: {host} | {matcher[7:] for matcher in domain_groups.get(host, ()) if matcher[7:] in retry_names}
+        for host in tags
+    }
     for page in discovery['pages']:
         candidates[page['site']].update(page['domains'])
         for error in page['errors']:
             message = error.removesuffix('; домен будет проверен через DNS/BGP')
             print(f"[{page['site']}] {message}", file=sys.stderr)
     discovered = set().union(*candidates.values())
-    pending = sorted(host for host in discovered if 'domain:' + host not in known)
-    print(f'DNS Check-Host: новых доменов {len(pending)}, уже в domains.json {len(discovered)-len(pending)}.', flush=True)
+    pending = sorted(host for host in discovered if 'domain:' + host not in known or host in retry_names)
+    print(f'DNS Check-Host: на проверку {len(pending)}, пропущено известных {len(discovered)-len(pending)}.', flush=True)
     observations = []
     responses = {}
     if args.evidence:
@@ -223,13 +250,13 @@ def incremental_update(args, entries, explicit, collect):
         write_json(args.evidence / 'discovery.json', discovery)
     if resume and (resume / 'dns-checkpoint.json').is_file():
         saved_dns = json.loads((resume / 'dns-checkpoint.json').read_text())
-        if not set(saved_dns) <= set(pending) or any(
+        if any(
             row['domain'] != host or row['complete'] is not True or not row['results']
             for host, row in saved_dns.items()
         ):
             raise ValueError('DNS/BGP: контрольная точка содержит неполные или незапрошенные домены.')
-        responses.update(saved_dns)
-        print(f'DNS/BGP: восстановлено доменов {len(saved_dns)}.', flush=True)
+        responses.update({host: row for host, row in saved_dns.items() if host in pending})
+        print(f'DNS/BGP: восстановлено доменов {len(responses)}.', flush=True)
     remaining = [host for host in pending if host not in responses]
     deadline = time.monotonic() + 6600
     if args.evidence:
@@ -238,14 +265,25 @@ def incremental_update(args, entries, explicit, collect):
         batch = remaining[start:start + 32]
         budget = deadline - time.monotonic()
         if budget <= 0:
-            raise RuntimeError('Истёк общий лимит DNS/BGP. Завершённые пакеты сохранены.')
-        scan = subprocess.run(['bash', str(args.scanner), '-s', *flags, '--', *batch],
-                              stdout=subprocess.PIPE, text=True, timeout=budget)
+            print('Истёк общий лимит DNS/BGP. Сохраняем завершённые пакеты.', file=sys.stderr)
+            break
+        try:
+            scan = subprocess.run(['bash', str(args.scanner), '-s', *flags, '--', *batch],
+                                  stdout=subprocess.PIPE, text=True, timeout=budget)
+        except subprocess.TimeoutExpired:
+            print('Истёк лимит DNS/BGP. Сохраняем найденные имена и полученные префиксы.', file=sys.stderr)
+            break
         if args.evidence:
             (args.evidence / f'scanner-output-{start // 32 + 1}.json').write_text(scan.stdout)
         if scan.returncode not in (0, 3):
-            raise RuntimeError(f'DNS/BGP-сканирование завершилось с ошибкой {scan.returncode}. См. журнал.')
-        data = json.loads(scan.stdout)
+            print(f'DNS/BGP завершился с ошибкой {scan.returncode}. Сохраняем обнаруженные имена. См. журнал.', file=sys.stderr)
+            break
+        try:
+            data = json.loads(scan.stdout)
+        except json.JSONDecodeError:
+            print('DNS/BGP вернул некорректный JSON. Сохраняем обнаруженные имена и готовые пакеты.',
+                  file=sys.stderr)
+            break
         rows = data['domains'] if 'domains' in data else [data]
         received = {row['domain']: row for row in rows}
         if len(received) != len(rows) or set(received) != set(batch):
@@ -258,35 +296,48 @@ def incremental_update(args, entries, explicit, collect):
             })
     resolved = {}
     for host, row in responses.items():
-        if row['complete'] and row['results']:
+        if row['results']:
             resolved[host] = {str(ipaddress.ip_network(route['prefix'])) for route in row['results']}
             observations.extend(row['results'])
-    unresolved = sorted(set(pending) - resolved.keys())
+    unresolved = sorted(host for host in pending if host not in resolved or responses[host]['complete'] is not True)
     if unresolved:
         print('DNS/BGP без полного результата. Домены остаются на повтор: ' + ', '.join(unresolved), file=sys.stderr)
     if args.evidence:
         write_json(args.evidence / 'bgp-observations.json', observations)
-    as_rules, as_missing, report = collect(explicit, observations)
+    asn_error = None
+    try:
+        as_rules, as_missing, report = collect(explicit, observations)
+    except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
+        asn_error = str(error)
+        as_rules, as_missing = [], sorted(explicit)
+        print(f'Выгрузка ASN недоступна: {error}. Сохраняем прежние ASN и результаты по доменам.', file=sys.stderr)
+        report = '## Покрытие ASN\n\nВыгрузка BGP.tools недоступна. См. журнал запуска.\n'
     print(report, flush=True)
     for rule in as_rules:
         if rule['ip']:
             source_groups.setdefault(rule['ruleTag'], set()).update(rule['ip'])
     for tag, hosts in candidates.items():
+        new_matchers = {'domain:' + host for host in hosts if 'domain:' + host not in known}
+        if new_matchers:
+            domain_groups.setdefault(tag, set()).update(new_matchers)
         for host in sorted(hosts & resolved.keys()):
-            domain_groups.setdefault(tag, set()).add('domain:' + host)
             source_groups.setdefault(tag, set()).update(resolved[host])
     sources = {'rules': [{'ruleTag': tag, 'ip': sorted(values)} for tag, values in sorted(source_groups.items())]}
     sources = compact_rules(sources, source_groups, dual_stack=True)
+    sources['pending_dns'] = sorted((retry_names - set(pending)) | set(unresolved))
     domains = {'rules': [{'ruleTag': tag, 'domain': sorted(values)} for tag, values in sorted(domain_groups.items())]}
     domains = domain_rules(domains, domain_groups, include_seed=False)
     result = global_rules(sources)
-    complete = discovery['complete'] and not unresolved and not as_missing
+    complete = discovery['complete'] and not unresolved and not as_missing and not invalid and asn_error is None
     if args.evidence:
         (args.evidence / 'asn-report.md').write_text(report)
         write_json(args.evidence / 'completeness.json', {
-            'complete': complete, 'mode': 'incremental', 'dns_requested': len(pending),
+            'complete': complete, 'mode': 'incremental', 'invalid_sites': invalid, 'dns_requested': len(pending),
             'dns_skipped_existing': len(discovered) - len(pending),
-            'domains_without_complete_dns_bgp': unresolved, 'asns_without_prefixes': as_missing,
+            'domains_without_complete_dns_bgp': unresolved,
+            'domains_without_any_prefix': sorted(set(pending) - resolved.keys()),
+            'asns_without_prefixes': as_missing,
+            'asn_export_error': asn_error,
             'services_written': len(result['rules']),
             'prefixes_written': sum(len(rule['ip']) for rule in result['rules']),
         })
