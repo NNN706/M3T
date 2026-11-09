@@ -1,10 +1,10 @@
 # Общее покрытие ASN правилами маршрутизации
 
-Опубликовано **719** уникальных подсетей (IPv4: **682**, IPv6: **37**). С ними пересекаются анонсы **554** ASN.
+Опубликовано **800** уникальных подсетей (IPv4: **759**, IPv6: **41**). С ними пересекаются анонсы **560** ASN.
 
 Источник правил — [IP.json](IP.json). Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).
 
-SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a8ecb5ebee4b15`.
+SHA-256 файла IP.json: `2c347ce5335276187a7ab6156e4d687e235259992a5eac47c2bcae8ff189138d`.
 
 «Затронуто» — анонсы ASN, которые хотя бы частично пересекаются с правилами. «Всего» — все анонсы этого ASN в снимке. Один префикс может учитываться у нескольких ASN, если они его анонсируют.
 
@@ -15,24 +15,26 @@ SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a
 | AS1299 | Arelion (fka. Telia Carrier) | 1 / 123 | Полностью покрыто: 1 |
 | AS2854 | LLC Orange Business Services | 1 / 44 | Полностью покрыто: 0 |
 | AS3175 | Citytelecom LLC | 4 / 45 | Полностью покрыто: 4 |
-| AS3216 | PJSC Vimpelcom | 13 / 597 | Полностью покрыто: 6 |
+| AS3216 | PJSC Vimpelcom | 14 / 597 | Полностью покрыто: 6 |
 | AS3218 | Federal State Budgetary Institution of Science "Space Research Institute of the Russian Academy of Sciences". | 9 / 24 | Полностью покрыто: 9 |
 | AS3253 | PJSC "Vimpelcom" | 3 / 20 | Полностью покрыто: 3 |
 | AS3267 | National Research Computer Network of Russia | 10 / 99 | Полностью покрыто: 10 |
 | AS3316 | Internet Exchange MSK-IX JSC | 10 / 33 | Полностью покрыто: 10 |
+| AS3320 | Deutsche Telekom AG | 1 / 976 | Полностью покрыто: 0 |
 | AS5429 | Telecommunications center UMOS, LLC | 1 / 7 | Полностью покрыто: 1 |
 | AS5547 | JSC Orient-Telecom | 2 / 20 | Полностью покрыто: 2 |
 | AS5568 | Join-stock company "Internet Exchange"MSK-IX" | 1 / 4 | Полностью покрыто: 1 |
 | AS6697 | Beltelecom | 2 / 231 | Полностью покрыто: 2 |
 | AS6762 | Telecom Italia Sparkle (Seabone) | 2 / 311 | Полностью покрыто: 2 |
+| AS6878 | T-Systems International GmbH | 1 / 51 | Полностью покрыто: 1 |
 | AS7377 | University of California, San Diego | 1 / 20 | Полностью покрыто: 0 |
 | AS7979 | Servers.com, Inc. | 10 / 1929 | Полностью покрыто: 10 |
 | AS8068 | Microsoft Corporation | 2 / 70 | Полностью покрыто: 2 |
-| AS8075 | Microsoft Corporation | 14 / 1361 | Полностью покрыто: 11 |
+| AS8075 | Microsoft Corporation | 15 / 1361 | Полностью покрыто: 12 |
 | AS8193 | "Uzbektelekom" Joint Stock Company | 1 / 105 | Полностью покрыто: 1 |
 | AS8291 | The Federal Guard Service of the Russian Federation | 15 / 15 | Все |
 | AS8342 | JSC RTComm.RU | 4 / 100 | Полностью покрыто: 4 |
-| AS8359 | MTS PJSC | 11 / 522 | Полностью покрыто: 9 |
+| AS8359 | MTS PJSC | 13 / 522 | Полностью покрыто: 10 |
 | AS8492 | "OBIT" Ltd. | 7 / 149 | Полностью покрыто: 7 |
 | AS8595 | OOO WestCall Ltd. | 3 / 55 | Полностью покрыто: 3 |
 | AS8641 | LLC "Nauka-Svyaz" | 1 / 62 | Полностью покрыто: 1 |
@@ -56,6 +58,7 @@ SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a
 | AS12737 | KrasPromStroy, LLC | 8 / 27 | Полностью покрыто: 8 |
 | AS13056 | PJSC Rostelecom | 1 / 10 | Полностью покрыто: 1 |
 | AS13075 | PJSC MegaFon | 2 / 5 | Полностью покрыто: 2 |
+| AS13174 | MTS PJSC | 3 / 12 | Полностью покрыто: 2 |
 | AS13238 | YANDEX LLC | 47 / 47 | Все |
 | AS15169 | Google LLC | 621 / 1454 | Полностью покрыто: 609 |
 | AS15632 | JSC "Alfa-Bank" | 14 / 14 | Все |
@@ -96,7 +99,7 @@ SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a
 | AS25591 | BCLan LLC | 1 / 27 | Полностью покрыто: 1 |
 | AS25820 | IT7 Networks Inc | 1 / 280 | Полностью покрыто: 1 |
 | AS27257 | Webair Internet Development Company Inc. | 10 / 84 | Полностью покрыто: 10 |
-| AS28709 | LLC VK | 10 / 19 | Полностью покрыто: 10 |
+| AS28709 | LLC VK | 19 / 19 | Все |
 | AS28753 | Leaseweb Deutschland GmbH | 1 / 191 | Полностью покрыто: 1 |
 | AS28762 | Citytelecom LLC | 1 / 8 | Полностью покрыто: 1 |
 | AS29076 | Citytelecom LLC | 12 / 81 | Полностью покрыто: 12 |
@@ -117,11 +120,11 @@ SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a
 | AS34665 | Petersburg Internet Network ltd. | 23 / 176 | Полностью покрыто: 23 |
 | AS34779 | T-2, d.o.o. | 1 / 34 | Полностью покрыто: 1 |
 | AS34858 | Telezon-Seti LLC | 6 / 22 | Полностью покрыто: 6 |
-| AS34879 | OOO "Sovremennye setevye tekhnologii" | 84 / 101 | Полностью покрыто: 84 |
+| AS34879 | OOO "Sovremennye setevye tekhnologii" | 101 / 101 | Все |
 | AS34959 | KVIKTEL LLC | 1 / 6 | Полностью покрыто: 1 |
 | AS35000 | JSC "Severen-Telecom" | 2 / 46 | Полностью покрыто: 0 |
 | AS35021 | MB Information Protection LLC | 3 / 7 | Полностью покрыто: 2 |
-| AS35237 | Sberbank of Russia PJSC | 8 / 16 | Полностью покрыто: 8 |
+| AS35237 | Sberbank of Russia PJSC | 12 / 16 | Полностью покрыто: 11 |
 | AS35297 | Dataline LLC | 1 / 22 | Полностью покрыто: 1 |
 | AS35566 | Kar-Tel LLC | 1 / 45 | Полностью покрыто: 1 |
 | AS35608 | R-LINE 1 LLC | 2 / 17 | Полностью покрыто: 2 |
@@ -146,7 +149,7 @@ SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a
 | AS41465 | Limited Liability Company VolgoGazTelecom | 1 / 16 | Полностью покрыто: 1 |
 | AS41706 | PJSC NK Rosneft | 3 / 3 | Все |
 | AS41719 | SKTV Spektr LLC | 1 / 10 | Полностью покрыто: 1 |
-| AS41722 | Miran Ltd. | 1 / 43 | Полностью покрыто: 1 |
+| AS41722 | Miran Ltd. | 2 / 43 | Полностью покрыто: 2 |
 | AS41740 | Join-stock company "Internet Exchange"MSK-IX" | 4 / 14 | Полностью покрыто: 4 |
 | AS41745 | Ilia Baikov | 1 / 240 | Полностью покрыто: 1 |
 | AS41798 | JSC Transtelecom | 2 / 209 | Полностью покрыто: 2 |
@@ -200,7 +203,7 @@ SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a
 | AS47542 | LLC VK | 8 / 8 | Все |
 | AS47723 | SOFTLINE PJSC | 3 / 48 | Полностью покрыто: 1 |
 | AS47724 | Limited Liability Company HeadHunter | 3 / 6 | Полностью покрыто: 3 |
-| AS47764 | LLC VK (Mail.ru) | 35 / 105 | Полностью покрыто: 31 |
+| AS47764 | LLC VK (Mail.ru) | 105 / 105 | Все |
 | AS47846 | SEDO GmbH | 1 / 3 | Полностью покрыто: 1 |
 | AS48009 | MB Information Protection LLC | 2 / 6 | Полностью покрыто: 2 |
 | AS48018 | Fornex Hosting S.L. | 2 / 14 | Полностью покрыто: 2 |
@@ -220,10 +223,11 @@ SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a
 | AS48922 | Domodedovo_IT_Services LLC | 3 / 3 | Все |
 | AS49053 | LLC Wildberries | 1 / 1 | Все |
 | AS49063 | Data Storage Center JSC | 7 / 172 | Полностью покрыто: 6 |
+| AS49186 | Federal State Institution Research and Development Institute "Voskhod", FGAU | 1 / 2 | Полностью покрыто: 1 |
 | AS49287 | Melbikomas UAB | 2 / 12 | Полностью покрыто: 2 |
 | AS49352 | "Domain names registrar REG.RU", Ltd | 5 / 28 | Полностью покрыто: 5 |
 | AS49453 | Global Layer B.V. | 2 / 169 | Полностью покрыто: 2 |
-| AS49505 | JSC Selectel | 194 / 678 | Полностью покрыто: 173 |
+| AS49505 | JSC Selectel | 199 / 678 | Полностью покрыто: 177 |
 | AS49531 | "NetCom-R" LLC | 2 / 70 | Полностью покрыто: 0 |
 | AS49612 | DDOS-GUARD LTD | 1 / 1 | Все |
 | AS49675 | SKB Kontur Production JSC | 1 / 18 | Полностью покрыто: 1 |
@@ -243,7 +247,7 @@ SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a
 | AS50276 | Federal State Budgetary Educational Institution of Higher Education "Russian University of Chemical Technology named after D.I. Mendeleev" | 2 / 2 | Все |
 | AS50282 | Gosudarstvennoe kazennoe uchrezhdenie Novosibirskoj oblasti "Regional'nyj informatsionnyj tsentr" | 1 / 1 | Все |
 | AS50339 | Joint-stock company "National system of payment cards" | 1 / 2 | Полностью покрыто: 1 |
-| AS50340 | Selectel - Moscow | 120 / 566 | Полностью покрыто: 111 |
+| AS50340 | Selectel - Moscow | 122 / 566 | Полностью покрыто: 113 |
 | AS50374 | Siberian Internet Company LLC | 1 / 4 | Полностью покрыто: 0 |
 | AS50416 | PUBLIC JOINT STOCK COMPANY "TRANSCAPITALBANK" | 1 / 1 | Все |
 | AS50451 | Ministry of Digital Development and Communications of the Novosibirsk Region | 1 / 2 | Полностью покрыто: 1 |
@@ -304,6 +308,7 @@ SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a
 | AS57645 | OOO LICARD | 1 / 4 | Полностью покрыто: 1 |
 | AS57652 | OOO "Zeltelecom" | 1 / 5 | Полностью покрыто: 1 |
 | AS57724 | DDOS-GUARD LTD | 35 / 35 | Все |
+| AS57973 | LLC VK | 2 / 3 | Полностью покрыто: 2 |
 | AS58067 | JOINT-STOCK COMPANY "MOSCOW ENERGY COMMUNICATION NODE" | 1 / 20 | Полностью покрыто: 1 |
 | AS58255 | Institute for Nuclear Research of the Russian Academy of Sciences | 1 / 8 | Полностью покрыто: 1 |
 | AS58272 | LeaderTelecom B.V. | 20 / 151 | Полностью покрыто: 20 |
@@ -488,6 +493,7 @@ SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a
 | AS207104 | "BiZone" LLC | 2 / 10 | Полностью покрыто: 2 |
 | AS207353 | Ruform LLC | 2 / 13 | Полностью покрыто: 2 |
 | AS207581 | LLC VK | 2 / 2 | Все |
+| AS207970 | LLC VK | 1 / 1 | Все |
 | AS207990 | HostRoyale Technologies Pvt Ltd | 17 / 1078 | Полностью покрыто: 17 |
 | AS208252 | LLC EVRAZ Steel Building | 1 / 1 | Все |
 | AS208388 | AO "Odezhda 3000" | 1 / 1 | Все |
@@ -514,7 +520,7 @@ SHA-256 файла IP.json: `456145d47ce331f40cd716e0c002788f910c1b66a1ad00a705a
 | AS210656 | Yandex.Cloud LLC | 3 / 9 | Полностью покрыто: 3 |
 | AS210725 | LLC Film Studio "Star" | 1 / 1 | Все |
 | AS210726 | ADV Launchpad Limited Liability Company | 2 / 2 | Все |
-| AS210756 | EdgeCenter LLC | 144 / 145 | Полностью покрыто: 144 |
+| AS210756 | EdgeCenter LLC | 145 / 145 | Все |
 | AS210829 | SATEL Ltd. | 2 / 2 | Все |
 | AS210889 | KRASTSVETMET OJSC | 1 / 1 | Все |
 | AS211183 | AdminVPS OOO | 3 / 93 | Полностью покрыто: 3 |
