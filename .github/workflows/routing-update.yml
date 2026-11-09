@@ -1,0 +1,137 @@
+name: Update service routing prefixes
+on:
+  workflow_dispatch:
+    inputs:
+      resume_run_id:
+        description: ID запуска с сохранёнными результатами
+        required: false
+        type: string
+  push:
+    branches: [test]
+    paths:
+      - 'source/routing/sites.txt'
+      - 'source/routing/ASN.txt'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: routing-update-test
+  cancel-in-progress: false
+jobs:
+  update:
+    if: github.ref == 'refs/heads/test'
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 120
+    steps:
+      - name: Verify runner
+        run: |
+          set -euo pipefail
+          test "$RUNNER_NAME" = Admiralteskiy
+          echo "XDG_CACHE_HOME=$HOME/.cache/m3t-routing" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/m3t-routing/chromium" >> "$GITHUB_ENV"
+          echo "ROUTING_EVIDENCE=$RUNNER_TEMP/routing-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
+          echo "ROUTING_RESUME=$RUNNER_TEMP/routing-resume-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: test
+      - name: Find checkpoint from previous routing run
+        if: inputs.resume_run_id != ''
+        id: resume
+        shell: bash
+        env:
+          RESUME_RUN_ID: ${{ inputs.resume_run_id }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          [[ "$RESUME_RUN_ID" =~ ^[0-9]+$ && "$RESUME_RUN_ID" != "$GITHUB_RUN_ID" ]] || {
+            echo '::error::resume_run_id должен быть числовым ID другого запуска.'
+            exit 1
+          }
+          api="$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs/$RESUME_RUN_ID"
+          headers=(-H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json')
+          curl -fsS --max-time 20 "${headers[@]}" "$api" | jq -e --arg repository "$GITHUB_REPOSITORY" '
+            .head_branch == "test" and .status == "completed"
+            and .head_repository.full_name == $repository
+            and (.event == "workflow_dispatch" or .event == "push")
+            and (.path | split("@")[0] == ".github/workflows/routing-update.yml")
+          ' >/dev/null || {
+            echo '::error::Указанный запуск должен быть завершённым routing-update в ветке test этого репозитория.'
+            exit 1
+          }
+          artifact=$(curl -fsS --max-time 20 "${headers[@]}" "$api/artifacts?per_page=100" | jq -er \
+            --arg prefix "routing-evidence-$RESUME_RUN_ID-" '
+            [.artifacts[] | select(.expired == false and (.name | startswith($prefix)))]
+            | sort_by(.created_at, .id) | last | .name // empty') || {
+            echo '::error::Контрольная точка отсутствует или срок её хранения истёк.'
+            exit 1
+          }
+          printf 'artifact=%s\n' "$artifact" >> "$GITHUB_OUTPUT"
+      - name: Download routing checkpoint
+        if: inputs.resume_run_id != ''
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ steps.resume.outputs.artifact }}
+          path: ${{ env.ROUTING_RESUME }}
+          run-id: ${{ inputs.resume_run_id }}
+          github-token: ${{ github.token }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Prepare Chromium without interactive sudo
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f "$ROUTING_RESUME/discovery.json" ]; then exit 0; fi
+          runtime="$XDG_CACHE_HOME/SubnetResolve/playwright-1.64.1"
+          mkdir -p "$runtime"
+          npm install --prefix "$runtime" --no-audit --no-fund --ignore-scripts playwright@1.64.1
+          node "$runtime/node_modules/playwright/cli.js" install --only-shell chromium
+          PLAYWRIGHT_MODULE="$runtime/node_modules/playwright" node -e '
+            require(process.env.PLAYWRIGHT_MODULE).chromium.launch({headless:true})
+              .then(browser => browser.close()).catch(error => {console.error(error.message);process.exit(1)});
+          '
+      - name: Test routing generator
+        run: |
+          python3 source/tests/test_routing.py
+          python3 source/tests/test_global_routing.py
+          python3 source/tests/test_json_routing.py
+          python3 source/tests/test_asn_routes.py
+          python3 source/tests/test_incremental_routing.py
+          python3 source/tests/test_publish_routing.py
+      - name: Scan sites and compact prefixes
+        shell: bash
+        env:
+          RESUME_RUN_ID: ${{ inputs.resume_run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$ROUTING_EVIDENCE"
+          resume=()
+          if [ -n "$RESUME_RUN_ID" ]; then resume=(--resume "$ROUTING_RESUME"); fi
+          timeout --verbose --kill-after=10s 105m python3 source/routing/update_routing.py --incremental --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
+          if ! python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["complete"])' "$ROUTING_EVIDENCE/completeness.json"; then
+            echo '::warning::Неполный сбор: опубликованы доступные подсети; прежние записи сохранены. См. routing-evidence.'
+          fi
+          {
+            cat "$ROUTING_EVIDENCE/asn-report.md"
+            printf '\n## Полнота сбора\n\n%s\n' '```json'
+            cat "$ROUTING_EVIDENCE/completeness.json"
+            printf '\n%s\n' '```'
+            printf '\n## Итоговые правила маршрутизации\n'
+            for file in domains.json IP.json; do
+              printf '\n<details>\n<summary>%s</summary>\n\n%s\n' "$file" '```json'
+              cat "$ROUTING_EVIDENCE/$file"
+              printf '\n%s\n\n</details>\n' '```'
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Save scan evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: routing-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.ROUTING_EVIDENCE }}
+          retention-days: 7
+      - name: Publish IP.json on current test
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --output "$ROUTING_EVIDENCE/IP.json" --domains "$ROUTING_EVIDENCE/domains.json" --sources "$ROUTING_EVIDENCE/sources.json"
