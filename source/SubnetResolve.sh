@@ -10,6 +10,7 @@ Usage: SubnetResolve.sh [-parse] [-rules] [-v] [-4] [-s] [domain-or-URL ...]
   -rules  Output per-service Xray rule fragments: {"rules":[{"ruleTag":...,"ip":[...]}]}.
   -v  Detailed progress log and complete Check-Host node metadata.
   -4  Output only unique IPv4 BGP prefixes: {"ip":[...]}.
+  --resume-bgp FILE  Continue WHOIS lookups from a saved DNS checkpoint.
   -s  Never ask to save and never save resolved.json.
   -h  Show help.
 Default: DNS A records; group by (ASN, prefix), ask to save (default no).
@@ -23,9 +24,13 @@ finish_progress() {
 }
 die() { finish_progress; printf 'Ошибка: %s\n' "$*" >&2; exit 1; }
 verbose=0; prefixes=0; silent=0; parse=0; rules=0
+resume_bgp=''
 args=()
 while [ "$#" -gt 0 ]; do
   case "$1" in
+    --resume-bgp)
+      [ "$#" -ge 2 ] && [ -n "$2" ] || die '--resume-bgp требует путь к файлу.'
+      resume_bgp=$2; shift ;;
     -parse|--parse) parse=1 ;;
     -rules|--rules) rules=1 ;;
     --) shift; while [ "$#" -gt 0 ]; do args+=("$1"); shift; done; break ;;
@@ -44,6 +49,7 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 set -- ${args[@]+"${args[@]}"}
+if [ -n "$resume_bgp" ]; then parse=0; fi
 # Install only missing tools. Package-manager output must not contaminate JSON.
 ensure_dependencies() {
   local dependency manager package seen existing
@@ -115,7 +121,19 @@ ensure_dependencies() {
   done
 }
 ensure_dependencies
-if [ "$#" -eq 0 ]; then
+if [ -n "$resume_bgp" ]; then
+  [ "$#" -eq 0 ] || die 'С --resume-bgp домены берутся из файла; уберите позиционные аргументы.'
+  jq -e 'type == "object" and .version == 1 and (.services | type == "array" and length > 0)
+    and (.dns | type == "array" and length > 0)
+    and all(.dns[]; (.domain | type == "string") and (.check | type == "object")
+      and (.nodes | type == "array") and (.observations | type == "array")
+      and all(.observations[]; (.ip | type == "string" and test("^([0-9]{1,3}\\.){3}[0-9]{1,3}$"))
+        and (.node | type == "string")))
+    and (.discovery == null or (.discovery | type == "object" and has("domains") and has("pages")))
+    and (.whois | type == "string")' "$resume_bgp" >/dev/null || die 'Файл продолжения BGP повреждён или имеет неподдерживаемый формат.'
+  inputs=()
+  while IFS= read -r domain; do inputs+=("$domain"); done < <(jq -r '.dns[].domain' "$resume_bgp")
+elif [ "$#" -eq 0 ]; then
   printf 'Введите домены или URL через пробел: ' >&2
   input_line=''
   IFS= read -r input_line || die 'Домены не введены.'
@@ -163,6 +181,8 @@ unset input input_line
 batch=$(mktemp -d "${TMPDIR:-/tmp}/SubnetResolve.XXXXXXXX")
 tmp=$batch
 printf '%s\n' "${domains[@]}" | jq -Rs 'split("\n") | map(select(length>0)) | unique' > "$batch/services.json"
+checkpoint=''
+bgp_complete=0
 ncpid=''
 http_pid=''
 parse_pid=''
@@ -201,6 +221,14 @@ cleanup() {
   finish_progress
   if [ -n "$http_pid" ]; then kill "$http_pid" 2>/dev/null || :; wait "$http_pid" 2>/dev/null || :; fi
   if [ -n "$ncpid" ]; then kill "$ncpid" 2>/dev/null || :; wait "$ncpid" 2>/dev/null || :; fi
+  if [ -n "$checkpoint" ]; then
+    if [ "$bgp_complete" -eq 1 ]; then
+      rm -f "$checkpoint"
+    else
+      save_bgp_checkpoint || :
+      if [ -s "$checkpoint" ]; then printf 'DNS/BGP сохранены для продолжения. Добавьте к команде --resume-bgp %q (без списка доменов).\n' "$checkpoint" >&2; fi
+    fi
+  fi
   rm -rf "$batch"
 }
 trap cleanup EXIT
@@ -404,10 +432,16 @@ bgp_state() {
   ' > "$state"
 }
 bgp_exchange() {
-  local ip_file=$1 target=$2 attempt rc timed_out reply_complete
+  local ip_file=$1 target=$2 mode=${3:-bulk} attempt rc timed_out reply_complete
   local wait_delay=5 wait_left recovering=0 cycle_timeout before_count remaining total
   local began last_data last_size size now transport_reason
   : > "$target"
+  if [ "$mode" = resume ]; then
+    # Retain only usable routes. Missing or invalid replies must be queried again.
+    jq -r .whois "$resume_bgp" > "$batch/previous-whois"
+    bgp_state "$ip_file" "$batch/previous-whois" "$batch/previous-bgp-state.json"
+    jq -r '.routes[] | [.asn[2:],.ip,.prefix,.country,.registry,(.allocated // ""),.as_name] | join(" | ")'       "$batch/previous-bgp-state.json" > "$target"
+  fi
   : > "$batch/bgp-unanswered"
   bgp_state "$ip_file" "$target" "$batch/bgp-state.json"
   total=$(jq '.pending|length' "$batch/bgp-state.json")
@@ -477,6 +511,7 @@ bgp_exchange() {
       wait_delay=5
       continue
     fi
+    if [ "$mode" = probe ]; then return 1; fi
     if [ "$cycle_timeout" -eq 0 ]; then
       # Do not retry forever when a completed response omitted these IPs.
       cat "$batch/bgp-request" >> "$batch/bgp-unanswered"
@@ -494,7 +529,7 @@ bgp_exchange() {
 }
 
 # Optional browser capture; runtime is reused, never installed for ordinary DNS mode.
-if [ "$parse" -eq 1 ]; then
+if [ "$parse" -eq 1 ] && [ -z "$resume_bgp" ]; then
   stage_name='Этап 1/4: доступность сайтов'
   printf '%s\n' "${inputs[@]}" | jq -Rs 'split("\n") | map(select(length>0) | if test("^https?://"; "i") then . else "https://" + . end) | unique' > "$batch/all-seeds.json"
   : > "$batch/accepted-seeds"
@@ -646,7 +681,47 @@ SUBNET_PARSE_JS
 fi
 unset inputs
 stage_name='Этап 3/4: DNS'
-if [ "${#domains[@]}" -gt 0 ]; then check_service; fi
+check_bgp_service() {
+  local probe_ip
+  stage_name='Подготовка DNS/BGP'
+  # One route can be temporarily unavailable while WHOIS is healthy.
+  for probe_ip in 1.1.1.1 8.8.8.8; do
+    printf '%s\n' "$probe_ip" > "$batch/probe-ip"
+    stage="проверка BGP.tools WHOIS для $probe_ip"
+    if bgp_exchange "$batch/probe-ip" "$batch/probe-bgp" probe; then return 0; fi
+    if [ "$verbose" -eq 1 ]; then
+      finish_progress
+      jq -r '.errors[] | "[BGP.tools WHOIS] \(.ip): \(.message)"' "$batch/bgp-state.json" >&2
+    fi
+  done
+  die 'BGP.tools WHOIS: не получены пригодные префиксы и ASN для 1.1.1.1 и 8.8.8.8. DNS-проверки и массовый запрос не запускаются.'
+}
+save_bgp_checkpoint() {
+  local data=$checkpoint.part
+  (umask 077; jq -n --slurpfile services "$batch/services.json" --slurpfile dns "$batch/dns-checkpoint.json" \
+    --slurpfile discovery "$batch/discovery.json" --rawfile whois "$batch/bgp.txt" \
+    '{version:1,services:$services[0],dns:$dns[0],discovery:$discovery[0],whois:$whois}' > "$data") &&
+    chmod 600 "$data" && mv -f "$data" "$checkpoint"
+}
+if [ -z "$resume_bgp" ]; then check_service; fi
+check_bgp_service
+stage_name='Этап 3/4: DNS'
+if [ -n "$resume_bgp" ]; then
+  jq '.services' "$resume_bgp" > "$batch/services.json"
+  jq '.discovery' "$resume_bgp" > "$batch/discovery.json"
+  if jq -e '.discovery != null' "$resume_bgp" >/dev/null; then parse=1; fi
+  index=0
+  observation_files=()
+  for domain in "${domains[@]}"; do
+    tmp="$batch/domain-$((index + 1))"
+    mkdir "$tmp"
+    for field in check nodes observations; do
+      jq --argjson i "$index" --arg field "$field" '.dns[$i][$field]' "$resume_bgp" > "$tmp/$field.json"
+    done
+    observation_files+=("$tmp/observations.json")
+    index=$((index + 1))
+  done
+else
 index=0
 observation_files=()
 for domain in "${domains[@]}"; do
@@ -713,17 +788,37 @@ jq -n --slurpfile c "$tmp/check.json" --slurpfile r "$tmp/dns.json" '
 jq '[.[] | .node as $node | .ips[] | {ip: ., node: $node}] | unique' "$tmp/nodes.json" > "$tmp/observations.json"
   observation_files+=("$tmp/observations.json")
 done
+fi
 tmp=$batch
 jq -s 'add | unique' "${observation_files[@]}" > "$tmp/observations.json"
 # Deduplicate across ALL domains before the single Bulk WHOIS request.
 jq -r '[.[].ip] | unique[]' "$tmp/observations.json" > "$tmp/ips"
 stage_name='Этап 4/4: BGP'
 if [ -s "$tmp/ips" ]; then
-  printf '1.1.1.1\n' > "$batch/probe-ip"
-  stage='проверка BGP.tools: BGP-префикс и ASN для 1.1.1.1'
-  bgp_exchange "$batch/probe-ip" "$batch/probe-bgp" || die 'BGP.tools завершил ответ, но не прислал корректные BGP-префикс и ASN для проверочного IP 1.1.1.1. Массовый запрос не запускается.'
+  # Keep DNS data even if the process is interrupted during WHOIS.
+  if [ ! -f "$batch/discovery.json" ]; then printf 'null\n' > "$batch/discovery.json"; fi
+  index=0
+  : > "$batch/dns-checkpoint.ndjson"
+  for domain in "${domains[@]}"; do
+    index=$((index + 1))
+    folder="$batch/domain-$index"
+    jq -nc --arg domain "$domain" --slurpfile check "$folder/check.json" \
+      --slurpfile nodes "$folder/nodes.json" --slurpfile observations "$folder/observations.json" \
+      '{domain:$domain,check:$check[0],nodes:$nodes[0],observations:$observations[0]}' >> "$batch/dns-checkpoint.ndjson"
+  done
+  jq -s . "$batch/dns-checkpoint.ndjson" > "$batch/dns-checkpoint.json"
+  : > "$batch/bgp.txt"
+  if [ -n "$resume_bgp" ]; then jq -r .whois "$resume_bgp" > "$batch/bgp.txt"; fi
+  cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/SubnetResolve"
+  mkdir -p "$cache_dir"
+  checkpoint=$(mktemp "$cache_dir/bgp-resume.XXXXXXXX") || die 'Не удалось создать файл продолжения BGP.'
+  save_bgp_checkpoint || die 'Не удалось сохранить DNS перед запросом BGP.tools.'
+  mode=bulk
+  if [ -n "$resume_bgp" ]; then mode=resume; fi
   stage="BGP-префиксы и ASN для уникальных IP: $(wc -l < "$tmp/ips" | tr -d ' ')"
-  if ! bgp_exchange "$tmp/ips" "$tmp/bgp.txt"; then
+  if bgp_exchange "$tmp/ips" "$tmp/bgp.txt" "$mode"; then
+    bgp_complete=1
+  else
     finish_progress
     printf 'Не для всех IP получены BGP-префикс и ASN. Полученные записи сохранены; причины будут указаны ниже.\n' >&2
   fi
