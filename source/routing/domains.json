@@ -80,9 +80,11 @@
         "domain:code.moviead55.ru",
         "domain:const.uno",
         "domain:creatives.al-adtech.com",
+        "domain:crm.allbdata.ru",
         "domain:crm.deepcall.ru",
         "domain:crm.info-it-data.ru",
         "domain:crm.viva-lead.ru",
+        "domain:dm-eu.hybrid.ai",
         "domain:dm.hybrid.ai",
         "domain:dmg.digitaltarget.ru",
         "domain:dmp.sbermarketing.ru",
@@ -97,6 +99,7 @@
         "domain:kimberlite.io",
         "domain:kraken-mdt.rambler.ru",
         "domain:kraken.rambler.ru",
+        "domain:m.kombinat.digital",
         "domain:marketplace.cloud.ru",
         "domain:match.ohmy.bid",
         "domain:matching.mobilebanner.ru",
@@ -144,6 +147,7 @@
         "domain:uaas.yandex.ru",
         "domain:vma.mts.ru",
         "domain:web-static.mindbox.ru",
+        "domain:www.acint.net",
         "domain:www.google-analytics.com",
         "domain:www.google.ru",
         "domain:www.googletagmanager.com",
@@ -370,6 +374,7 @@
       "ruleTag": "mws.ru",
       "domain": [
         "domain:5817185321794261790587.cm.a.mts.ru",
+        "domain:5819685921794266382441.cm.a.mts.ru",
         "domain:5882964711793495484340.cm.a.mts.ru",
         "domain:6790708701793721784494.cm.a.mts.ru",
         "domain:abt.s3.yandex.net",
@@ -558,6 +563,7 @@
     {
       "ruleTag": "spb.mts.ru",
       "domain": [
+        "domain:2934199061794266471230.cm.a.mts.ru",
         "domain:4394285141794261891524.cm.a.mts.ru",
         "domain:bs.serving-sys.ru",
         "domain:cdn.mtscdn.ru",
@@ -583,6 +589,7 @@
     {
       "ruleTag": "tbank-online.com",
       "domain": [
+        "domain:2260358961794266483993.cm.a.mts.ru",
         "domain:2w.ru",
         "domain:9501822521794261904662.cm.a.mts.ru",
         "domain:api-common.tbank-online.com",
