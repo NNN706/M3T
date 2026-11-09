@@ -20,8 +20,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
    self.send_response(101);self.send_header('Upgrade','websocket');self.send_header('Connection','Upgrade');self.send_header('Sec-WebSocket-Accept',accept);self.end_headers();return
   port=self.server.server_port
   if self.path.startswith('/Redirect'):
-   self.send_response(307);self.send_header('Location',f'http://api.localhost:{port}/Start?Case=YES');self.end_headers();return
-  if self.path.startswith('/Start'):
+   self.send_response(307);self.send_header('Location',f'http://redirect.localhost:{port}/Hop?Case=YES');self.end_headers();return
+  if self.path == '/Hop?Case=YES':
+   self.send_response(302);self.send_header('Location',f'http://api.localhost:{port}/Start?Case=YES');self.end_headers();return
+  if self.path == '/Start?Case=YES':
    body=f'''<html><body style="height:8000px"><script>
 fetch('http://api.localhost:{port}/data');
 fetch('http://api.localhost:{port}/again');
@@ -37,9 +39,9 @@ seed=f'http://site.localhost:{server.server_port}/Redirect?Case=YES'
 env={**os.environ,'SUBNET_PLAYWRIGHT':runtime,'XDG_CACHE_HOME':str(cache),'SUBNET_VERBOSE':'1'}
 p=subprocess.run(['node',str(root/'extracted-parse.cjs'),str(root/'parse-seeds.json'),str(root/'parse-discovery.json'),str(root/'parse-progress')],env=env,capture_output=True,text=True,timeout=65)
 assert p.returncode==0,(p.stdout,p.stderr)
-d=json.loads((root/'parse-discovery.json').read_text());expected={'site.localhost','api.localhost','delayed.localhost','socket.localhost','frame.localhost','lazy.localhost'}
+d=json.loads((root/'parse-discovery.json').read_text());expected={'site.localhost','redirect.localhost','api.localhost','delayed.localhost','socket.localhost','frame.localhost','lazy.localhost'}
 assert set(d['domains'])==expected,d
-assert d['complete'] and not p.stdout and 'Редирект: site.localhost → api.localhost' in p.stderr
+assert d['complete'] and not p.stdout and 'Редирект: site.localhost → redirect.localhost' in p.stderr
 print('PASS real Chromium: JS, delayed fetch, dedup, iframe, WebSocket, scroll, URL path/case preserved',flush=True)
 # Same browser through the full Bash entrypoint, with DNS/BGP mock executables.
 bin=root/'parse-bin';bin.mkdir(exist_ok=True)
@@ -59,19 +61,35 @@ for file in bin.iterdir():file.chmod(0o755)
 env.update(PATH=str(bin)+':'+env['PATH'],SENT=str(root/'parse-sent'))
 (root/'parse-sent').write_text('')
 p=subprocess.run(['/bin/bash',str(script),'-parse','-4s',seed],env=env,text=True,capture_output=True,timeout=90)
-assert p.returncode==0 and 'Редирект: site.localhost → api.localhost' in p.stderr,p.stderr
+assert p.returncode==0 and 'Редирект: site.localhost → redirect.localhost' in p.stderr,p.stderr
 for line in p.stderr.splitlines():
  if 'Редирект:' in line:assert 'http://' not in line and '?Case=' not in line,line
 assert '[Этап 2/4: браузер] Редирект:' not in p.stderr and 'SUBNET_PAGE_DONE' not in p.stderr,p.stderr
 assert p.stderr.count('Сбор доменов: 1/1: site.localhost; найдено доменов:')==1,p.stderr
 r=json.loads(p.stdout);assert set(r)=={'ip','domain'} and r['domain']==['domain:'+h for h in sorted(expected)] and r['ip']==['1.1.1.0/24'],r
 transactions=(root/'parse-sent').read_text().split('end\n');assert transactions[0].splitlines().count('1.1.1.1')==1 and transactions[1].splitlines().count('1.1.1.1')==1 and len(transactions)==3
-print('PASS full -parse -4s: one JSON, unique domain: entries, one unique IP sent to BGP for six domains',flush=True)
+print('PASS full -parse -4s: one JSON, unique domain: entries, one unique IP sent to BGP for all discovered domains',flush=True)
+# Check the published domain format through the routing generator. The
+# intermediate redirect host appears only in Location, never in page resources.
+sites=root/'sites.txt'
+sites.write_text(seed+'\n')
+generator=pathlib.Path(__file__).resolve().parents[1]/'routing/update_routing.py'
+fixture_scanner=root/'routing-scanner.sh'
+fixture_scanner.write_text('#!/bin/bash\nunset SUBNET_BGP_OBSERVATIONS\nexec bash '
+                           +__import__('shlex').quote(str(script))+' "$@"\n')
+routing_run=subprocess.run(
+ ['python3',str(generator),'--sites',str(sites),'--scanner',str(fixture_scanner),'--output',str(root/'IP.json')],
+ env=env,text=True,capture_output=True,timeout=90)
+assert routing_run.returncode==0,routing_run.stderr
+published=json.loads((root/'domains.json').read_text())
+assert published=={'rules':[{'ruleTag':'site.localhost',
+                             'domain':['domain:'+host for host in sorted(expected)]}]},published
+print('PASS domains.json retains the intermediate and final redirect hosts under the source site',flush=True)
 p=subprocess.run(['/bin/bash',str(script),'-parse','-vs',seed.replace('/Redirect?Case=YES','/Denied')],env=env,text=True,capture_output=True,timeout=65)
 assert p.returncode==3,p.stderr
-r=json.loads(p.stdout);assert r['domain']==[] and not r['complete'] and 'отказал' in r['discovery']['pages'][0]['errors'][0] and 'domains' in r,r
+r=json.loads(p.stdout);assert r['domain']==['domain:site.localhost'] and r['domains'][0]['results'][0]['prefix']=='1.1.1.0/24' and not r['complete'] and 'отказал' in r['discovery']['pages'][0]['errors'][0] and 'domains' in r,r
 assert 'отказал' in p.stderr and 'Ресурсы страницы не загружены' in p.stderr and 'код выхода' not in p.stderr and 'код результата' not in p.stderr
-print('PASS HTTP 403: curl rejects site before Chromium/DNS/BGP, clear explanation, empty domain/IP output',flush=True)
+print('PASS HTTP 403: curl skips Chromium, retains domain and still resolves its prefix',flush=True)
 server.shutdown()
 if os.environ.get('TEST_ARTIFACTS'):
  destination=pathlib.Path(os.environ['TEST_ARTIFACTS']);destination.mkdir(parents=True,exist_ok=True)

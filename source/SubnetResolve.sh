@@ -216,6 +216,7 @@ site_progress() {
 fetch_http() {
   local expected=$1 attempt rc tls_mode=default meta status effective redirects tcp tls first challenge locations request_url wait_delay=5 wait_left wait_started=-1
   local tls_args=()
+  local request_stage=$stage
   shift
   for request_url do :; done
   http_wait_seconds=${http_wait_seconds:-0}
@@ -281,7 +282,7 @@ fetch_http() {
          { [ "$expected" = object ] && jq -e 'type == "object"' "$batch/http-response" >/dev/null 2>&1; } ||
          { [ "$expected" = check ] && jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$batch/http-response" >/dev/null 2>&1; }; then
         if [ "$expected" = site ]; then
-          site_progress "$stage; попытка $attempt/2${locations:+; Редирект: $locations}; HTTP $status"
+          site_progress "$request_stage; попытка $attempt/2${locations:+; Редирект: $locations}; HTTP $status"
         fi
         if [ "$wait_started" -ge 0 ]; then
           http_wait_seconds=$((http_wait_seconds + SECONDS - wait_started))
@@ -332,7 +333,7 @@ fetch_http() {
           http_reason='Истёк общий лимит 2 секунды на переходы и загрузку страницы'
         fi
       fi
-      site_progress "$stage; попытка $attempt/2${locations:+; Редирект: $locations}; $http_reason"
+      site_progress "$request_stage; попытка $attempt/2${locations:+; Редирект: $locations}; $http_reason"
     fi
     if [ "$attempt" -eq 1 ]; then
       if [ "$expected" != site ]; then
@@ -504,7 +505,7 @@ if [ "$parse" -eq 1 ]; then
     if fetch_http site "$seed" > /dev/null; then
       printf '%s\n' "$seed" >> "$batch/accepted-seeds"
     else
-      jq -nc --arg site "$site" --arg message "$http_reason" '{site:$site, domains:[], skipped:true, errors:[$message + "; сайт пропущен до запуска Chromium"]}' >> "$batch/skipped-pages"
+      jq -nc --arg site "$site" --arg message "$http_reason" '{site:$site, domains:[], skipped:true, errors:[$message + "; Chromium пропущен; домен будет проверен через DNS/BGP"]}' >> "$batch/skipped-pages"
     fi
   done < <(jq -r '.[]' "$batch/all-seeds.json")
   jq -Rs 'split("\n") | map(select(length>0))' "$batch/accepted-seeds" > "$batch/seeds.json"
@@ -633,30 +634,25 @@ SUBNET_PARSE_JS
   else
     printf '{"domains":[],"pages":[],"complete":true}\n' > "$batch/discovery.json"
   fi
-  jq --slurpfile skipped "$batch/skipped-pages" '.pages += $skipped | .complete = (.complete and ($skipped|length == 0))' "$batch/discovery.json" > "$batch/discovery-next.json"
+  jq --slurpfile skipped "$batch/skipped-pages" --slurpfile services "$batch/services.json" '
+    .domains = ((.domains + $services[0]) | unique) |
+    .pages += $skipped |
+    .complete = (.complete and ($skipped|length == 0))
+  ' "$batch/discovery.json" > "$batch/discovery-next.json"
   mv "$batch/discovery-next.json" "$batch/discovery.json"
   domains=()
-  while IFS= read -r domain; do domains+=("$domain"); done < <(jq -r '(.domains + [.pages[] | select(.skipped == true) | .site]) | unique[]' "$batch/discovery.json")
+  while IFS= read -r domain; do domains+=("$domain"); done < <(jq -r '.domains[]' "$batch/discovery.json")
   progress "Сбор завершён; уникальных доменов: ${#domains[@]}"
 fi
 unset inputs
 stage_name='Этап 3/4: DNS'
-active_count=${#domains[@]}
-if [ "$parse" -eq 1 ]; then active_count=$(jq '.domains|length' "$batch/discovery.json"); fi
-if [ "$active_count" -gt 0 ]; then check_service; fi
+if [ "${#domains[@]}" -gt 0 ]; then check_service; fi
 index=0
 observation_files=()
 for domain in "${domains[@]}"; do
   index=$((index + 1))
   tmp="$batch/domain-$index"
   mkdir "$tmp"
-  if [ "$parse" -eq 1 ] && ! jq -e --arg d "$domain" '.domains | index($d) != null' "$batch/discovery.json" >/dev/null; then
-    printf '{"nodes":{},"permanent_link":null,"request_error":"Сайт недоступен через curl; Chromium и DNS для него не запускались"}\n' > "$tmp/check.json"
-    printf '[]\n' > "$tmp/nodes.json"
-    printf '[]\n' > "$tmp/observations.json"
-    observation_files+=("$tmp/observations.json")
-    continue
-  fi
   stage="Домен $index/${#domains[@]}: $domain — отправка задания DNS в Check-Host"
 progress "Запрашиваем DNS A для $domain..."
 if ! fetch_http check -H 'Accept: application/json' -G --data-urlencode "host=$domain" https://check-host.net/check-dns > "$tmp/check.json" ||

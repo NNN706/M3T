@@ -6,6 +6,7 @@ on:
       - 'source/SubnetResolve.sh'
       - 'source/tests/**'
       - 'source/routing/update_routing.py'
+      - 'source/routing/asn_routes.py'
       - 'source/routing/publish_routing.py'
       - '.github/workflows/subnetresolve-test.yml'
   workflow_dispatch:
@@ -33,6 +34,7 @@ jobs:
         with:
           node-version: '22'
       - name: Prepare local test dependencies
+        id: dependencies
         shell: bash
         run: |
           set -euo pipefail
@@ -72,6 +74,8 @@ jobs:
           set -euo pipefail
           python3 source/tests/test_global_routing.py 2>&1 | tee "$TEST_ARTIFACTS/global-routing.log"
           python3 source/tests/test_json_routing.py 2>&1 | tee "$TEST_ARTIFACTS/json-routing.log"
+          python3 source/tests/test_asn_routes.py 2>&1 | tee "$TEST_ARTIFACTS/asn-routes.log"
+          python3 source/tests/test_incremental_routing.py 2>&1 | tee "$TEST_ARTIFACTS/incremental-routing.log"
           python3 source/tests/test_publish_routing.py 2>&1 | tee "$TEST_ARTIFACTS/publish-routing.log"
           python3 source/tests/test_routing.py 2>&1 | tee "$TEST_ARTIFACTS/routing.log"
           python3 source/tests/test_progress_changes.py 2>&1 | tee "$TEST_ARTIFACTS/progress-changes.log"
@@ -103,6 +107,24 @@ jobs:
         run: |
           set -euo pipefail
           python3 source/tests/test_bgp.py --live 2>&1 | tee "$TEST_ARTIFACTS/live-bgp.log"
+      - name: Resolve VTB service domain without relying on HTTPS
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rc=0
+          timeout --kill-after=5s 150s bash source/SubnetResolve.sh -parse -rules -vs esmdtpep.vtb.ru \
+            > "$TEST_ARTIFACTS/vtb-service.json" 2> >(tee "$TEST_ARTIFACTS/vtb-service.log" >&2) || rc=$?
+          case "$rc" in
+            0|3) ;;
+            *) echo "::error::esmdtpep.vtb.ru scan failed or timed out (exit $rc). See vtb-service.log."; exit 1 ;;
+          esac
+          if ! jq -e '.rules | any(.ruleTag == "esmdtpep.vtb.ru" and any(.ip[]; . == "195.242.82.0/24" or . == "195.242.83.0/24"))' "$TEST_ARTIFACTS/vtb-service.json"; then
+            echo '::error::esmdtpep.vtb.ru did not produce either known BGP prefix 195.242.82.0/24 or 195.242.83.0/24. Check DNS/BGP logs and whether the announcement changed.'
+            cat "$TEST_ARTIFACTS/vtb-service.json"
+            exit 1
+          fi
+          jq -r '.rules[] | "PASS \(.ruleTag) → \(.ip | join(", "))"' "$TEST_ARTIFACTS/vtb-service.json"
       - name: Save test results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
