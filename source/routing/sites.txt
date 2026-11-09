@@ -15,3 +15,11 @@ fornex.com
 contell.ru
 datahouse.ru
 majordomo.ru
+back.vtb.fp.f6.security
+mb.vtb.ru
+online.vtb.ru
+h2.vtb.ru
+async-online4.vtb.ru
+sso-mb.vtb.ru
+esmdtpep.vtb.ru
+s2.vtb.ru
