@@ -1,6 +1,22 @@
 {
   "rules": [
     {
+      "ruleTag": "2ip.io",
+      "domain": [
+        "domain:favicon.yandex.net",
+        "domain:get-v6.2ip.io",
+        "domain:luxcdn.com",
+        "domain:s.luxcdn.com",
+        "full:2ip.io"
+      ]
+    },
+    {
+      "ruleTag": "2ip.ru",
+      "domain": [
+        "domain:2ip.ru"
+      ]
+    },
+    {
       "ruleTag": "alfabank.ru",
       "domain": [
         "domain:alfabank.ru"
@@ -65,6 +81,7 @@
         "domain:ads.adtec.ru",
         "domain:ads.betweendigital.com",
         "domain:ads.gpm-ssp.ru",
+        "domain:ads.tds.bid",
         "domain:am9.bigdata-it.ru",
         "domain:an.yandex.ru",
         "domain:api.cloud.ru",
@@ -275,6 +292,12 @@
       ]
     },
     {
+      "ruleTag": "ifconfig.me",
+      "domain": [
+        "domain:connect.facebook.net"
+      ]
+    },
+    {
       "ruleTag": "ihc.ru",
       "domain": [
         "domain:code.jivosite.com",
@@ -296,8 +319,18 @@
       ]
     },
     {
+      "ruleTag": "ipinfo.io",
+      "domain": [
+        "domain:assets.capterra.com",
+        "domain:connect.facebook.net",
+        "domain:p.typekit.net",
+        "domain:use.typekit.net"
+      ]
+    },
+    {
       "ruleTag": "landvps.ru",
       "domain": [
+        "domain:adfstat.yandex.ru",
         "domain:landvps.ru",
         "domain:mc.yandex.ru",
         "domain:mdd.yandex.net",
@@ -359,6 +392,7 @@
       "ruleTag": "mws.ru",
       "domain": [
         "domain:1686587501794300151369.cm.a.mts.ru",
+        "domain:3565207081794340010766.cm.a.mts.ru",
         "domain:4135084311794335388817.cm.a.mts.ru",
         "domain:4636494031794306066312.cm.a.mts.ru",
         "domain:5817185321794261790587.cm.a.mts.ru",
@@ -543,6 +577,7 @@
     {
       "ruleTag": "spb.mts.ru",
       "domain": [
+        "domain:1416232981794340017831.cm.a.mts.ru",
         "domain:2399342921794300238215.cm.a.mts.ru",
         "domain:2934199061794266471230.cm.a.mts.ru",
         "domain:4394285141794261891524.cm.a.mts.ru",
@@ -574,6 +609,7 @@
       "domain": [
         "domain:2260358961794266483993.cm.a.mts.ru",
         "domain:2w.ru",
+        "domain:3930159131794340027045.cm.a.mts.ru",
         "domain:4830143981794300251190.cm.a.mts.ru",
         "domain:6655435111794306084179.cm.a.mts.ru",
         "domain:9184320031794335405752.cm.a.mts.ru",
