@@ -57,16 +57,46 @@ def compare(direct, proxied):
     return '\n'.join(lines) + '\n', regressions
 
 
+def failed_urls(evidence):
+    urls = {}
+    browser_path = evidence / 'sites.json'
+    if browser_path.is_file():
+        for row in json.loads(browser_path.read_bytes())['results']:
+            if row['required'] and not row['ok']:
+                urls[row['url']] = None
+    proxy_path = evidence / 'curl-xray.json'
+    if proxy_path.is_file():
+        for url, attempts in json.loads(proxy_path.read_bytes()).items():
+            if not successful(attempts):
+                urls[url] = None
+    return list(urls)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('required_sites', type=Path)
     parser.add_argument('evidence', type=Path)
-    parser.add_argument('--proxy')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--proxy')
+    mode.add_argument('--after-failure', action='store_true')
     args = parser.parse_args()
-    urls = list(dict.fromkeys(row['url'] for row in json.loads(args.required_sites.read_bytes())))
+    if args.after_failure:
+        urls = failed_urls(args.evidence)
+        if not urls:
+            print('Нет результатов с ошибкой конкретного сайта для повторного curl.')
+            return 0
+    else:
+        urls = list(dict.fromkeys(row['url'] for row in json.loads(args.required_sites.read_bytes())))
     direct_file = args.evidence / 'curl-direct.json'
     with ThreadPoolExecutor(max_workers=6) as pool:
         results = dict(zip(urls, pool.map(lambda url: probe(url, args.proxy), urls)))
+    if args.after_failure:
+        (args.evidence / 'curl-direct-after-failure.json').write_text(json.dumps(results, indent=2) + '\n')
+        print('\n## Прямой curl после сбоя Xray-проверки\n')
+        print('| Сайт | Две попытки без прокси |\n| --- | --- |')
+        for url, attempts in results.items():
+            print(f"| {url.replace('|', '%7C')} | {describe(attempts)} |")
+        return 0
     if args.proxy is None:
         direct_file.write_text(json.dumps(results, indent=2) + '\n')
         return 0
