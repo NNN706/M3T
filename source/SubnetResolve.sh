@@ -644,7 +644,15 @@ async function main() {
   browser = await chromium.launch({headless: true});
   if (process.env.SUBNET_PROBE === '1') { await browser.close(); return; }
   const seeds = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
-  for (let i = 0; i < seeds.length; i++) {
+  const workers = Math.min(10, seeds.length);
+  let next = 0, completed = 0;
+  function publishProgress(i, origin, detail) {
+    const status = workers > 1
+      ? `обработано сайтов: ${completed}/${seeds.length}; найдено доменов: ${domains.size}`
+      : `${i+1}/${seeds.length}: ${origin}; ${detail}`;
+    fs.writeFileSync(progressPath, status);
+  }
+  async function capture(i) {
     const seed = new URL(seeds[i]);
     // Do not use or persist URL credentials; paths and queries are needed to load the page.
     seed.username = ''; seed.password = '';
@@ -660,8 +668,8 @@ async function main() {
     });
     context.on('page', p => p.on('websocket', ws => record(ws.url())));
     const page = await context.newPage();
-    fs.writeFileSync(progressPath, `${i+1}/${seeds.length}: ${origin}; загрузка и прокрутка`);
-    let timeout;
+    publishProgress(i, origin, 'загрузка и прокрутка');
+    let timeout, stopped = false;
     const run = async () => {
       try {
         const response = await page.goto(seed.href, {waitUntil:'domcontentloaded',timeout:30000});
@@ -674,19 +682,24 @@ async function main() {
             'Не удалось загрузить страницу: сервер вернул ошибку. Проверьте адрес сайта.');
         }
       } catch(e) { errors.add(e.name === 'TimeoutError' ? 'Страница не загрузилась за 30 секунд. Собраны только запросы, появившиеся до завершения ожидания.' : 'Браузер не смог открыть страницу. Проверьте доступность сайта, сеть и сертификат HTTPS.'); }
-      for(let step=0;step<10;step++) {
+      for(let step=0;step<10 && !stopped;step++) {
         await page.evaluate(() => window.scrollBy(0, Math.max(600, innerHeight))).catch(() => {});
         await sleep(1000);
-        fs.writeFileSync(progressPath, `${i+1}/${seeds.length}: ${origin}; найдено доменов: ${seen.size}`);
+        if (!stopped) publishProgress(i, origin, `найдено доменов: ${seen.size}`);
       }
     };
     try {
       await Promise.race([run(), new Promise((_,reject) => {timeout=setTimeout(()=>reject(new Error('capture_timeout')),45000);})]);
     } catch { errors.add('Сбор запросов не завершился за 45 секунд. Список доменов неполный.'); }
-    finally { clearTimeout(timeout); await context.close(); }
-    pages.push({site:origin, domains:[...seen].sort(), errors:[...errors]});
+    finally { stopped = true; clearTimeout(timeout); await context.close(); }
+    pages[i] = {site:origin, domains:[...seen].sort(), errors:[...errors]};
+    completed++;
+    if (workers > 1) publishProgress(i, origin);
     console.error(`SUBNET_PAGE_DONE ${i+1}/${seeds.length}: ${origin}; найдено доменов: ${seen.size}`);
   }
+  await Promise.all(Array.from({length: workers}, async () => {
+    while (next < seeds.length) await capture(next++);
+  }));
   await browser.close();
   fs.writeFileSync(outputPath, JSON.stringify({domains:[...domains].sort(),pages,complete:pages.every(p=>!p.errors.length)}));
 }
