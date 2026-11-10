@@ -50,3 +50,6 @@ ipinfo.io
 ifconfig.me
 2ip.io
 2ip.ru
+vk.ru
+ok.ru
+mail.ru
