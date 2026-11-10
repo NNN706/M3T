@@ -15,6 +15,7 @@ test('queue preserves URL paths and mandatory profiles override duplicates',()=>
     {url:'https://tax.test/login',text:'Login',selector:'input'}]);
   assert.equal(result.length,3);assert.equal(result[0].required,true);assert.equal(result[2].url,'https://tax.test/login');
   assert.throws(()=>targets('example.com',[]));
+  assert.equal(targets('', [{url:'https://dzen.ru/',statusOnly:true}])[0].required,true);
 });
 test('10 workers, complete all items after a recorded failure',async()=>{
   let running=0,peak=0,done=0;
@@ -56,6 +57,7 @@ test('real Chromium: redirects, SPA, challenge, blank, HTTP error, timeout, fail
   const server=http.createServer((req,res)=>{
     if(req.url==='/redirect'){res.writeHead(302,{Location:'/ok'});return res.end();}
     if(req.url==='/redirect403'){res.writeHead(302,{Location:'/403'});return res.end();}
+    if(req.url==='/201'){res.writeHead(201,{'Content-Type':'text/html'});return res.end(body);}
     if(req.url==='/403'){res.writeHead(403);return res.end(body);}
     if(req.url==='/timeout')return;
     if(req.url==='/resource'){res.writeHead(500);return res.end();}
@@ -74,6 +76,14 @@ test('real Chromium: redirects, SPA, challenge, blank, HTTP error, timeout, fail
     assert.equal((await run('/redirect',0)).ok,true);
     assert.equal((await run('/spa',1)).ok,true);
     for(const [i,p] of ['/403','/redirect403','/challenge','/blank','/timeout'].entries())assert.equal((await run(p,i+2)).ok,false,p);
+    const statusOnly=(p,i)=>visit(browser,{url:url+p,required:true,statusOnly:true},i,out,{timeout:1500});
+    assert.equal((await statusOnly('/blank',10)).ok,true);
+    assert.equal((await statusOnly('/redirect',11)).status,200);
+    for (const [i,p] of ['/201','/redirect403'].entries()) {
+      const result=await statusOnly(p,i+12);
+      assert.equal(result.ok,false);
+      assert.match(result.error,/ожидался HTTP 200/);
+    }
     const cert=spawnSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',path.join(out,'key.pem'),'-out',path.join(out,'cert.pem'),'-days','1','-subj','/CN=localhost'],{encoding:'utf8'});
     assert.equal(cert.status,0,cert.stderr);
     const tls=https.createServer({key:fs.readFileSync(path.join(out,'key.pem')),cert:fs.readFileSync(path.join(out,'cert.pem'))},(req,res)=>res.end(body));
