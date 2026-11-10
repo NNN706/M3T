@@ -1,10 +1,10 @@
 # Общее покрытие ASN правилами маршрутизации
 
-Опубликовано **849** уникальных подсетей (IPv4: **808**, IPv6: **41**). С ними пересекаются анонсы **565** ASN.
+Опубликовано **865** уникальных подсетей (IPv4: **823**, IPv6: **42**). С ними пересекаются анонсы **567** ASN.
 
 Источник правил — [IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/IP.json). Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).
 
-SHA-256 файла IP.json: `b3dc61ce7cf6b6c44f2b12a28ac06c6b9a0d428f94bee0c9a29011083e28bf71`.
+SHA-256 файла IP.json: `7be83c74ee427dba7b06211385f170151081c1d90b08e06dd71b86b0253152f3`.
 
 «Затронуто» — анонсы ASN, которые хотя бы частично пересекаются с правилами. «Всего» — все анонсы этого ASN в снимке. Один префикс может учитываться у нескольких ASN, если они его анонсируют.
 
@@ -187,7 +187,9 @@ SHA-256 файла IP.json: `b3dc61ce7cf6b6c44f2b12a28ac06c6b9a0d428f94bee0c9a29
 | AS44051 | Fornex Hosting S.L. | 1 / 88 |
 | AS44066 | firstcolo GmbH | 2 / 69 |
 | AS44112 | SpaceWeb Ltd | 9 / 37 |
+| AS44128 | Internet-Pro LLC | 41 / 41 |
 | AS44386 | LLC Internet Solutions | 5 / 9 |
+| AS44428 | HOST EXPERT LLC | 1 / 1 |
 | AS44534 | YANDEX LLC | 28 / 28 |
 | AS44559 | IT HOSTLINE LTD | 2 / 1592 |
 | AS44578 | ITGLOBAL COM DMCC | 3 / 10 |
