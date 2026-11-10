@@ -83,7 +83,7 @@ with tempfile.TemporaryDirectory(prefix='subnet-pipeline-') as directory:
    assert output['ip']==expected_ips,(mode,hosts,output)
    if web_failure:
     assert output['domain']==['domain:'+h for h in sorted(hosts)]
-    assert [d for phase,d in events if phase=='dns']==sorted(hosts)
+    assert sorted(d for phase,d in events if phase=='dns')==sorted(hosts)
     if mode=='cert':
      for host in bad:
       for attempt in (1,2):

@@ -14,6 +14,7 @@ Usage: SubnetResolve.sh [-parse] [-rules] [-v] [-4] [-s] [domain-or-URL ...]
   -s  Never ask to save and never save resolved.json.
   -h  Show help.
 Default: DNS A records; group by (ASN, prefix), ask to save (default no).
+Set SUBNET_DNS_CONCURRENCY to 1–10 to limit simultaneous Check-Host DNS checks (default 10).
 JSON goes to stdout; prompts, diagnostics and report URL go to stderr.
 Failures are explained on stderr; incomplete results return a non-zero exit status for automation.
 HELP
@@ -53,7 +54,7 @@ if [ -n "$resume_bgp" ]; then parse=0; fi
 # Install only missing tools. Package-manager output must not contaminate JSON.
 ensure_dependencies() {
   local dependency manager package seen existing
-  local missing=() packages=() elevate=() required=(curl jq nc mktemp mkdir cat cp mv rm sleep wc tr)
+  local missing=() packages=() elevate=() required=(curl jq nc mktemp mkdir cat cp mv rm sleep wc tr date)
   if [ "$parse" -eq 1 ]; then required+=(node npm); fi
   for dependency in "${required[@]}"; do
     if ! command -v "$dependency" >/dev/null 2>&1; then
@@ -186,6 +187,13 @@ bgp_complete=0
 ncpid=''
 http_pid=''
 parse_pid=''
+dns_pids=()
+dns_concurrency=${SUBNET_DNS_CONCURRENCY:-10}
+if ! [[ "$dns_concurrency" =~ ^([1-9]|10)$ ]]; then
+  rm -rf "$batch"
+  die 'SUBNET_DNS_CONCURRENCY должен быть от 1 до 10.'
+fi
+mkdir "$batch/check-host-cooldown"
 started=$SECONDS
 stage_name='Подготовка'
 stage='подготовка запроса'
@@ -195,7 +203,7 @@ progress() {
     [ "${last_progress_event:-}" != "$event_key" ] || return 0
     last_progress_event=$event_key
     printf '[%3ds] [%s] %s\n' "$((SECONDS - started))" "$stage_name" "$*" >&2
-  elif [ -t 2 ]; then
+  elif [ -t 2 ] && [ "${dns_worker:-0}" -eq 0 ]; then
     local rendered term_size term_cols count row
     if [ "$progress_active" -eq 1 ] && [ "${progress_rows:-1}" -gt 1 ]; then
       printf '\r' >&2
@@ -217,6 +225,9 @@ progress() {
   fi
 }
 cleanup() {
+  local pid
+  for pid in ${dns_pids[@]+"${dns_pids[@]}"}; do kill "$pid" 2>/dev/null || :; done
+  for pid in ${dns_pids[@]+"${dns_pids[@]}"}; do wait "$pid" 2>/dev/null || :; done
   if [ -n "$parse_pid" ]; then kill "$parse_pid" 2>/dev/null || :; wait "$parse_pid" 2>/dev/null || :; fi
   finish_progress
   if [ -n "$http_pid" ]; then kill "$http_pid" 2>/dev/null || :; wait "$http_pid" 2>/dev/null || :; fi
@@ -241,9 +252,28 @@ site_progress() {
     printf '[%3ds] [%s] %s\n' "$((SECONDS - ${started:-$SECONDS}))" "$stage_name" "$*" >&2
   fi
 }
+wait_for_check_host() {
+  local now deadline file
+  while :; do
+    now=$(date +%s)
+    for file in "$batch/check-host-cooldown/"*.until; do
+      [ -f "$file" ] || continue
+      read -r deadline < "$file"
+      if [ "$deadline" -gt "$now" ]; then
+        if [ "$wait_started" -lt 0 ]; then wait_started=$SECONDS; fi
+        sleep 1
+        continue 2
+      fi
+    done
+    return 0
+  done
+}
+
 fetch_http() {
   local expected=$1 attempt rc tls_mode=default meta status effective redirects tcp tls first challenge locations request_url wait_delay=5 wait_left wait_started=-1
   local tls_args=()
+  local request_dir=${http_dir:-$batch} rate_retries=0 retry_after retry_epoch deadline
+  local cooldown_file="$batch/check-host-cooldown/${request_dir##*/}.until"
   local request_stage=$stage
   shift
   for request_url do :; done
@@ -253,6 +283,7 @@ fetch_http() {
   if [ "$expected" != site ]; then tls_mode=tls12; fi
   http_reason=''; http_transport_failed=0
   for attempt in 1 2; do
+    if [ "$expected" != site ]; then wait_for_check_host; fi
     rc=0
     tls_args=()
     if [ "$tls_mode" = tls12 ]; then tls_args=(--tlsv1.2 --tls-max 1.2); fi
@@ -264,18 +295,18 @@ fetch_http() {
     elif [ "$expected" != site ] || [ "$verbose" -eq 0 ]; then
       progress "$stage; попытка $attempt/2"
     fi
-    : > "$batch/http-headers"
-    : > "$batch/http-meta"
-    : > "$batch/http-response"
+    : > "$request_dir/http-headers"
+    : > "$request_dir/http-meta"
+    : > "$request_dir/http-response"
     if [ "$expected" = site ]; then
       # Keep response bodies even on HTTP errors: challenge pages carry evidence.
       curl -sS --connect-timeout 2 --max-time 2 -L --max-redirs 50 \
         --proto '=http,https' --proto-redir '=http,https' \
-        -D "$batch/http-headers" -o "$batch/http-response" \
+        -D "$request_dir/http-headers" -o "$request_dir/http-response" \
         -w '%{http_code}\t%{url_effective}\t%{num_redirects}\t%{time_connect}\t%{time_appconnect}\t%{time_starttransfer}\n' \
-        "$@" > "$batch/http-meta" 2> "$batch/http-error" &
+        "$@" > "$request_dir/http-meta" 2> "$request_dir/http-error" &
     else
-      curl ${tls_args[@]+"${tls_args[@]}"} -fsS --connect-timeout 1.5 --max-time 1.5 "$@" > "$batch/http-response" 2> "$batch/http-error" &
+      curl ${tls_args[@]+"${tls_args[@]}"} -fsS -D "$request_dir/http-headers" --connect-timeout 1.5 --max-time 1.5 "$@" > "$request_dir/http-response" 2> "$request_dir/http-error" &
     fi
     http_pid=$!
     while kill -0 "$http_pid" 2>/dev/null; do
@@ -283,8 +314,32 @@ fetch_http() {
     done
     wait "$http_pid" || rc=$?
     http_pid=''
+    if [ "$expected" != site ] && [ "$rc" -eq 22 ] &&
+       jq -Rse '[splits("\n") | select(test("^HTTP/[^ ]+ ")) | split(" ")[1] | rtrimstr("\r")] | last == "429"' "$request_dir/http-headers" >/dev/null; then
+      retry_after=$(jq -Rrs '[splits("\n") | select(test("^retry-after:"; "i")) |
+        sub("^[^:]+:[ \t]*"; "") | gsub("[ \t\r]+$"; "")] | last // ""' "$request_dir/http-headers")
+      deadline=$(date +%s)
+      if [[ "$retry_after" =~ ^[0-9]{1,9}$ ]]; then
+        retry_after=$((10#$retry_after))
+      else
+        retry_epoch=$(date -u -d "$retry_after" +%s 2>/dev/null ||
+          date -u -j -f '%a, %d %b %Y %H:%M:%S GMT' "$retry_after" +%s 2>/dev/null || :)
+        if [[ "$retry_epoch" =~ ^[0-9]+$ ]] && [ "$retry_epoch" -gt "$deadline" ]; then
+          retry_after=$((retry_epoch - deadline))
+        else
+          retry_after=$((5 << rate_retries))
+        fi
+      fi
+      printf '%s\n' "$((deadline + retry_after + 1))" > "$cooldown_file.tmp"
+      mv "$cooldown_file.tmp" "$cooldown_file"
+      http_reason='Check-Host вернул HTTP 429'
+      if [ "$rate_retries" -eq 3 ]; then break 2; fi
+      rate_retries=$((rate_retries + 1))
+      progress "$stage; HTTP 429; общая пауза $retry_after с; повтор $rate_retries/3"
+      continue 2
+    fi
     if [ "$expected" = site ]; then
-      meta=$(cat "$batch/http-meta" | tr -d '\000-\010\013-\037\177')
+      meta=$(cat "$request_dir/http-meta" | tr -d '\000-\010\013-\037\177')
       status=000; effective=''; redirects=0; tcp=0; tls=0; first=0
       IFS=$'\t' read -r status effective redirects tcp tls first <<< "$meta" || :
       # Header values are untrusted: remove control characters before diagnostics.
@@ -297,9 +352,9 @@ fetch_http() {
           reduce .[] as $url ({current:$initial,chain:[$initial]};
             ($url|host) as $next | .current = (if $next == "" then .current else $next end) | .chain += [.current]) |
           .chain | join(" → ") end
-      ' "$batch/http-headers")
+      ' "$request_dir/http-headers")
       challenge=0
-      if jq -Rrse 'test("(?im)^cf-mitigated: *challenge\r?$")' "$batch/http-headers" >/dev/null; then challenge=1; fi
+      if jq -Rrse 'test("(?im)^cf-mitigated: *challenge\r?$")' "$request_dir/http-headers" >/dev/null; then challenge=1; fi
       if [ "$rc" -eq 0 ]; then
         case "$status" in [45][0-9][0-9]) rc=22 ;; esac
         if [ "$challenge" -eq 1 ]; then rc=22; fi
@@ -307,8 +362,8 @@ fetch_http() {
     fi
     if [ "$rc" -eq 0 ]; then
       if [ "$expected" = site ] ||
-         { [ "$expected" = object ] && jq -e 'type == "object"' "$batch/http-response" >/dev/null 2>&1; } ||
-         { [ "$expected" = check ] && jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$batch/http-response" >/dev/null 2>&1; }; then
+         { [ "$expected" = object ] && jq -e 'type == "object"' "$request_dir/http-response" >/dev/null 2>&1; } ||
+         { [ "$expected" = check ] && jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$request_dir/http-response" >/dev/null 2>&1; }; then
         if [ "$expected" = site ]; then
           site_progress "$request_stage; попытка $attempt/2${locations:+; Редирект: $locations}; HTTP $status"
         fi
@@ -316,7 +371,7 @@ fetch_http() {
           http_wait_seconds=$((http_wait_seconds + SECONDS - wait_started))
           progress "Check-Host снова отвечает; $stage"
         fi
-        cat "$batch/http-response"
+        cat "$request_dir/http-response"
         return 0
       fi
       http_reason='API вернул некорректный ответ или отклонил запрос'
@@ -327,7 +382,7 @@ fetch_http() {
         6) http_reason='Не удалось определить IP-адрес сервера' ;;
         7) http_reason='Не удалось подключиться к серверу' ;;
         22) http_reason='Сервер вернул HTTP-ошибку'; http_transport_failed=0
-            case "$(cat "$batch/http-error")" in
+            case "$(cat "$request_dir/http-error")" in
               *403*) http_reason='Сайт отказал в доступе. Ресурсы страницы не загружены' ;;
               *404*) http_reason='Страница не найдена' ;;
               *429*) http_reason='Сервер ограничил частоту запросов' ;;
@@ -390,6 +445,10 @@ fetch_http() {
   if [ "$wait_started" -ge 0 ]; then http_wait_seconds=$((http_wait_seconds + SECONDS - wait_started)); fi
   [ "$expected" != site ] || return 1
   finish_progress
+  if [ "$rate_retries" -gt 0 ] && [ "$http_reason" = 'Check-Host вернул HTTP 429' ]; then
+    printf '[%s] %s: %s; исчерпаны 3 повтора.\n' "$stage_name" "$stage" "$http_reason" >&2
+    return 1
+  fi
   printf '[%s] %s: %s; обе попытки не удались.\n' "$stage_name" "$stage" "$http_reason" >&2
   return 1
 }
@@ -397,7 +456,7 @@ get_json() { fetch_http object -H 'Accept: application/json' "$@"; }
 check_service() {
   local previous_stage=$stage previous_reason=${http_reason:-} previous_transport=${http_transport_failed:-0}
   stage='проверка доступности API Check-Host (3 узла)'
-  if ! fetch_http check -H 'Accept: application/json' -G --data-urlencode 'host=https://check-host.net' --data-urlencode 'max_nodes=3' https://check-host.net/check-dns > "$batch/service-check.json"; then
+  if ! fetch_http check -H 'Accept: application/json' -G --data-urlencode 'host=https://check-host.net' --data-urlencode 'max_nodes=3' https://check-host.net/check-dns > "${http_dir:-$batch}/service-check.json"; then
     die 'API Check-Host недоступен. DNS-проверки доменов и запросы BGP.tools не запускаются.'
   fi
   stage=$previous_stage
@@ -749,71 +808,104 @@ if [ -n "$resume_bgp" ]; then
     index=$((index + 1))
   done
 else
+check_dns_domain() {
+  local domain=$1 index=$2 tmp=$3 http_dir=$3
+  local request_id dns_started node_total answered attempt remaining pause_before
+  local http_wait_seconds=0
+  stage="Домен $index/${#domains[@]}: $domain — отправка задания DNS в Check-Host"
+  progress "Запрашиваем DNS A для $domain..."
+  if ! fetch_http check -H 'Accept: application/json' -G --data-urlencode "host=$domain" https://check-host.net/check-dns > "$tmp/check.json" ||
+     ! jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$tmp/check.json" >/dev/null; then
+    if [ "$http_transport_failed" -eq 1 ]; then check_service; fi
+    jq -n --arg message "$http_reason" '{nodes:{},permanent_link:null,request_error:("Check-Host: не удалось отправить задание DNS; " + $message)}' > "$tmp/check.json"
+    printf '[]\n' > "$tmp/nodes.json"
+    printf '[]\n' > "$tmp/observations.json"
+    return 0
+  fi
+  request_id=$(jq -r .request_id "$tmp/check.json")
+  if [ "$verbose" -eq 1 ]; then
+    printf 'Отчёт: %s\n' "$(jq -r .permanent_link "$tmp/check.json")" >&2
+  fi
+  printf '{}\n' > "$tmp/dns.json"
+  # Bound active polling; API outage recovery pauses this budget.
+  dns_started=$SECONDS
+  node_total=$(jq '.nodes | length' "$tmp/check.json")
+  answered=0
+  for ((attempt=0; attempt<20; attempt++)); do
+    remaining=$((60 - (SECONDS - dns_started)))
+    [ "$remaining" -gt 0 ] || break
+    stage="Домен $index/${#domains[@]}: $domain — ожидание DNS-ответов; ответили $answered/$node_total узлов; опрос $((attempt + 1))/20"
+    pause_before=${http_wait_seconds:-0}
+    if get_json "https://check-host.net/check-result/$request_id" > "$tmp/next.json" && jq -e 'type == "object"' "$tmp/next.json" >/dev/null; then
+      dns_started=$((dns_started + ${http_wait_seconds:-0} - pause_before))
+      # A non-null node response is final, including errors and empty A records.
+      # Poll only for pending nodes; never replace/retry already completed ones.
+      jq --slurpfile old "$tmp/dns.json" --slurpfile c "$tmp/check.json" '
+        . as $next | reduce ($c[0].nodes | keys[]) as $node ($old[0];
+          if .[$node] == null and $next[$node] != null then .[$node] = $next[$node] else . end)
+      ' "$tmp/next.json" > "$tmp/merged.json"
+      mv "$tmp/merged.json" "$tmp/dns.json"
+      answered=$(jq --slurpfile c "$tmp/check.json" '. as $r | [$c[0].nodes | keys[] | select($r[.] != null)] | length' "$tmp/dns.json")
+      found=$(jq '[.. | objects | .A? | arrays | .[] | strings] | unique | length' "$tmp/dns.json")
+      progress "Домен $index/${#domains[@]}: $domain — ответили $answered/$node_total узлов; уникальных A-адресов: $found"
+      [ "$answered" -lt "$node_total" ] || break
+    else
+      if [ "$http_transport_failed" -eq 1 ]; then check_service; fi
+      jq --arg reason "$http_reason" '.poll_error = ($reason + "; не удалось получить отчёт Check-Host")' "$tmp/check.json" > "$tmp/check-next.json"
+      mv "$tmp/check-next.json" "$tmp/check.json"
+      progress 'Не удалось получить DNS-результат; переходим к следующему домену'
+      break
+    fi
+    if [ "$attempt" -lt 19 ] && [ "$((SECONDS - dns_started))" -lt 58 ]; then sleep 2; fi
+  done
+  if [ "$answered" -lt "$node_total" ]; then
+    progress "DNS: ожидание завершено, ответили $answered/$node_total; продолжаем с доступными результатами"
+  fi
+  jq -n --slurpfile c "$tmp/check.json" --slurpfile r "$tmp/dns.json" '
+    def ipv4: if type != "string" then false else
+      test("^([0-9]{1,3}\\.){3}[0-9]{1,3}$") and (split(".") | all(.[]; tonumber <= 255)) end;
+    [$c[0].nodes | keys[] as $node | $r[0][$node] as $answer |
+      {node: $node, ips: ([$answer | .. | objects | .A? | arrays | .[] | select(ipv4)] | unique),
+       response: $answer}]
+  ' > "$tmp/nodes.json"
+  jq '[.[] | .node as $node | .ips[] | {ip: ., node: $node}] | unique' "$tmp/nodes.json" > "$tmp/observations.json"
+}
+
 index=0
 observation_files=()
+finished=0
 for domain in "${domains[@]}"; do
   index=$((index + 1))
-  tmp="$batch/domain-$index"
-  mkdir "$tmp"
-  stage="Домен $index/${#domains[@]}: $domain — отправка задания DNS в Check-Host"
-progress "Запрашиваем DNS A для $domain..."
-if ! fetch_http check -H 'Accept: application/json' -G --data-urlencode "host=$domain" https://check-host.net/check-dns > "$tmp/check.json" ||
-   ! jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$tmp/check.json" >/dev/null; then
-  if [ "$http_transport_failed" -eq 1 ]; then check_service; fi
-  jq -n --arg message "$http_reason" '{nodes:{},permanent_link:null,request_error:("Check-Host: не удалось отправить задание DNS после двух попыток; " + $message)}' > "$tmp/check.json"
-  printf '[]\n' > "$tmp/nodes.json"
-  printf '[]\n' > "$tmp/observations.json"
-  observation_files+=("$tmp/observations.json")
-  continue
-fi
-request_id=$(jq -r .request_id "$tmp/check.json")
-if [ "$verbose" -eq 1 ]; then
-  printf 'Отчёт: %s\n' "$(jq -r .permanent_link "$tmp/check.json")" >&2
-fi
-printf '{}\n' > "$tmp/dns.json"
-# Bound active polling; API outage recovery pauses this budget.
-dns_started=$SECONDS
-node_total=$(jq '.nodes | length' "$tmp/check.json")
-answered=0
-for ((attempt=0; attempt<20; attempt++)); do
-  remaining=$((60 - (SECONDS - dns_started)))
-  [ "$remaining" -gt 0 ] || break
-  stage="Домен $index/${#domains[@]}: $domain — ожидание DNS-ответов; ответили $answered/$node_total узлов; опрос $((attempt + 1))/20"
-  pause_before=${http_wait_seconds:-0}
-  if get_json "https://check-host.net/check-result/$request_id" > "$tmp/next.json" && jq -e 'type == "object"' "$tmp/next.json" >/dev/null; then
-    dns_started=$((dns_started + ${http_wait_seconds:-0} - pause_before))
-    # A non-null node response is final, including errors and empty A records.
-    # Poll only for pending nodes; never replace/retry already completed ones.
-    jq --slurpfile old "$tmp/dns.json" --slurpfile c "$tmp/check.json" '
-      . as $next | reduce ($c[0].nodes | keys[]) as $node ($old[0];
-        if .[$node] == null and $next[$node] != null then .[$node] = $next[$node] else . end)
-    ' "$tmp/next.json" > "$tmp/merged.json"
-    mv "$tmp/merged.json" "$tmp/dns.json"
-    answered=$(jq --slurpfile c "$tmp/check.json" '. as $r | [$c[0].nodes | keys[] | select($r[.] != null)] | length' "$tmp/dns.json")
-    found=$(jq '[.. | objects | .A? | arrays | .[] | strings] | unique | length' "$tmp/dns.json")
-    progress "Домен $index/${#domains[@]}: $domain — ответили $answered/$node_total узлов; уникальных A-адресов: $found"
-    [ "$answered" -lt "$node_total" ] || break
-  else
-    if [ "$http_transport_failed" -eq 1 ]; then check_service; fi
-    jq --arg reason "$http_reason" '.poll_error = ($reason + "; не удалось получить отчёт Check-Host после двух попыток")' "$tmp/check.json" > "$tmp/check-next.json"
-    mv "$tmp/check-next.json" "$tmp/check.json"
-    progress 'Не удалось получить DNS-результат после двух попыток; переходим к следующему домену'
-    break
+  folder="$batch/domain-$index"
+  mkdir "$folder"
+  observation_files+=("$folder/observations.json")
+  if [ "$dns_concurrency" -eq 1 ] || [ "${#domains[@]}" -eq 1 ]; then
+    check_dns_domain "$domain" "$index" "$folder"
+    continue
   fi
-  if [ "$attempt" -lt 19 ] && [ "$((SECONDS - dns_started))" -lt 58 ]; then sleep 2; fi
+  while [ "$((index - 1 - finished))" -ge "$dns_concurrency" ]; do
+    for slot in "${!dns_pids[@]}"; do
+      pid=${dns_pids[$slot]}
+      if ! kill -0 "$pid" 2>/dev/null; then
+        wait "$pid" || die 'Сбой фоновой DNS-проверки.'
+        unset 'dns_pids[slot]'
+        finished=$((finished + 1))
+      fi
+    done
+    if [ "$((index - 1 - finished))" -ge "$dns_concurrency" ]; then sleep 0.1; fi
+  done
+  (
+    dns_worker=1
+    trap 'exit 143' TERM
+    trap 'if [ -n "$http_pid" ]; then kill "$http_pid" 2>/dev/null || :; wait "$http_pid" 2>/dev/null || :; fi' EXIT
+    check_dns_domain "$domain" "$index" "$folder"
+  ) &
+  dns_pids[$index]=$!
+  if [ "$verbose" -eq 0 ]; then progress "DNS: завершено $finished/${#domains[@]}; одновременно до $dns_concurrency"; fi
 done
-if [ "$answered" -lt "$node_total" ]; then
-  progress "DNS: ожидание завершено, ответили $answered/$node_total; продолжаем с доступными результатами"
-fi
-jq -n --slurpfile c "$tmp/check.json" --slurpfile r "$tmp/dns.json" '
-  def ipv4: if type != "string" then false else
-    test("^([0-9]{1,3}\\.){3}[0-9]{1,3}$") and (split(".") | all(.[]; tonumber <= 255)) end;
-  [$c[0].nodes | keys[] as $node | $r[0][$node] as $answer |
-    {node: $node, ips: ([$answer | .. | objects | .A? | arrays | .[] | select(ipv4)] | unique),
-     response: $answer}]
-' > "$tmp/nodes.json"
-jq '[.[] | .node as $node | .ips[] | {ip: ., node: $node}] | unique' "$tmp/nodes.json" > "$tmp/observations.json"
-  observation_files+=("$tmp/observations.json")
+for slot in ${!dns_pids[@]}; do
+  wait "${dns_pids[$slot]}" || die 'Сбой фоновой DNS-проверки.'
+  unset 'dns_pids[slot]'
 done
 fi
 tmp=$batch

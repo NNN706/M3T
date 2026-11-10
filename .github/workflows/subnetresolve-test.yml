@@ -88,6 +88,7 @@ jobs:
           python3 source/tests/test_bgp_tcp.py 2>&1 | tee "$TEST_ARTIFACTS/bgp-tcp.log"
           python3 source/tests/test_bgp.py 2>&1 | tee "$TEST_ARTIFACTS/bgp.log"
           python3 source/tests/test_wait.py 2>&1 | tee "$TEST_ARTIFACTS/wait.log"
+          python3 source/tests/test_dns_parallel.py 2>&1 | tee "$TEST_ARTIFACTS/dns-parallel.log"
           python3 source/tests/test_pipeline.py 2>&1 | tee "$TEST_ARTIFACTS/pipeline.log"
       - name: Open cloud.vk.com in curl and Chromium
         shell: bash

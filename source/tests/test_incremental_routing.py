@@ -174,3 +174,22 @@ with tempfile.TemporaryDirectory() as directory:
         status = json.loads((args.evidence / 'completeness.json').read_text())
         assert status['mode'] == 'full-refresh' and status['complete'] is success
 print('PASS daily full refresh replaces generated rules only after complete active discovery and keeps legacy')
+
+with tempfile.TemporaryDirectory() as directory:
+    tmp = Path(directory)
+    args = argparse.Namespace(scanner=root / 'SubnetResolve.sh', verbose=False, allow_partial=True,
+                              full_refresh=True, domains_output=tmp / 'domains.json',
+                              sources_output=tmp / 'sources.json', output=tmp / 'IP.json',
+                              evidence=tmp / 'evidence')
+    write_json(args.sources_output, {'rules': [{'ruleTag': 'legacy', 'ip': ['198.51.100.0/24']}]})
+    discovery = {'pages': [{'site': 'site.example', 'domains': [], 'errors': []}]}
+    with patch('update_routing.time.monotonic', side_effect=[0, 1, 13801]), patch(
+        'update_routing.subprocess.run',
+        return_value=subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+    ) as run:
+        incremental_update(args, [('site.example', 'https://site.example')], set(), lambda *_: ([], [], ''))
+        assert run.call_count == 1
+    assert json.loads(args.output.read_text())['rules'] == [{'ruleTag': 'legacy', 'ip': ['198.51.100.0/24']}]
+    assert json.loads((args.evidence / 'completeness.json').read_text())['complete'] is False
+
+print('PASS expired shared scan budget preserves output and records incomplete refresh')
