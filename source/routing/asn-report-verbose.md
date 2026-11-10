@@ -1,36 +1,36 @@
 # Подробный отчёт ASN
 
-Опубликовано **819** уникальных подсетей (IPv4: **778**, IPv6: **41**). С ними пересекаются анонсы **563** ASN.
+Опубликовано **757** уникальных подсетей (IPv4: **716**, IPv6: **41**). С ними пересекаются анонсы **560** ASN.
 
 Источник правил — [IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/IP.json). Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).
 
-SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4d613272e8a4b7`.
+SHA-256 файла IP.json: `5500911c6cb862c911d237f00939feb4f5d40ad4a6fbbf65a89ce3a9d39c98ef`.
 
 «Затронуто» — анонсы ASN, которые хотя бы частично пересекаются с правилами. «Всего» — все анонсы этого ASN в снимке. Один префикс может учитываться у нескольких ASN, если они его анонсируют.
 
 | ASN | Название | Затронуто / всего |
 | --- | --- | ---: |
-| AS174 | Cogent Communications, LLC | 1 / 4197 |
-| AS714 | Apple Inc. | 5 / 2030 |
-| AS1299 | Arelion (fka. Telia Carrier) | 2 / 123 |
+| AS174 | Cogent Communications, LLC | 1 / 4195 |
+| AS714 | Apple Inc. | 5 / 2031 |
+| AS1299 | Arelion (fka. Telia Carrier) | 2 / 124 |
 | AS2854 | LLC Orange Business Services | 1 / 44 |
 | AS3175 | Citytelecom LLC | 4 / 45 |
 | AS3216 | PJSC Vimpelcom | 14 / 597 |
 | AS3218 | Federal State Budgetary Institution of Science "Space Research Institute of the Russian Academy of Sciences". | 9 / 24 |
 | AS3253 | PJSC "Vimpelcom" | 3 / 20 |
-| AS3267 | National Research Computer Network of Russia | 10 / 99 |
+| AS3267 | National Research Computer Network of Russia | 10 / 100 |
 | AS3316 | Internet Exchange MSK-IX JSC | 10 / 33 |
-| AS3320 | Deutsche Telekom AG | 1 / 976 |
+| AS3320 | Deutsche Telekom AG | 1 / 974 |
 | AS4787 | PT Cyberindo Aditama | 7 / 458 |
 | AS5429 | Telecommunications center UMOS, LLC | 1 / 7 |
 | AS5547 | JSC Orient-Telecom | 2 / 20 |
 | AS5568 | Join-stock company "Internet Exchange"MSK-IX" | 1 / 4 |
 | AS6677 | Míla hf | 4 / 14 |
-| AS6697 | Beltelecom | 2 / 231 |
+| AS6697 | Beltelecom | 2 / 241 |
 | AS6762 | Telecom Italia Sparkle (Seabone) | 2 / 311 |
 | AS6878 | T-Systems International GmbH | 1 / 51 |
 | AS7377 | University of California, San Diego | 1 / 20 |
-| AS7979 | Servers.com, Inc. | 10 / 1930 |
+| AS7979 | Servers.com, Inc. | 10 / 1931 |
 | AS8193 | "Uzbektelekom" Joint Stock Company | 1 / 105 |
 | AS8291 | The Federal Guard Service of the Russian Federation | 15 / 15 |
 | AS8342 | JSC RTComm.RU | 4 / 100 |
@@ -48,10 +48,10 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS9049 | JSC "ER-Telecom Holding" | 1 / 43 |
 | AS9068 | JSC Comcor | 1 / 1 |
 | AS9121 | Turk Telekom | 4 / 1354 |
-| AS9123 | JSC "TIMEWEB" | 66 / 965 |
+| AS9123 | JSC "TIMEWEB" | 66 / 966 |
 | AS9198 | JSC Kazakhtelecom | 3 / 1111 |
-| AS9498 | Bharti Airtel Ltd. | 1 / 5285 |
-| AS12389 | PJSC Rostelecom | 100 / 3551 |
+| AS9498 | Bharti Airtel Ltd. | 1 / 5288 |
+| AS12389 | PJSC Rostelecom | 100 / 3555 |
 | AS12400 | Partner Communications Ltd. | 3 / 326 |
 | AS12555 | Data-center IMAQLIQ Ltd. | 1 / 28 |
 | AS12616 | Citytelecom LLC | 2 / 20 |
@@ -61,18 +61,16 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS13075 | PJSC MegaFon | 2 / 5 |
 | AS13174 | MTS PJSC | 3 / 12 |
 | AS13238 | YANDEX LLC | 47 / 47 |
-| AS15169 | Google LLC | 633 / 1454 |
 | AS15632 | JSC "Alfa-Bank" | 14 / 14 |
 | AS15754 | OOO Taxtelecom | 1 / 1 |
 | AS15943 | wilhelm.tel GmbH | 1 / 67 |
 | AS16249 | Open Joint Stock Company HLEBPROM | 1 / 1 |
-| AS16276 | OVH SAS | 2 / 750 |
+| AS16276 | OVH SAS | 2 / 751 |
 | AS16321 | Petersburg Internet Network ltd. | 1 / 8 |
-| AS16345 | PJSC "Vimpelcom" | 1 / 197 |
-| AS16509 | Amazon.com, Inc. | 6 / 23401 |
+| AS16345 | PJSC "Vimpelcom" | 1 / 198 |
+| AS16509 | Amazon.com, Inc. | 6 / 23420 |
 | AS16625 | Akamai Technologies, Inc. | 8 / 1802 |
-| AS18403 | FPT Telecom Company | 5 / 8454 |
-| AS19527 | Google LLC (Google Cloud) | 8 / 343 |
+| AS18403 | FPT Telecom Company | 5 / 8449 |
 | AS20454 | SECURED SERVERS LLC | 2 / 162 |
 | AS20485 | JSC TransTeleCom | 1 / 87 |
 | AS20764 | CJSC RASCOM | 1 / 9 |
@@ -83,7 +81,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS21299 | Kar-Tel LLC | 28 / 768 |
 | AS21769 | Colocation America Corporation | 2 / 104 |
 | AS22297 | Jelecos LLC | 6 / 30 |
-| AS23470 | ReliableSite.Net LLC | 2 / 219 |
+| AS23470 | ReliableSite.Net LLC | 2 / 218 |
 | AS24638 | Rambler Internet Holding LLC | 1 / 4 |
 | AS24739 | JSC "Severen-Telecom" | 13 / 90 |
 | AS24774 | 3DATA LLC | 1 / 4 |
@@ -101,7 +99,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS25820 | IT7 Networks Inc | 1 / 280 |
 | AS27257 | Webair Internet Development Company Inc. | 10 / 84 |
 | AS28709 | LLC VK | 19 / 19 |
-| AS28753 | Leaseweb Deutschland GmbH | 1 / 191 |
+| AS28753 | Leaseweb Deutschland GmbH | 1 / 189 |
 | AS28762 | Citytelecom LLC | 1 / 8 |
 | AS29076 | Citytelecom LLC | 12 / 81 |
 | AS29182 | JSC IOT | 20 / 196 |
@@ -118,7 +116,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS34470 | PortTelekom LLC | 1 / 9 |
 | AS34545 | Webinar Tehnologii OOO | 1 / 8 |
 | AS34597 | LLC "SUNLIGHT" | 2 / 4 |
-| AS34665 | Petersburg Internet Network ltd. | 23 / 176 |
+| AS34665 | Petersburg Internet Network ltd. | 23 / 177 |
 | AS34779 | T-2, d.o.o. | 1 / 34 |
 | AS34858 | Telezon-Seti LLC | 6 / 22 |
 | AS34879 | OOO "Sovremennye setevye tekhnologii" | 101 / 101 |
@@ -152,7 +150,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS41719 | SKTV Spektr LLC | 1 / 10 |
 | AS41722 | Miran Ltd. | 2 / 43 |
 | AS41740 | Join-stock company "Internet Exchange"MSK-IX" | 4 / 14 |
-| AS41745 | Ilia Baikov | 1 / 240 |
+| AS41745 | Ilia Baikov | 1 / 241 |
 | AS41798 | JSC Transtelecom | 2 / 209 |
 | AS41895 | "INFORM-Svyaz" LTD | 1 / 2 |
 | AS42038 | Krivets Sergey Sergeevich | 2 / 33 |
@@ -178,7 +176,6 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS43362 | Hosting Ltd | 1 / 18 |
 | AS43399 | "TBANK" JSC | 19 / 20 |
 | AS43489 | JSC "RU-CENTER" | 1 / 9 |
-| AS43515 | Google Ireland Limited | 7 / 238 |
 | AS43581 | ZTV CORP LLC | 1 / 21 |
 | AS43733 | Viva Armenia CJSC | 3 / 22 |
 | AS43797 | The Federal Guard Service of the Russian Federation | 10 / 33 |
@@ -193,7 +190,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS44657 | JSC Steel Industrial Company | 1 / 1 |
 | AS44677 | MTS PJSC | 2 / 14 |
 | AS44704 | Perekrestok-2000 LLC | 3 / 3 |
-| AS44812 | IP Server LLC | 1 / 52 |
+| AS44812 | IP Server LLC | 1 / 53 |
 | AS45102 | Alibaba (US) Technology Co., Ltd. | 13 / 1351 |
 | AS47104 | Prolink MO.ru Ltd. | 1 / 3 |
 | AS47122 | CYBERFIRST LLC | 1 / 4 |
@@ -229,7 +226,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS49287 | Melbikomas UAB | 2 / 12 |
 | AS49352 | "Domain names registrar REG.RU", Ltd | 5 / 28 |
 | AS49453 | Global Layer B.V. | 2 / 169 |
-| AS49505 | JSC Selectel | 202 / 678 |
+| AS49505 | JSC Selectel | 202 / 679 |
 | AS49531 | "NetCom-R" LLC | 2 / 70 |
 | AS49612 | DDOS-GUARD LTD | 1 / 1 |
 | AS49675 | SKB Kontur Production JSC | 1 / 18 |
@@ -237,7 +234,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS49742 | LLC "Iwt" | 1 / 1 |
 | AS49797 | LLC VK | 1 / 1 |
 | AS49925 | LLC South Networks | 2 / 7 |
-| AS49981 | WorldStream B.V. | 1 / 261 |
+| AS49981 | WorldStream B.V. | 1 / 262 |
 | AS49988 | LLC VK | 1 / 2 |
 | AS50098 | Melbikomas UAB | 1 / 23 |
 | AS50166 | RTCloud, LLC | 1 / 5 |
@@ -291,7 +288,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS56864 | Xeon LLC | 7 / 16 |
 | AS57008 | ITGLOBAL.COM KZ LLP | 3 / 23 |
 | AS57038 | LLC "Amurtelekom" | 1 / 1 |
-| AS57043 | HOSTKEY B.V. | 1 / 692 |
+| AS57043 | HOSTKEY B.V. | 1 / 693 |
 | AS57073 | LLC Wildberries | 23 / 23 |
 | AS57139 | SYBEST LLC | 2 / 2 |
 | AS57251 | LLC Intelcom | 1 / 14 |
@@ -317,7 +314,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS58272 | LeaderTelecom B.V. | 20 / 151 |
 | AS58279 | Federal State Budgetary Institution "All Russia Research Geological Petroleum Institute" (FGBU VNIGNI) | 1 / 2 |
 | AS59210 | PhoenixNAP | 1 / 26 |
-| AS59253 | Leaseweb Singapore Pte. Ltd. | 1 / 102 |
+| AS59253 | Leaseweb Singapore Pte. Ltd. | 1 / 100 |
 | AS59437 | Northern Data AG | 1 / 38 |
 | AS59504 | LLC Vpsville | 1 / 62 |
 | AS59513 | SevenTech LLC | 1 / 2 |
@@ -380,7 +377,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS197535 | LLC "Svyazenergo" | 1 / 9 |
 | AS197571 | LLC "Search portal Sputnik" | 1 / 1 |
 | AS197675 | ADGUARD WALLET LTD | 1 / 2 |
-| AS197695 | "Domain names registrar REG.RU", Ltd | 68 / 497 |
+| AS197695 | "Domain names registrar REG.RU", Ltd | 68 / 499 |
 | AS197760 | Cesar Satellite JSC | 1 / 1 |
 | AS197998 | LLC Afk group | 1 / 7 |
 | AS198068 | CLOUD.DOG OU | 9 / 107 |
@@ -427,6 +424,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS201589 | "EDGEAM" LLC | 2 / 16 |
 | AS201593 | Technologii svyazi Ltd. | 1 / 4 |
 | AS201706 | SERVICEPIPE LLC | 26 / 26 |
+| AS201738 | UFO TECHNOLOGIES LIMITED | 1 / 8 |
 | AS201776 | Miranda-Media Ltd | 1 / 121 |
 | AS201778 | FSBE Institution of HE "I.S. TURGENEV Orlovsky STATE UNIVERSITY" | 1 / 1 |
 | AS201804 | National Insurance Information System JSC | 2 / 2 |
@@ -506,7 +504,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS208981 | Data Center LLC | 2 / 6 |
 | AS209006 | WEBAIR INTERNET DEVELOPMENT COMPANY LLC | 1 / 2 |
 | AS209024 | MTS PJSC | 4 / 48 |
-| AS209030 | AO Kaspersky Lab | 5 / 6 |
+| AS209030 | AO Kaspersky Lab | 6 / 7 |
 | AS209367 | LLC HAPOTELE | 8 / 24 |
 | AS209415 | GPM CINEMA Limited Liability Company | 1 / 1 |
 | AS209500 | WARPIRIS BILISIM TEKNOLOJILERI ANONIM SIRKETI | 1 / 3 |
@@ -518,12 +516,12 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS210226 | Windcloud 4.0 GmbH | 1 / 9 |
 | AS210240 | New Communication Technologies LLC | 1 / 3 |
 | AS210443 | RC Company LLC | 2 / 2 |
-| AS210559 | G-Core Labs S.A. | 1 / 3 |
+| AS210559 | G-Core Labs S.A. | 1 / 2 |
 | AS210644 | Aéza International Limited | 6 / 350 |
 | AS210656 | Yandex.Cloud LLC | 3 / 9 |
 | AS210725 | LLC Film Studio "Star" | 1 / 1 |
 | AS210726 | ADV Launchpad Limited Liability Company | 2 / 2 |
-| AS210756 | EdgeCenter LLC | 145 / 145 |
+| AS210756 | EdgeCenter LLC | 146 / 146 |
 | AS210829 | SATEL Ltd. | 2 / 2 |
 | AS210889 | KRASTSVETMET OJSC | 1 / 1 |
 | AS211183 | AdminVPS OOO | 3 / 93 |
@@ -556,7 +554,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS214395 | Joint-Stock Commercial Bank "NOOSPHERE" (Joint-Stock Company) | 1 / 1 |
 | AS214597 | — | 1 / 1 |
 | AS214822 | MT FINANCE LLC | 11 / 68 |
-| AS214833 | Aleksandr Shmalko trading as PR Obrada Podataka Castles Novi Sad | 1 / 11 |
+| AS214833 | Aleksandr Shmalko trading as PR Obrada Podataka Castles Novi Sad | 1 / 13 |
 | AS215013 | Yandex.Cloud LLC | 1 / 14 |
 | AS215070 | LLC Wildberries | 3 / 3 |
 | AS215074 | RossTel Company LLC | 1 / 13 |
@@ -572,7 +570,6 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | AS216379 | Joint Stock Company "CifraBeat" | 1 / 1 |
 | AS219061 | "Fritato Group" Limited Liability Company | 1 / 3 |
 | AS219407 | German Khanin | 1 / 3 |
-| AS396982 | Google Cloud Platform | 4 / 3903 |
 
 Домены указаны по сохранённым ответам DNS и BGP. IP должен входить и в анонс этого ASN, и в опубликованную подсеть. «Нет наблюдений» означает, что в сохранённых данных такой связи нет.
 
@@ -1309,644 +1306,6 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | `2a02:6b8:24::/48` | `2a02:6b8::/29` | Ручной импорт |
 | `2a02:6b8:215::/48` | `2a02:6b8::/29` | Ручной импорт |
 
-## AS15169 — Google LLC
-
-| Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
-| --- | --- | --- |
-| `34.0.0.0/15` | `34.1.224.0/19` | `pool.liftdsp.com` (`34.1.247.177`) |
-| `34.1.224.0/19` | `34.1.224.0/19` | `pool.liftdsp.com` (`34.1.247.177`) |
-| `35.208.0.0/14` | `35.211.0.0/16` | Нет наблюдений |
-| `35.211.0.0/16` | `35.211.0.0/16` | Нет наблюдений |
-| `35.212.0.0/14` | `35.212.128.0/17`, `35.213.0.0/17`, `35.214.128.0/17` | `x.bidswitch.net` (`35.214.136.108`) |
-| `35.212.128.0/17` | `35.212.128.0/17` | Нет наблюдений |
-| `35.213.0.0/17` | `35.213.0.0/17` | Нет наблюдений |
-| `35.214.128.0/17` | `35.214.128.0/17` | `x.bidswitch.net` (`35.214.136.108`) |
-| `64.233.160.0/19` | `64.233.161.0/24`, `64.233.162.0/23`, `64.233.164.0/22`, `64.233.170.0/24`, `64.233.176.0/24`, `64.233.184.0/24`, `64.233.186.0/23`, `64.233.189.0/24`, `64.233.190.0/24` | `ad.doubleclick.net` (`64.233.161.148`), `ad.doubleclick.net` (`64.233.161.149`), `ad.doubleclick.net` (`64.233.170.148`), `ad.doubleclick.net` (`64.233.170.149`), `fonts.googleapis.com` (`64.233.161.95`), `fonts.gstatic.com` (`64.233.163.94`), `fonts.gstatic.com` (`64.233.166.94`), `googleads.g.doubleclick.net` (`64.233.161.154`), `googleads.g.doubleclick.net` (`64.233.161.155`), `googleads.g.doubleclick.net` (`64.233.161.156`), `googleads.g.doubleclick.net` (`64.233.161.157`), `googleads.g.doubleclick.net` (`64.233.164.154`), `googleads.g.doubleclick.net` (`64.233.164.155`), `googleads.g.doubleclick.net` (`64.233.164.156`), `googleads.g.doubleclick.net` (`64.233.164.157`), `pagead2.googlesyndication.com` (`64.233.162.154`), `pagead2.googlesyndication.com` (`64.233.162.155`), `pagead2.googlesyndication.com` (`64.233.162.156`), `pagead2.googlesyndication.com` (`64.233.162.157`), `pagead2.googlesyndication.com` (`64.233.165.154`), `pagead2.googlesyndication.com` (`64.233.165.155`), `pagead2.googlesyndication.com` (`64.233.165.156`), `pagead2.googlesyndication.com` (`64.233.165.157`), `pagead2.googlesyndication.com` (`64.233.170.154`), `pagead2.googlesyndication.com` (`64.233.170.155`), `pagead2.googlesyndication.com` (`64.233.170.156`), `pagead2.googlesyndication.com` (`64.233.170.157`), `stats.g.doubleclick.net` (`64.233.164.154`), `stats.g.doubleclick.net` (`64.233.164.155`), `stats.g.doubleclick.net` (`64.233.164.156`), `stats.g.doubleclick.net` (`64.233.164.157`), `stats.g.doubleclick.net` (`64.233.167.154`), `stats.g.doubleclick.net` (`64.233.167.155`), `stats.g.doubleclick.net` (`64.233.167.156`), `stats.g.doubleclick.net` (`64.233.167.157`), `stats.g.doubleclick.net` (`64.233.170.154`), `stats.g.doubleclick.net` (`64.233.170.155`), `stats.g.doubleclick.net` (`64.233.170.156`), `stats.g.doubleclick.net` (`64.233.170.157`), `stats.g.doubleclick.net` (`64.233.184.154`), `stats.g.doubleclick.net` (`64.233.184.155`), `stats.g.doubleclick.net` (`64.233.184.156`), `stats.g.doubleclick.net` (`64.233.184.157`), `stats.g.doubleclick.net` (`64.233.186.154`), `stats.g.doubleclick.net` (`64.233.186.155`), `stats.g.doubleclick.net` (`64.233.186.156`), `stats.g.doubleclick.net` (`64.233.186.157`), `stats.g.doubleclick.net` (`64.233.190.154`), `stats.g.doubleclick.net` (`64.233.190.155`), `stats.g.doubleclick.net` (`64.233.190.156`), `stats.g.doubleclick.net` (`64.233.190.157`), `www.google-analytics.com` (`64.233.162.100`), `www.google-analytics.com` (`64.233.162.101`), `www.google-analytics.com` (`64.233.162.102`), `www.google-analytics.com` (`64.233.162.113`), `www.google-analytics.com` (`64.233.162.138`), `www.google-analytics.com` (`64.233.162.139`), `www.google-analytics.com` (`64.233.176.100`), `www.google-analytics.com` (`64.233.176.101`), `www.google-analytics.com` (`64.233.176.102`), `www.google-analytics.com` (`64.233.176.113`), `www.google-analytics.com` (`64.233.176.138`), `www.google-analytics.com` (`64.233.176.139`), `www.google.ru` (`64.233.164.94`), `www.googletagmanager.com` (`64.233.162.97`) |
-| `64.233.161.0/24` | `64.233.161.0/24` | `ad.doubleclick.net` (`64.233.161.148`), `ad.doubleclick.net` (`64.233.161.149`), `fonts.googleapis.com` (`64.233.161.95`), `googleads.g.doubleclick.net` (`64.233.161.154`), `googleads.g.doubleclick.net` (`64.233.161.155`), `googleads.g.doubleclick.net` (`64.233.161.156`), `googleads.g.doubleclick.net` (`64.233.161.157`) |
-| `64.233.162.0/24` | `64.233.162.0/23` | `pagead2.googlesyndication.com` (`64.233.162.154`), `pagead2.googlesyndication.com` (`64.233.162.155`), `pagead2.googlesyndication.com` (`64.233.162.156`), `pagead2.googlesyndication.com` (`64.233.162.157`), `www.google-analytics.com` (`64.233.162.100`), `www.google-analytics.com` (`64.233.162.101`), `www.google-analytics.com` (`64.233.162.102`), `www.google-analytics.com` (`64.233.162.113`), `www.google-analytics.com` (`64.233.162.138`), `www.google-analytics.com` (`64.233.162.139`), `www.googletagmanager.com` (`64.233.162.97`) |
-| `64.233.163.0/24` | `64.233.162.0/23` | `fonts.gstatic.com` (`64.233.163.94`) |
-| `64.233.164.0/24` | `64.233.164.0/22` | `googleads.g.doubleclick.net` (`64.233.164.154`), `googleads.g.doubleclick.net` (`64.233.164.155`), `googleads.g.doubleclick.net` (`64.233.164.156`), `googleads.g.doubleclick.net` (`64.233.164.157`), `stats.g.doubleclick.net` (`64.233.164.154`), `stats.g.doubleclick.net` (`64.233.164.155`), `stats.g.doubleclick.net` (`64.233.164.156`), `stats.g.doubleclick.net` (`64.233.164.157`), `www.google.ru` (`64.233.164.94`) |
-| `64.233.165.0/24` | `64.233.164.0/22` | `pagead2.googlesyndication.com` (`64.233.165.154`), `pagead2.googlesyndication.com` (`64.233.165.155`), `pagead2.googlesyndication.com` (`64.233.165.156`), `pagead2.googlesyndication.com` (`64.233.165.157`) |
-| `64.233.166.0/24` | `64.233.164.0/22` | `fonts.gstatic.com` (`64.233.166.94`) |
-| `64.233.167.0/24` | `64.233.164.0/22` | `stats.g.doubleclick.net` (`64.233.167.154`), `stats.g.doubleclick.net` (`64.233.167.155`), `stats.g.doubleclick.net` (`64.233.167.156`), `stats.g.doubleclick.net` (`64.233.167.157`) |
-| `64.233.170.0/24` | `64.233.170.0/24` | `ad.doubleclick.net` (`64.233.170.148`), `ad.doubleclick.net` (`64.233.170.149`), `pagead2.googlesyndication.com` (`64.233.170.154`), `pagead2.googlesyndication.com` (`64.233.170.155`), `pagead2.googlesyndication.com` (`64.233.170.156`), `pagead2.googlesyndication.com` (`64.233.170.157`), `stats.g.doubleclick.net` (`64.233.170.154`), `stats.g.doubleclick.net` (`64.233.170.155`), `stats.g.doubleclick.net` (`64.233.170.156`), `stats.g.doubleclick.net` (`64.233.170.157`) |
-| `64.233.176.0/24` | `64.233.176.0/24` | `www.google-analytics.com` (`64.233.176.100`), `www.google-analytics.com` (`64.233.176.101`), `www.google-analytics.com` (`64.233.176.102`), `www.google-analytics.com` (`64.233.176.113`), `www.google-analytics.com` (`64.233.176.138`), `www.google-analytics.com` (`64.233.176.139`) |
-| `64.233.184.0/24` | `64.233.184.0/24` | `stats.g.doubleclick.net` (`64.233.184.154`), `stats.g.doubleclick.net` (`64.233.184.155`), `stats.g.doubleclick.net` (`64.233.184.156`), `stats.g.doubleclick.net` (`64.233.184.157`) |
-| `64.233.186.0/24` | `64.233.186.0/23` | `stats.g.doubleclick.net` (`64.233.186.154`), `stats.g.doubleclick.net` (`64.233.186.155`), `stats.g.doubleclick.net` (`64.233.186.156`), `stats.g.doubleclick.net` (`64.233.186.157`) |
-| `64.233.187.0/24` | `64.233.186.0/23` | Нет наблюдений |
-| `64.233.189.0/24` | `64.233.189.0/24` | Нет наблюдений |
-| `64.233.190.0/24` | `64.233.190.0/24` | `stats.g.doubleclick.net` (`64.233.190.154`), `stats.g.doubleclick.net` (`64.233.190.155`), `stats.g.doubleclick.net` (`64.233.190.156`), `stats.g.doubleclick.net` (`64.233.190.157`) |
-| `66.102.0.0/20` | `66.102.1.0/24` | `fonts.googleapis.com` (`66.102.1.95`), `stats.g.doubleclick.net` (`66.102.1.154`), `stats.g.doubleclick.net` (`66.102.1.155`), `stats.g.doubleclick.net` (`66.102.1.156`), `stats.g.doubleclick.net` (`66.102.1.157`) |
-| `66.102.1.0/24` | `66.102.1.0/24` | `fonts.googleapis.com` (`66.102.1.95`), `stats.g.doubleclick.net` (`66.102.1.154`), `stats.g.doubleclick.net` (`66.102.1.155`), `stats.g.doubleclick.net` (`66.102.1.156`), `stats.g.doubleclick.net` (`66.102.1.157`) |
-| `74.125.0.0/16` | `74.125.21.0/24`, `74.125.24.0/24`, `74.125.29.0/24`, `74.125.68.0/24`, `74.125.71.0/24`, `74.125.130.0/23`, `74.125.133.0/24`, `74.125.136.0/23`, `74.125.138.0/24`, `74.125.142.0/24`, `74.125.195.0/24`, `74.125.200.0/24`, `74.125.204.0/23`, `74.125.206.0/24` | `ad.doubleclick.net` (`74.125.24.148`), `ad.doubleclick.net` (`74.125.24.149`), `ad.doubleclick.net` (`74.125.29.148`), `ad.doubleclick.net` (`74.125.29.149`), `analytics.google.com` (`74.125.195.100`), `analytics.google.com` (`74.125.195.101`), `analytics.google.com` (`74.125.195.102`), `analytics.google.com` (`74.125.195.113`), `analytics.google.com` (`74.125.195.138`), `analytics.google.com` (`74.125.195.139`), `fonts.googleapis.com` (`74.125.130.95`), `fonts.googleapis.com` (`74.125.131.95`), `fonts.googleapis.com` (`74.125.200.95`), `fonts.googleapis.com` (`74.125.29.95`), `fonts.googleapis.com` (`74.125.71.95`), `fonts.gstatic.com` (`74.125.130.94`), `fonts.gstatic.com` (`74.125.205.94`), `fonts.gstatic.com` (`74.125.29.94`), `googleads.g.doubleclick.net` (`74.125.200.154`), `googleads.g.doubleclick.net` (`74.125.200.155`), `googleads.g.doubleclick.net` (`74.125.200.156`), `googleads.g.doubleclick.net` (`74.125.200.157`), `googleads.g.doubleclick.net` (`74.125.206.154`), `googleads.g.doubleclick.net` (`74.125.206.155`), `googleads.g.doubleclick.net` (`74.125.206.156`), `googleads.g.doubleclick.net` (`74.125.206.157`), `pagead2.googlesyndication.com` (`74.125.130.154`), `pagead2.googlesyndication.com` (`74.125.130.155`), `pagead2.googlesyndication.com` (`74.125.130.156`), `pagead2.googlesyndication.com` (`74.125.130.157`), `pagead2.googlesyndication.com` (`74.125.133.154`), `pagead2.googlesyndication.com` (`74.125.133.155`), `pagead2.googlesyndication.com` (`74.125.133.156`), `pagead2.googlesyndication.com` (`74.125.133.157`), `pagead2.googlesyndication.com` (`74.125.200.154`), `pagead2.googlesyndication.com` (`74.125.200.155`), `pagead2.googlesyndication.com` (`74.125.200.156`), `pagead2.googlesyndication.com` (`74.125.200.157`), `pagead2.googlesyndication.com` (`74.125.206.154`), `pagead2.googlesyndication.com` (`74.125.206.155`), `pagead2.googlesyndication.com` (`74.125.206.156`), `pagead2.googlesyndication.com` (`74.125.206.157`), `pagead2.googlesyndication.com` (`74.125.21.154`), `pagead2.googlesyndication.com` (`74.125.21.155`), `pagead2.googlesyndication.com` (`74.125.21.156`), `pagead2.googlesyndication.com` (`74.125.21.157`), `pagead2.googlesyndication.com` (`74.125.24.154`), `pagead2.googlesyndication.com` (`74.125.24.155`), `pagead2.googlesyndication.com` (`74.125.24.156`), `pagead2.googlesyndication.com` (`74.125.24.157`), `pagead2.googlesyndication.com` (`74.125.68.154`), `pagead2.googlesyndication.com` (`74.125.68.155`), `pagead2.googlesyndication.com` (`74.125.68.156`), `pagead2.googlesyndication.com` (`74.125.68.157`), `pagead2.googlesyndication.com` (`74.125.71.154`), `pagead2.googlesyndication.com` (`74.125.71.155`), `pagead2.googlesyndication.com` (`74.125.71.156`), `pagead2.googlesyndication.com` (`74.125.71.157`), `stats.g.doubleclick.net` (`74.125.137.154`), `stats.g.doubleclick.net` (`74.125.137.155`), `stats.g.doubleclick.net` (`74.125.137.156`), `stats.g.doubleclick.net` (`74.125.137.157`), `stats.g.doubleclick.net` (`74.125.142.154`), `stats.g.doubleclick.net` (`74.125.142.155`), `stats.g.doubleclick.net` (`74.125.142.156`), `stats.g.doubleclick.net` (`74.125.142.157`), `stats.g.doubleclick.net` (`74.125.205.154`), `stats.g.doubleclick.net` (`74.125.205.155`), `stats.g.doubleclick.net` (`74.125.205.156`), `stats.g.doubleclick.net` (`74.125.205.157`), `stats.g.doubleclick.net` (`74.125.206.154`), `stats.g.doubleclick.net` (`74.125.206.155`), `stats.g.doubleclick.net` (`74.125.206.156`), `stats.g.doubleclick.net` (`74.125.206.157`), `stats.g.doubleclick.net` (`74.125.68.154`), `stats.g.doubleclick.net` (`74.125.68.155`), `stats.g.doubleclick.net` (`74.125.68.156`), `stats.g.doubleclick.net` (`74.125.68.157`), `stats.g.doubleclick.net` (`74.125.71.154`), `stats.g.doubleclick.net` (`74.125.71.155`), `stats.g.doubleclick.net` (`74.125.71.156`), `stats.g.doubleclick.net` (`74.125.71.157`), `www.google-analytics.com` (`74.125.131.100`), `www.google-analytics.com` (`74.125.131.101`), `www.google-analytics.com` (`74.125.131.102`), `www.google-analytics.com` (`74.125.131.113`), `www.google-analytics.com` (`74.125.131.138`), `www.google-analytics.com` (`74.125.131.139`), `www.google-analytics.com` (`74.125.29.100`), `www.google-analytics.com` (`74.125.29.101`), `www.google-analytics.com` (`74.125.29.102`), `www.google-analytics.com` (`74.125.29.113`), `www.google-analytics.com` (`74.125.29.138`), `www.google-analytics.com` (`74.125.29.139`), `www.google-analytics.com` (`74.125.68.100`), `www.google-analytics.com` (`74.125.68.101`), `www.google-analytics.com` (`74.125.68.102`), `www.google-analytics.com` (`74.125.68.113`), `www.google-analytics.com` (`74.125.68.138`), `www.google-analytics.com` (`74.125.68.139`), `www.google.ru` (`74.125.130.94`), `www.google.ru` (`74.125.24.94`), `www.googletagmanager.com` (`74.125.205.97`), `www.googletagmanager.com` (`74.125.206.97`), `www.googletagmanager.com` (`74.125.29.97`), `www.gstatic.com` (`74.125.200.94`), `www.gstatic.com` (`74.125.29.94`) |
-| `74.125.21.0/24` | `74.125.21.0/24` | `pagead2.googlesyndication.com` (`74.125.21.154`), `pagead2.googlesyndication.com` (`74.125.21.155`), `pagead2.googlesyndication.com` (`74.125.21.156`), `pagead2.googlesyndication.com` (`74.125.21.157`) |
-| `74.125.24.0/24` | `74.125.24.0/24` | `ad.doubleclick.net` (`74.125.24.148`), `ad.doubleclick.net` (`74.125.24.149`), `pagead2.googlesyndication.com` (`74.125.24.154`), `pagead2.googlesyndication.com` (`74.125.24.155`), `pagead2.googlesyndication.com` (`74.125.24.156`), `pagead2.googlesyndication.com` (`74.125.24.157`), `www.google.ru` (`74.125.24.94`) |
-| `74.125.29.0/24` | `74.125.29.0/24` | `ad.doubleclick.net` (`74.125.29.148`), `ad.doubleclick.net` (`74.125.29.149`), `fonts.googleapis.com` (`74.125.29.95`), `fonts.gstatic.com` (`74.125.29.94`), `www.google-analytics.com` (`74.125.29.100`), `www.google-analytics.com` (`74.125.29.101`), `www.google-analytics.com` (`74.125.29.102`), `www.google-analytics.com` (`74.125.29.113`), `www.google-analytics.com` (`74.125.29.138`), `www.google-analytics.com` (`74.125.29.139`), `www.googletagmanager.com` (`74.125.29.97`), `www.gstatic.com` (`74.125.29.94`) |
-| `74.125.68.0/24` | `74.125.68.0/24` | `pagead2.googlesyndication.com` (`74.125.68.154`), `pagead2.googlesyndication.com` (`74.125.68.155`), `pagead2.googlesyndication.com` (`74.125.68.156`), `pagead2.googlesyndication.com` (`74.125.68.157`), `stats.g.doubleclick.net` (`74.125.68.154`), `stats.g.doubleclick.net` (`74.125.68.155`), `stats.g.doubleclick.net` (`74.125.68.156`), `stats.g.doubleclick.net` (`74.125.68.157`), `www.google-analytics.com` (`74.125.68.100`), `www.google-analytics.com` (`74.125.68.101`), `www.google-analytics.com` (`74.125.68.102`), `www.google-analytics.com` (`74.125.68.113`), `www.google-analytics.com` (`74.125.68.138`), `www.google-analytics.com` (`74.125.68.139`) |
-| `74.125.71.0/24` | `74.125.71.0/24` | `fonts.googleapis.com` (`74.125.71.95`), `pagead2.googlesyndication.com` (`74.125.71.154`), `pagead2.googlesyndication.com` (`74.125.71.155`), `pagead2.googlesyndication.com` (`74.125.71.156`), `pagead2.googlesyndication.com` (`74.125.71.157`), `stats.g.doubleclick.net` (`74.125.71.154`), `stats.g.doubleclick.net` (`74.125.71.155`), `stats.g.doubleclick.net` (`74.125.71.156`), `stats.g.doubleclick.net` (`74.125.71.157`) |
-| `74.125.130.0/24` | `74.125.130.0/23` | `fonts.googleapis.com` (`74.125.130.95`), `fonts.gstatic.com` (`74.125.130.94`), `pagead2.googlesyndication.com` (`74.125.130.154`), `pagead2.googlesyndication.com` (`74.125.130.155`), `pagead2.googlesyndication.com` (`74.125.130.156`), `pagead2.googlesyndication.com` (`74.125.130.157`), `www.google.ru` (`74.125.130.94`) |
-| `74.125.131.0/24` | `74.125.130.0/23` | `fonts.googleapis.com` (`74.125.131.95`), `www.google-analytics.com` (`74.125.131.100`), `www.google-analytics.com` (`74.125.131.101`), `www.google-analytics.com` (`74.125.131.102`), `www.google-analytics.com` (`74.125.131.113`), `www.google-analytics.com` (`74.125.131.138`), `www.google-analytics.com` (`74.125.131.139`) |
-| `74.125.133.0/24` | `74.125.133.0/24` | `pagead2.googlesyndication.com` (`74.125.133.154`), `pagead2.googlesyndication.com` (`74.125.133.155`), `pagead2.googlesyndication.com` (`74.125.133.156`), `pagead2.googlesyndication.com` (`74.125.133.157`) |
-| `74.125.136.0/24` | `74.125.136.0/23` | Нет наблюдений |
-| `74.125.137.0/24` | `74.125.136.0/23` | `stats.g.doubleclick.net` (`74.125.137.154`), `stats.g.doubleclick.net` (`74.125.137.155`), `stats.g.doubleclick.net` (`74.125.137.156`), `stats.g.doubleclick.net` (`74.125.137.157`) |
-| `74.125.138.0/24` | `74.125.138.0/24` | Нет наблюдений |
-| `74.125.142.0/24` | `74.125.142.0/24` | `stats.g.doubleclick.net` (`74.125.142.154`), `stats.g.doubleclick.net` (`74.125.142.155`), `stats.g.doubleclick.net` (`74.125.142.156`), `stats.g.doubleclick.net` (`74.125.142.157`) |
-| `74.125.195.0/24` | `74.125.195.0/24` | `analytics.google.com` (`74.125.195.100`), `analytics.google.com` (`74.125.195.101`), `analytics.google.com` (`74.125.195.102`), `analytics.google.com` (`74.125.195.113`), `analytics.google.com` (`74.125.195.138`), `analytics.google.com` (`74.125.195.139`) |
-| `74.125.200.0/24` | `74.125.200.0/24` | `fonts.googleapis.com` (`74.125.200.95`), `googleads.g.doubleclick.net` (`74.125.200.154`), `googleads.g.doubleclick.net` (`74.125.200.155`), `googleads.g.doubleclick.net` (`74.125.200.156`), `googleads.g.doubleclick.net` (`74.125.200.157`), `pagead2.googlesyndication.com` (`74.125.200.154`), `pagead2.googlesyndication.com` (`74.125.200.155`), `pagead2.googlesyndication.com` (`74.125.200.156`), `pagead2.googlesyndication.com` (`74.125.200.157`), `www.gstatic.com` (`74.125.200.94`) |
-| `74.125.204.0/24` | `74.125.204.0/23` | Нет наблюдений |
-| `74.125.205.0/24` | `74.125.204.0/23` | `fonts.gstatic.com` (`74.125.205.94`), `stats.g.doubleclick.net` (`74.125.205.154`), `stats.g.doubleclick.net` (`74.125.205.155`), `stats.g.doubleclick.net` (`74.125.205.156`), `stats.g.doubleclick.net` (`74.125.205.157`), `www.googletagmanager.com` (`74.125.205.97`) |
-| `74.125.206.0/24` | `74.125.206.0/24` | `googleads.g.doubleclick.net` (`74.125.206.154`), `googleads.g.doubleclick.net` (`74.125.206.155`), `googleads.g.doubleclick.net` (`74.125.206.156`), `googleads.g.doubleclick.net` (`74.125.206.157`), `pagead2.googlesyndication.com` (`74.125.206.154`), `pagead2.googlesyndication.com` (`74.125.206.155`), `pagead2.googlesyndication.com` (`74.125.206.156`), `pagead2.googlesyndication.com` (`74.125.206.157`), `stats.g.doubleclick.net` (`74.125.206.154`), `stats.g.doubleclick.net` (`74.125.206.155`), `stats.g.doubleclick.net` (`74.125.206.156`), `stats.g.doubleclick.net` (`74.125.206.157`), `www.googletagmanager.com` (`74.125.206.97`) |
-| `108.177.0.0/17` | `108.177.11.0/24`, `108.177.14.0/23`, `108.177.97.0/24`, `108.177.119.0/24`, `108.177.122.0/24` | `ad.doubleclick.net` (`108.177.119.148`), `ad.doubleclick.net` (`108.177.119.149`), `fonts.googleapis.com` (`108.177.14.95`), `googleads.g.doubleclick.net` (`108.177.122.154`), `googleads.g.doubleclick.net` (`108.177.122.155`), `googleads.g.doubleclick.net` (`108.177.122.156`), `googleads.g.doubleclick.net` (`108.177.122.157`), `stats.g.doubleclick.net` (`108.177.11.154`), `stats.g.doubleclick.net` (`108.177.11.155`), `stats.g.doubleclick.net` (`108.177.11.156`), `stats.g.doubleclick.net` (`108.177.11.157`), `stats.g.doubleclick.net` (`108.177.14.154`), `stats.g.doubleclick.net` (`108.177.14.155`), `stats.g.doubleclick.net` (`108.177.14.156`), `stats.g.doubleclick.net` (`108.177.14.157`), `stats.g.doubleclick.net` (`108.177.15.154`), `stats.g.doubleclick.net` (`108.177.15.155`), `stats.g.doubleclick.net` (`108.177.15.156`), `stats.g.doubleclick.net` (`108.177.15.157`), `stats.g.doubleclick.net` (`108.177.97.155`), `stats.g.doubleclick.net` (`108.177.97.157`), `www.googletagmanager.com` (`108.177.14.97`) |
-| `108.177.11.0/24` | `108.177.11.0/24` | `stats.g.doubleclick.net` (`108.177.11.154`), `stats.g.doubleclick.net` (`108.177.11.155`), `stats.g.doubleclick.net` (`108.177.11.156`), `stats.g.doubleclick.net` (`108.177.11.157`) |
-| `108.177.14.0/24` | `108.177.14.0/23` | `fonts.googleapis.com` (`108.177.14.95`), `stats.g.doubleclick.net` (`108.177.14.154`), `stats.g.doubleclick.net` (`108.177.14.155`), `stats.g.doubleclick.net` (`108.177.14.156`), `stats.g.doubleclick.net` (`108.177.14.157`), `www.googletagmanager.com` (`108.177.14.97`) |
-| `108.177.15.0/24` | `108.177.14.0/23` | `stats.g.doubleclick.net` (`108.177.15.154`), `stats.g.doubleclick.net` (`108.177.15.155`), `stats.g.doubleclick.net` (`108.177.15.156`), `stats.g.doubleclick.net` (`108.177.15.157`) |
-| `108.177.97.0/24` | `108.177.97.0/24` | `stats.g.doubleclick.net` (`108.177.97.155`), `stats.g.doubleclick.net` (`108.177.97.157`) |
-| `108.177.119.0/24` | `108.177.119.0/24` | `ad.doubleclick.net` (`108.177.119.148`), `ad.doubleclick.net` (`108.177.119.149`) |
-| `108.177.122.0/24` | `108.177.122.0/24` | `googleads.g.doubleclick.net` (`108.177.122.154`), `googleads.g.doubleclick.net` (`108.177.122.155`), `googleads.g.doubleclick.net` (`108.177.122.156`), `googleads.g.doubleclick.net` (`108.177.122.157`) |
-| `142.250.0.0/15` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.250.109.148`), `ad.doubleclick.net` (`142.250.109.149`), `ad.doubleclick.net` (`142.250.120.148`), `ad.doubleclick.net` (`142.250.120.149`), `ad.doubleclick.net` (`142.250.130.148`), `ad.doubleclick.net` (`142.250.130.149`), `ad.doubleclick.net` (`142.250.151.148`), `ad.doubleclick.net` (`142.250.151.149`), `ad.doubleclick.net` (`142.250.190.230`), `ad.doubleclick.net` (`142.250.197.38`), `ad.doubleclick.net` (`142.250.198.166`), `ad.doubleclick.net` (`142.250.202.230`), `ad.doubleclick.net` (`142.250.204.102`), `ad.doubleclick.net` (`142.250.219.198`), `ad.doubleclick.net` (`142.250.75.102`), `ad.doubleclick.net` (`142.250.75.134`), `ad.doubleclick.net` (`142.250.75.198`), `ad.doubleclick.net` (`142.251.10.148`), `ad.doubleclick.net` (`142.251.10.149`), `ad.doubleclick.net` (`142.251.110.148`), `ad.doubleclick.net` (`142.251.110.149`), `ad.doubleclick.net` (`142.251.13.148`), `ad.doubleclick.net` (`142.251.13.149`), `ad.doubleclick.net` (`142.251.14.148`), `ad.doubleclick.net` (`142.251.14.149`), `ad.doubleclick.net` (`142.251.140.230`), `ad.doubleclick.net` (`142.251.141.38`), `ad.doubleclick.net` (`142.251.142.230`), `ad.doubleclick.net` (`142.251.143.134`), `ad.doubleclick.net` (`142.251.175.148`), `ad.doubleclick.net` (`142.251.175.149`), `ad.doubleclick.net` (`142.251.186.148`), `ad.doubleclick.net` (`142.251.186.149`), `ad.doubleclick.net` (`142.251.20.148`), `ad.doubleclick.net` (`142.251.20.149`), `ad.doubleclick.net` (`142.251.208.102`), `ad.doubleclick.net` (`142.251.210.134`), `ad.doubleclick.net` (`142.251.23.148`), `ad.doubleclick.net` (`142.251.23.149`), `ad.doubleclick.net` (`142.251.24.148`), `ad.doubleclick.net` (`142.251.24.149`), `ad.doubleclick.net` (`142.251.27.148`), `ad.doubleclick.net` (`142.251.27.149`), `ad.doubleclick.net` (`142.251.36.38`), `ad.doubleclick.net` (`142.251.38.102`), `ad.doubleclick.net` (`142.251.38.134`), `ad.doubleclick.net` (`142.251.38.230`), `ad.doubleclick.net` (`142.251.39.102`), `ad.doubleclick.net` (`142.251.39.134`), `ad.doubleclick.net` (`142.251.39.198`), `ad.doubleclick.net` (`142.251.45.134`), `ad.doubleclick.net` (`142.251.46.70`), `analytics.google.com` (`142.250.109.100`), `analytics.google.com` (`142.250.109.101`), `analytics.google.com` (`142.250.109.102`), `analytics.google.com` (`142.250.109.113`), `analytics.google.com` (`142.250.109.138`), `analytics.google.com` (`142.250.109.139`), `analytics.google.com` (`142.250.181.142`), `analytics.google.com` (`142.250.190.238`), `analytics.google.com` (`142.250.203.206`), `analytics.google.com` (`142.250.204.206`), `analytics.google.com` (`142.251.13.100`), `analytics.google.com` (`142.251.13.101`), `analytics.google.com` (`142.251.13.102`), `analytics.google.com` (`142.251.13.113`), `analytics.google.com` (`142.251.13.138`), `analytics.google.com` (`142.251.13.139`), `analytics.google.com` (`142.251.14.100`), `analytics.google.com` (`142.251.14.101`), `analytics.google.com` (`142.251.14.102`), `analytics.google.com` (`142.251.14.113`), `analytics.google.com` (`142.251.14.138`), `analytics.google.com` (`142.251.14.139`), `analytics.google.com` (`142.251.20.100`), `analytics.google.com` (`142.251.20.101`), `analytics.google.com` (`142.251.20.102`), `analytics.google.com` (`142.251.20.113`), `analytics.google.com` (`142.251.20.138`), `analytics.google.com` (`142.251.20.139`), `analytics.google.com` (`142.251.209.14`), `analytics.google.com` (`142.251.215.46`), `analytics.google.com` (`142.251.29.100`), `analytics.google.com` (`142.251.29.101`), `analytics.google.com` (`142.251.29.102`), `analytics.google.com` (`142.251.29.113`), `analytics.google.com` (`142.251.29.138`), `analytics.google.com` (`142.251.29.139`), `fonts.googleapis.com` (`142.250.102.95`), `fonts.googleapis.com` (`142.250.109.95`), `fonts.googleapis.com` (`142.250.129.95`), `fonts.googleapis.com` (`142.250.130.95`), `fonts.googleapis.com` (`142.250.151.95`), `fonts.googleapis.com` (`142.250.154.95`), `fonts.googleapis.com` (`142.250.157.95`), `fonts.googleapis.com` (`142.250.181.170`), `fonts.googleapis.com` (`142.250.217.10`), `fonts.googleapis.com` (`142.250.4.95`), `fonts.googleapis.com` (`142.250.75.138`), `fonts.googleapis.com` (`142.250.75.42`), `fonts.googleapis.com` (`142.251.14.95`), `fonts.googleapis.com` (`142.251.20.95`), `fonts.googleapis.com` (`142.251.209.42`), `fonts.googleapis.com` (`142.251.27.95`), `fonts.googleapis.com` (`142.251.35.106`), `fonts.googleapis.com` (`142.251.41.10`), `fonts.googleapis.com` (`142.251.98.95`), `fonts.gstatic.com` (`142.250.109.94`), `fonts.gstatic.com` (`142.250.114.94`), `fonts.gstatic.com` (`142.250.120.94`), `fonts.gstatic.com` (`142.250.130.94`), `fonts.gstatic.com` (`142.250.140.94`), `fonts.gstatic.com` (`142.250.143.94`), `fonts.gstatic.com` (`142.250.154.94`), `fonts.gstatic.com` (`142.250.178.35`), `fonts.gstatic.com` (`142.250.178.67`), `fonts.gstatic.com` (`142.250.178.99`), `fonts.gstatic.com` (`142.250.199.227`), `fonts.gstatic.com` (`142.250.203.195`), `fonts.gstatic.com` (`142.250.204.227`), `fonts.gstatic.com` (`142.250.75.163`), `fonts.gstatic.com` (`142.250.75.195`), `fonts.gstatic.com` (`142.251.10.94`), `fonts.gstatic.com` (`142.251.110.94`), `fonts.gstatic.com` (`142.251.12.94`), `fonts.gstatic.com` (`142.251.13.94`), `fonts.gstatic.com` (`142.251.142.227`), `fonts.gstatic.com` (`142.251.20.94`), `fonts.gstatic.com` (`142.251.209.35`), `fonts.gstatic.com` (`142.251.209.99`), `fonts.gstatic.com` (`142.251.27.94`), `fonts.gstatic.com` (`142.251.30.94`), `fonts.gstatic.com` (`142.251.35.227`), `fonts.gstatic.com` (`142.251.39.131`), `fonts.gstatic.com` (`142.251.40.227`), `fonts.gstatic.com` (`142.251.41.3`), `googleads.g.doubleclick.net` (`142.250.109.154`), `googleads.g.doubleclick.net` (`142.250.109.155`), `googleads.g.doubleclick.net` (`142.250.109.156`), `googleads.g.doubleclick.net` (`142.250.109.157`), `googleads.g.doubleclick.net` (`142.250.120.154`), `googleads.g.doubleclick.net` (`142.250.120.155`), `googleads.g.doubleclick.net` (`142.250.120.156`), `googleads.g.doubleclick.net` (`142.250.120.157`), `googleads.g.doubleclick.net` (`142.250.129.154`), `googleads.g.doubleclick.net` (`142.250.129.155`), `googleads.g.doubleclick.net` (`142.250.129.156`), `googleads.g.doubleclick.net` (`142.250.129.157`), `googleads.g.doubleclick.net` (`142.250.130.154`), `googleads.g.doubleclick.net` (`142.250.130.155`), `googleads.g.doubleclick.net` (`142.250.130.156`), `googleads.g.doubleclick.net` (`142.250.130.157`), `googleads.g.doubleclick.net` (`142.250.151.154`), `googleads.g.doubleclick.net` (`142.250.151.155`), `googleads.g.doubleclick.net` (`142.250.151.156`), `googleads.g.doubleclick.net` (`142.250.151.157`), `googleads.g.doubleclick.net` (`142.250.154.154`), `googleads.g.doubleclick.net` (`142.250.154.155`), `googleads.g.doubleclick.net` (`142.250.154.156`), `googleads.g.doubleclick.net` (`142.250.154.157`), `googleads.g.doubleclick.net` (`142.250.178.2`), `googleads.g.doubleclick.net` (`142.250.181.162`), `googleads.g.doubleclick.net` (`142.250.188.2`), `googleads.g.doubleclick.net` (`142.250.195.66`), `googleads.g.doubleclick.net` (`142.250.198.194`), `googleads.g.doubleclick.net` (`142.250.199.194`), `googleads.g.doubleclick.net` (`142.250.66.130`), `googleads.g.doubleclick.net` (`142.250.75.194`), `googleads.g.doubleclick.net` (`142.250.75.66`), `googleads.g.doubleclick.net` (`142.251.10.154`), `googleads.g.doubleclick.net` (`142.251.10.155`), `googleads.g.doubleclick.net` (`142.251.10.156`), `googleads.g.doubleclick.net` (`142.251.10.157`), `googleads.g.doubleclick.net` (`142.251.110.154`), `googleads.g.doubleclick.net` (`142.251.110.155`), `googleads.g.doubleclick.net` (`142.251.110.156`), `googleads.g.doubleclick.net` (`142.251.110.157`), `googleads.g.doubleclick.net` (`142.251.12.154`), `googleads.g.doubleclick.net` (`142.251.12.155`), `googleads.g.doubleclick.net` (`142.251.12.156`), `googleads.g.doubleclick.net` (`142.251.12.157`), `googleads.g.doubleclick.net` (`142.251.126.154`), `googleads.g.doubleclick.net` (`142.251.126.155`), `googleads.g.doubleclick.net` (`142.251.126.156`), `googleads.g.doubleclick.net` (`142.251.126.157`), `googleads.g.doubleclick.net` (`142.251.13.154`), `googleads.g.doubleclick.net` (`142.251.13.155`), `googleads.g.doubleclick.net` (`142.251.13.156`), `googleads.g.doubleclick.net` (`142.251.13.157`), `googleads.g.doubleclick.net` (`142.251.140.98`), `googleads.g.doubleclick.net` (`142.251.141.34`), `googleads.g.doubleclick.net` (`142.251.142.226`), `googleads.g.doubleclick.net` (`142.251.142.66`), `googleads.g.doubleclick.net` (`142.251.143.130`), `googleads.g.doubleclick.net` (`142.251.143.2`), `googleads.g.doubleclick.net` (`142.251.168.154`), `googleads.g.doubleclick.net` (`142.251.168.155`), `googleads.g.doubleclick.net` (`142.251.168.156`), `googleads.g.doubleclick.net` (`142.251.168.157`), `googleads.g.doubleclick.net` (`142.251.175.154`), `googleads.g.doubleclick.net` (`142.251.175.155`), `googleads.g.doubleclick.net` (`142.251.175.156`), `googleads.g.doubleclick.net` (`142.251.175.157`), `googleads.g.doubleclick.net` (`142.251.20.154`), `googleads.g.doubleclick.net` (`142.251.20.155`), `googleads.g.doubleclick.net` (`142.251.20.156`), `googleads.g.doubleclick.net` (`142.251.20.157`), `googleads.g.doubleclick.net` (`142.251.210.66`), `googleads.g.doubleclick.net` (`142.251.211.194`), `googleads.g.doubleclick.net` (`142.251.211.226`), `googleads.g.doubleclick.net` (`142.251.215.226`), `googleads.g.doubleclick.net` (`142.251.23.154`), `googleads.g.doubleclick.net` (`142.251.23.155`), `googleads.g.doubleclick.net` (`142.251.23.156`), `googleads.g.doubleclick.net` (`142.251.23.157`), `googleads.g.doubleclick.net` (`142.251.24.154`), `googleads.g.doubleclick.net` (`142.251.24.155`), `googleads.g.doubleclick.net` (`142.251.24.156`), `googleads.g.doubleclick.net` (`142.251.24.157`), `googleads.g.doubleclick.net` (`142.251.30.154`), `googleads.g.doubleclick.net` (`142.251.30.155`), `googleads.g.doubleclick.net` (`142.251.30.156`), `googleads.g.doubleclick.net` (`142.251.30.157`), `googleads.g.doubleclick.net` (`142.251.32.162`), `googleads.g.doubleclick.net` (`142.251.38.98`), `googleads.g.doubleclick.net` (`142.251.39.130`), `googleads.g.doubleclick.net` (`142.251.39.194`), `googleads.g.doubleclick.net` (`142.251.45.130`), `googleads.g.doubleclick.net` (`142.251.98.154`), `googleads.g.doubleclick.net` (`142.251.98.155`), `googleads.g.doubleclick.net` (`142.251.98.156`), `googleads.g.doubleclick.net` (`142.251.98.157`), `pagead2.googlesyndication.com` (`142.250.109.154`), `pagead2.googlesyndication.com` (`142.250.109.155`), `pagead2.googlesyndication.com` (`142.250.109.156`), `pagead2.googlesyndication.com` (`142.250.109.157`), `pagead2.googlesyndication.com` (`142.250.117.154`), `pagead2.googlesyndication.com` (`142.250.117.155`), `pagead2.googlesyndication.com` (`142.250.117.156`), `pagead2.googlesyndication.com` (`142.250.117.157`), `pagead2.googlesyndication.com` (`142.250.120.154`), `pagead2.googlesyndication.com` (`142.250.120.155`), `pagead2.googlesyndication.com` (`142.250.120.156`), `pagead2.googlesyndication.com` (`142.250.120.157`), `pagead2.googlesyndication.com` (`142.250.129.154`), `pagead2.googlesyndication.com` (`142.250.129.155`), `pagead2.googlesyndication.com` (`142.250.129.156`), `pagead2.googlesyndication.com` (`142.250.129.157`), `pagead2.googlesyndication.com` (`142.250.130.154`), `pagead2.googlesyndication.com` (`142.250.130.155`), `pagead2.googlesyndication.com` (`142.250.130.156`), `pagead2.googlesyndication.com` (`142.250.130.157`), `pagead2.googlesyndication.com` (`142.250.134.154`), `pagead2.googlesyndication.com` (`142.250.134.155`), `pagead2.googlesyndication.com` (`142.250.134.156`), `pagead2.googlesyndication.com` (`142.250.134.157`), `pagead2.googlesyndication.com` (`142.250.151.154`), `pagead2.googlesyndication.com` (`142.250.151.155`), `pagead2.googlesyndication.com` (`142.250.151.156`), `pagead2.googlesyndication.com` (`142.250.151.157`), `pagead2.googlesyndication.com` (`142.250.154.154`), `pagead2.googlesyndication.com` (`142.250.154.155`), `pagead2.googlesyndication.com` (`142.250.154.156`), `pagead2.googlesyndication.com` (`142.250.154.157`), `pagead2.googlesyndication.com` (`142.250.176.66`), `pagead2.googlesyndication.com` (`142.250.198.130`), `pagead2.googlesyndication.com` (`142.250.199.194`), `pagead2.googlesyndication.com` (`142.250.204.162`), `pagead2.googlesyndication.com` (`142.250.204.226`), `pagead2.googlesyndication.com` (`142.250.204.66`), `pagead2.googlesyndication.com` (`142.250.217.130`), `pagead2.googlesyndication.com` (`142.250.23.154`), `pagead2.googlesyndication.com` (`142.250.23.155`), `pagead2.googlesyndication.com` (`142.250.23.156`), `pagead2.googlesyndication.com` (`142.250.23.157`), `pagead2.googlesyndication.com` (`142.250.73.66`), `pagead2.googlesyndication.com` (`142.250.75.162`), `pagead2.googlesyndication.com` (`142.250.75.66`), `pagead2.googlesyndication.com` (`142.250.75.98`), `pagead2.googlesyndication.com` (`142.251.110.154`), `pagead2.googlesyndication.com` (`142.251.110.155`), `pagead2.googlesyndication.com` (`142.251.110.156`), `pagead2.googlesyndication.com` (`142.251.110.157`), `pagead2.googlesyndication.com` (`142.251.116.154`), `pagead2.googlesyndication.com` (`142.251.116.155`), `pagead2.googlesyndication.com` (`142.251.116.156`), `pagead2.googlesyndication.com` (`142.251.116.157`), `pagead2.googlesyndication.com` (`142.251.12.154`), `pagead2.googlesyndication.com` (`142.251.12.155`), `pagead2.googlesyndication.com` (`142.251.12.156`), `pagead2.googlesyndication.com` (`142.251.12.157`), `pagead2.googlesyndication.com` (`142.251.127.154`), `pagead2.googlesyndication.com` (`142.251.127.155`), `pagead2.googlesyndication.com` (`142.251.127.156`), `pagead2.googlesyndication.com` (`142.251.127.157`), `pagead2.googlesyndication.com` (`142.251.129.194`), `pagead2.googlesyndication.com` (`142.251.13.154`), `pagead2.googlesyndication.com` (`142.251.13.155`), `pagead2.googlesyndication.com` (`142.251.13.156`), `pagead2.googlesyndication.com` (`142.251.13.157`), `pagead2.googlesyndication.com` (`142.251.14.154`), `pagead2.googlesyndication.com` (`142.251.14.155`), `pagead2.googlesyndication.com` (`142.251.14.156`), `pagead2.googlesyndication.com` (`142.251.14.157`), `pagead2.googlesyndication.com` (`142.251.141.34`), `pagead2.googlesyndication.com` (`142.251.142.194`), `pagead2.googlesyndication.com` (`142.251.142.226`), `pagead2.googlesyndication.com` (`142.251.142.2`), `pagead2.googlesyndication.com` (`142.251.142.66`), `pagead2.googlesyndication.com` (`142.251.142.98`), `pagead2.googlesyndication.com` (`142.251.143.130`), `pagead2.googlesyndication.com` (`142.251.143.2`), `pagead2.googlesyndication.com` (`142.251.150.155`), `pagead2.googlesyndication.com` (`142.251.151.155`), `pagead2.googlesyndication.com` (`142.251.152.155`), `pagead2.googlesyndication.com` (`142.251.153.155`), `pagead2.googlesyndication.com` (`142.251.154.155`), `pagead2.googlesyndication.com` (`142.251.155.155`), `pagead2.googlesyndication.com` (`142.251.156.155`), `pagead2.googlesyndication.com` (`142.251.157.155`), `pagead2.googlesyndication.com` (`142.251.186.154`), `pagead2.googlesyndication.com` (`142.251.186.155`), `pagead2.googlesyndication.com` (`142.251.186.156`), `pagead2.googlesyndication.com` (`142.251.186.157`), `pagead2.googlesyndication.com` (`142.251.20.154`), `pagead2.googlesyndication.com` (`142.251.20.155`), `pagead2.googlesyndication.com` (`142.251.20.156`), `pagead2.googlesyndication.com` (`142.251.20.157`), `pagead2.googlesyndication.com` (`142.251.208.98`), `pagead2.googlesyndication.com` (`142.251.209.130`), `pagead2.googlesyndication.com` (`142.251.209.226`), `pagead2.googlesyndication.com` (`142.251.209.98`), `pagead2.googlesyndication.com` (`142.251.210.34`), `pagead2.googlesyndication.com` (`142.251.211.162`), `pagead2.googlesyndication.com` (`142.251.211.226`), `pagead2.googlesyndication.com` (`142.251.211.66`), `pagead2.googlesyndication.com` (`142.251.215.34`), `pagead2.googlesyndication.com` (`142.251.218.2`), `pagead2.googlesyndication.com` (`142.251.24.154`), `pagead2.googlesyndication.com` (`142.251.24.155`), `pagead2.googlesyndication.com` (`142.251.24.156`), `pagead2.googlesyndication.com` (`142.251.24.157`), `pagead2.googlesyndication.com` (`142.251.27.154`), `pagead2.googlesyndication.com` (`142.251.27.155`), `pagead2.googlesyndication.com` (`142.251.27.156`), `pagead2.googlesyndication.com` (`142.251.27.157`), `pagead2.googlesyndication.com` (`142.251.29.154`), `pagead2.googlesyndication.com` (`142.251.29.155`), `pagead2.googlesyndication.com` (`142.251.29.156`), `pagead2.googlesyndication.com` (`142.251.29.157`), `pagead2.googlesyndication.com` (`142.251.34.194`), `pagead2.googlesyndication.com` (`142.251.34.66`), `pagead2.googlesyndication.com` (`142.251.36.130`), `pagead2.googlesyndication.com` (`142.251.38.226`), `pagead2.googlesyndication.com` (`142.251.38.98`), `pagead2.googlesyndication.com` (`142.251.39.130`), `pagead2.googlesyndication.com` (`142.251.39.98`), `pagead2.googlesyndication.com` (`142.251.40.98`), `pagead2.googlesyndication.com` (`142.251.42.226`), `pagead2.googlesyndication.com` (`142.251.45.130`), `pagead2.googlesyndication.com` (`142.251.98.154`), `pagead2.googlesyndication.com` (`142.251.98.155`), `pagead2.googlesyndication.com` (`142.251.98.156`), `pagead2.googlesyndication.com` (`142.251.98.157`), `stats.g.doubleclick.net` (`142.250.102.154`), `stats.g.doubleclick.net` (`142.250.102.155`), `stats.g.doubleclick.net` (`142.250.102.156`), `stats.g.doubleclick.net` (`142.250.102.157`), `stats.g.doubleclick.net` (`142.250.113.154`), `stats.g.doubleclick.net` (`142.250.113.155`), `stats.g.doubleclick.net` (`142.250.113.156`), `stats.g.doubleclick.net` (`142.250.113.157`), `stats.g.doubleclick.net` (`142.250.147.154`), `stats.g.doubleclick.net` (`142.250.147.155`), `stats.g.doubleclick.net` (`142.250.147.156`), `stats.g.doubleclick.net` (`142.250.147.157`), `stats.g.doubleclick.net` (`142.250.27.154`), `stats.g.doubleclick.net` (`142.250.27.155`), `stats.g.doubleclick.net` (`142.250.27.156`), `stats.g.doubleclick.net` (`142.250.27.157`), `stats.g.doubleclick.net` (`142.250.4.154`), `stats.g.doubleclick.net` (`142.250.4.155`), `stats.g.doubleclick.net` (`142.250.4.156`), `stats.g.doubleclick.net` (`142.250.4.157`), `stats.g.doubleclick.net` (`142.251.1.154`), `stats.g.doubleclick.net` (`142.251.1.155`), `stats.g.doubleclick.net` (`142.251.1.156`), `stats.g.doubleclick.net` (`142.251.1.157`), `stats.g.doubleclick.net` (`142.251.107.154`), `stats.g.doubleclick.net` (`142.251.107.155`), `stats.g.doubleclick.net` (`142.251.107.156`), `stats.g.doubleclick.net` (`142.251.107.157`), `stats.g.doubleclick.net` (`142.251.111.154`), `stats.g.doubleclick.net` (`142.251.111.155`), `stats.g.doubleclick.net` (`142.251.127.154`), `stats.g.doubleclick.net` (`142.251.127.155`), `stats.g.doubleclick.net` (`142.251.127.156`), `stats.g.doubleclick.net` (`142.251.127.157`), `stats.g.doubleclick.net` (`142.251.173.154`), `stats.g.doubleclick.net` (`142.251.173.155`), `stats.g.doubleclick.net` (`142.251.173.156`), `stats.g.doubleclick.net` (`142.251.173.157`), `stats.g.doubleclick.net` (`142.251.175.154`), `stats.g.doubleclick.net` (`142.251.175.155`), `stats.g.doubleclick.net` (`142.251.175.156`), `stats.g.doubleclick.net` (`142.251.175.157`), `stats.g.doubleclick.net` (`142.251.31.154`), `stats.g.doubleclick.net` (`142.251.31.155`), `stats.g.doubleclick.net` (`142.251.31.156`), `stats.g.doubleclick.net` (`142.251.31.157`), `stats.g.doubleclick.net` (`142.251.8.156`), `stats.g.doubleclick.net` (`142.251.8.157`), `stats.g.doubleclick.net` (`142.251.9.154`), `stats.g.doubleclick.net` (`142.251.9.155`), `stats.g.doubleclick.net` (`142.251.9.156`), `stats.g.doubleclick.net` (`142.251.9.157`), `www.google-analytics.com` (`142.250.109.100`), `www.google-analytics.com` (`142.250.109.101`), `www.google-analytics.com` (`142.250.109.102`), `www.google-analytics.com` (`142.250.109.113`), `www.google-analytics.com` (`142.250.109.138`), `www.google-analytics.com` (`142.250.109.139`), `www.google-analytics.com` (`142.250.117.100`), `www.google-analytics.com` (`142.250.117.101`), `www.google-analytics.com` (`142.250.117.102`), `www.google-analytics.com` (`142.250.117.113`), `www.google-analytics.com` (`142.250.117.138`), `www.google-analytics.com` (`142.250.117.139`), `www.google-analytics.com` (`142.250.120.100`), `www.google-analytics.com` (`142.250.120.101`), `www.google-analytics.com` (`142.250.120.102`), `www.google-analytics.com` (`142.250.120.113`), `www.google-analytics.com` (`142.250.120.138`), `www.google-analytics.com` (`142.250.120.139`), `www.google-analytics.com` (`142.250.130.100`), `www.google-analytics.com` (`142.250.130.101`), `www.google-analytics.com` (`142.250.130.102`), `www.google-analytics.com` (`142.250.130.113`), `www.google-analytics.com` (`142.250.130.138`), `www.google-analytics.com` (`142.250.130.139`), `www.google-analytics.com` (`142.250.178.110`), `www.google-analytics.com` (`142.250.178.14`), `www.google-analytics.com` (`142.250.198.206`), `www.google-analytics.com` (`142.250.204.174`), `www.google-analytics.com` (`142.250.23.100`), `www.google-analytics.com` (`142.250.23.101`), `www.google-analytics.com` (`142.250.23.102`), `www.google-analytics.com` (`142.250.23.113`), `www.google-analytics.com` (`142.250.23.138`), `www.google-analytics.com` (`142.250.23.139`), `www.google-analytics.com` (`142.250.74.78`), `www.google-analytics.com` (`142.250.75.142`), `www.google-analytics.com` (`142.250.75.174`), `www.google-analytics.com` (`142.251.1.100`), `www.google-analytics.com` (`142.251.1.101`), `www.google-analytics.com` (`142.251.1.102`), `www.google-analytics.com` (`142.251.1.113`), `www.google-analytics.com` (`142.251.1.138`), `www.google-analytics.com` (`142.251.1.139`), `www.google-analytics.com` (`142.251.10.100`), `www.google-analytics.com` (`142.251.10.101`), `www.google-analytics.com` (`142.251.10.102`), `www.google-analytics.com` (`142.251.10.113`), `www.google-analytics.com` (`142.251.10.138`), `www.google-analytics.com` (`142.251.10.139`), `www.google-analytics.com` (`142.251.106.100`), `www.google-analytics.com` (`142.251.106.101`), `www.google-analytics.com` (`142.251.106.102`), `www.google-analytics.com` (`142.251.106.113`), `www.google-analytics.com` (`142.251.106.138`), `www.google-analytics.com` (`142.251.106.139`), `www.google-analytics.com` (`142.251.110.100`), `www.google-analytics.com` (`142.251.110.101`), `www.google-analytics.com` (`142.251.110.102`), `www.google-analytics.com` (`142.251.110.113`), `www.google-analytics.com` (`142.251.110.138`), `www.google-analytics.com` (`142.251.110.139`), `www.google-analytics.com` (`142.251.13.100`), `www.google-analytics.com` (`142.251.13.101`), `www.google-analytics.com` (`142.251.13.102`), `www.google-analytics.com` (`142.251.13.113`), `www.google-analytics.com` (`142.251.13.138`), `www.google-analytics.com` (`142.251.13.139`), `www.google-analytics.com` (`142.251.14.100`), `www.google-analytics.com` (`142.251.14.101`), `www.google-analytics.com` (`142.251.14.102`), `www.google-analytics.com` (`142.251.14.113`), `www.google-analytics.com` (`142.251.14.138`), `www.google-analytics.com` (`142.251.14.139`), `www.google-analytics.com` (`142.251.140.238`), `www.google-analytics.com` (`142.251.141.174`), `www.google-analytics.com` (`142.251.141.46`), `www.google-analytics.com` (`142.251.20.100`), `www.google-analytics.com` (`142.251.20.101`), `www.google-analytics.com` (`142.251.20.102`), `www.google-analytics.com` (`142.251.20.113`), `www.google-analytics.com` (`142.251.20.138`), `www.google-analytics.com` (`142.251.20.139`), `www.google-analytics.com` (`142.251.208.110`), `www.google-analytics.com` (`142.251.210.142`), `www.google-analytics.com` (`142.251.29.100`), `www.google-analytics.com` (`142.251.29.101`), `www.google-analytics.com` (`142.251.29.102`), `www.google-analytics.com` (`142.251.29.113`), `www.google-analytics.com` (`142.251.29.138`), `www.google-analytics.com` (`142.251.29.139`), `www.google-analytics.com` (`142.251.38.238`), `www.google-analytics.com` (`142.251.38.46`), `www.google-analytics.com` (`142.251.39.142`), `www.google-analytics.com` (`142.251.39.174`), `www.google-analytics.com` (`142.251.45.206`), `www.google.com` (`142.251.150.119`), `www.google.com` (`142.251.151.119`), `www.google.com` (`142.251.152.119`), `www.google.com` (`142.251.153.119`), `www.google.com` (`142.251.154.119`), `www.google.com` (`142.251.155.119`), `www.google.com` (`142.251.156.119`), `www.google.com` (`142.251.157.119`), `www.google.ru` (`142.250.109.94`), `www.google.ru` (`142.250.120.94`), `www.google.ru` (`142.250.129.94`), `www.google.ru` (`142.250.130.94`), `www.google.ru` (`142.250.151.94`), `www.google.ru` (`142.250.186.227`), `www.google.ru` (`142.250.197.227`), `www.google.ru` (`142.250.204.99`), `www.google.ru` (`142.250.21.94`), `www.google.ru` (`142.250.75.131`), `www.google.ru` (`142.251.110.94`), `www.google.ru` (`142.251.126.94`), `www.google.ru` (`142.251.13.94`), `www.google.ru` (`142.251.14.94`), `www.google.ru` (`142.251.142.227`), `www.google.ru` (`142.251.20.94`), `www.google.ru` (`142.251.208.99`), `www.google.ru` (`142.251.209.99`), `www.google.ru` (`142.251.34.67`), `www.google.ru` (`142.251.38.99`), `www.google.ru` (`142.251.45.195`), `www.googletagmanager.com` (`142.250.109.97`), `www.googletagmanager.com` (`142.250.113.97`), `www.googletagmanager.com` (`142.250.117.97`), `www.googletagmanager.com` (`142.250.120.97`), `www.googletagmanager.com` (`142.250.129.97`), `www.googletagmanager.com` (`142.250.130.97`), `www.googletagmanager.com` (`142.250.146.97`), `www.googletagmanager.com` (`142.250.154.97`), `www.googletagmanager.com` (`142.250.198.136`), `www.googletagmanager.com` (`142.250.204.200`), `www.googletagmanager.com` (`142.250.21.97`), `www.googletagmanager.com` (`142.250.217.136`), `www.googletagmanager.com` (`142.250.75.168`), `www.googletagmanager.com` (`142.251.10.97`), `www.googletagmanager.com` (`142.251.110.97`), `www.googletagmanager.com` (`142.251.12.97`), `www.googletagmanager.com` (`142.251.14.97`), `www.googletagmanager.com` (`142.251.142.104`), `www.googletagmanager.com` (`142.251.20.97`), `www.googletagmanager.com` (`142.251.208.104`), `www.googletagmanager.com` (`142.251.208.136`), `www.googletagmanager.com` (`142.251.208.232`), `www.googletagmanager.com` (`142.251.209.8`), `www.googletagmanager.com` (`142.251.215.200`), `www.googletagmanager.com` (`142.251.38.40`), `www.gstatic.com` (`142.250.109.94`), `www.gstatic.com` (`142.250.130.94`), `www.gstatic.com` (`142.250.217.3`), `www.gstatic.com` (`142.251.14.94`), `www.gstatic.com` (`142.251.142.99`), `www.gstatic.com` (`142.251.150.120`), `www.gstatic.com` (`142.251.151.120`), `www.gstatic.com` (`142.251.152.120`), `www.gstatic.com` (`142.251.153.120`), `www.gstatic.com` (`142.251.154.120`), `www.gstatic.com` (`142.251.155.120`), `www.gstatic.com` (`142.251.156.120`), `www.gstatic.com` (`142.251.157.120`), `www.gstatic.com` (`142.251.175.94`), `www.gstatic.com` (`142.251.20.94`), `www.gstatic.com` (`142.251.209.3`), `www.gstatic.com` (`142.251.209.67`), `www.gstatic.com` (`142.251.30.94`), `www.gstatic.com` (`142.251.34.131`) |
-| `142.250.0.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.1.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.2.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.3.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.4.0/24` | `142.250.0.0/15` | `fonts.googleapis.com` (`142.250.4.95`), `stats.g.doubleclick.net` (`142.250.4.154`), `stats.g.doubleclick.net` (`142.250.4.155`), `stats.g.doubleclick.net` (`142.250.4.156`), `stats.g.doubleclick.net` (`142.250.4.157`) |
-| `142.250.5.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.6.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.7.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.8.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.9.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.10.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.11.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.12.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.13.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.14.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.15.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.16.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.17.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.18.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.19.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.20.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.21.0/24` | `142.250.0.0/15` | `www.google.ru` (`142.250.21.94`), `www.googletagmanager.com` (`142.250.21.97`) |
-| `142.250.22.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.23.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.250.23.154`), `pagead2.googlesyndication.com` (`142.250.23.155`), `pagead2.googlesyndication.com` (`142.250.23.156`), `pagead2.googlesyndication.com` (`142.250.23.157`), `www.google-analytics.com` (`142.250.23.100`), `www.google-analytics.com` (`142.250.23.101`), `www.google-analytics.com` (`142.250.23.102`), `www.google-analytics.com` (`142.250.23.113`), `www.google-analytics.com` (`142.250.23.138`), `www.google-analytics.com` (`142.250.23.139`) |
-| `142.250.24.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.25.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.26.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.27.0/24` | `142.250.0.0/15` | `stats.g.doubleclick.net` (`142.250.27.154`), `stats.g.doubleclick.net` (`142.250.27.155`), `stats.g.doubleclick.net` (`142.250.27.156`), `stats.g.doubleclick.net` (`142.250.27.157`) |
-| `142.250.28.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.29.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.30.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.31.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.64.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.65.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.66.0/24` | `142.250.0.0/15` | `googleads.g.doubleclick.net` (`142.250.66.130`) |
-| `142.250.67.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.68.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.69.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.70.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.71.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.72.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.73.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.250.73.66`) |
-| `142.250.74.0/24` | `142.250.0.0/15` | `www.google-analytics.com` (`142.250.74.78`) |
-| `142.250.75.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.250.75.102`), `ad.doubleclick.net` (`142.250.75.134`), `ad.doubleclick.net` (`142.250.75.198`), `fonts.googleapis.com` (`142.250.75.138`), `fonts.googleapis.com` (`142.250.75.42`), `fonts.gstatic.com` (`142.250.75.163`), `fonts.gstatic.com` (`142.250.75.195`), `googleads.g.doubleclick.net` (`142.250.75.194`), `googleads.g.doubleclick.net` (`142.250.75.66`), `pagead2.googlesyndication.com` (`142.250.75.162`), `pagead2.googlesyndication.com` (`142.250.75.66`), `pagead2.googlesyndication.com` (`142.250.75.98`), `www.google-analytics.com` (`142.250.75.142`), `www.google-analytics.com` (`142.250.75.174`), `www.google.ru` (`142.250.75.131`), `www.googletagmanager.com` (`142.250.75.168`) |
-| `142.250.76.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.77.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.78.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.79.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.80.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.81.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.82.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.92.0/23` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.96.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.97.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.98.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.99.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.100.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.101.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.102.0/24` | `142.250.0.0/15` | `fonts.googleapis.com` (`142.250.102.95`), `stats.g.doubleclick.net` (`142.250.102.154`), `stats.g.doubleclick.net` (`142.250.102.155`), `stats.g.doubleclick.net` (`142.250.102.156`), `stats.g.doubleclick.net` (`142.250.102.157`) |
-| `142.250.103.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.104.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.105.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.106.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.107.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.108.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.109.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.250.109.148`), `ad.doubleclick.net` (`142.250.109.149`), `analytics.google.com` (`142.250.109.100`), `analytics.google.com` (`142.250.109.101`), `analytics.google.com` (`142.250.109.102`), `analytics.google.com` (`142.250.109.113`), `analytics.google.com` (`142.250.109.138`), `analytics.google.com` (`142.250.109.139`), `fonts.googleapis.com` (`142.250.109.95`), `fonts.gstatic.com` (`142.250.109.94`), `googleads.g.doubleclick.net` (`142.250.109.154`), `googleads.g.doubleclick.net` (`142.250.109.155`), `googleads.g.doubleclick.net` (`142.250.109.156`), `googleads.g.doubleclick.net` (`142.250.109.157`), `pagead2.googlesyndication.com` (`142.250.109.154`), `pagead2.googlesyndication.com` (`142.250.109.155`), `pagead2.googlesyndication.com` (`142.250.109.156`), `pagead2.googlesyndication.com` (`142.250.109.157`), `www.google-analytics.com` (`142.250.109.100`), `www.google-analytics.com` (`142.250.109.101`), `www.google-analytics.com` (`142.250.109.102`), `www.google-analytics.com` (`142.250.109.113`), `www.google-analytics.com` (`142.250.109.138`), `www.google-analytics.com` (`142.250.109.139`), `www.google.ru` (`142.250.109.94`), `www.googletagmanager.com` (`142.250.109.97`), `www.gstatic.com` (`142.250.109.94`) |
-| `142.250.110.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.111.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.112.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.113.0/24` | `142.250.0.0/15` | `stats.g.doubleclick.net` (`142.250.113.154`), `stats.g.doubleclick.net` (`142.250.113.155`), `stats.g.doubleclick.net` (`142.250.113.156`), `stats.g.doubleclick.net` (`142.250.113.157`), `www.googletagmanager.com` (`142.250.113.97`) |
-| `142.250.114.0/24` | `142.250.0.0/15` | `fonts.gstatic.com` (`142.250.114.94`) |
-| `142.250.115.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.116.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.117.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.250.117.154`), `pagead2.googlesyndication.com` (`142.250.117.155`), `pagead2.googlesyndication.com` (`142.250.117.156`), `pagead2.googlesyndication.com` (`142.250.117.157`), `www.google-analytics.com` (`142.250.117.100`), `www.google-analytics.com` (`142.250.117.101`), `www.google-analytics.com` (`142.250.117.102`), `www.google-analytics.com` (`142.250.117.113`), `www.google-analytics.com` (`142.250.117.138`), `www.google-analytics.com` (`142.250.117.139`), `www.googletagmanager.com` (`142.250.117.97`) |
-| `142.250.118.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.119.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.120.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.250.120.148`), `ad.doubleclick.net` (`142.250.120.149`), `fonts.gstatic.com` (`142.250.120.94`), `googleads.g.doubleclick.net` (`142.250.120.154`), `googleads.g.doubleclick.net` (`142.250.120.155`), `googleads.g.doubleclick.net` (`142.250.120.156`), `googleads.g.doubleclick.net` (`142.250.120.157`), `pagead2.googlesyndication.com` (`142.250.120.154`), `pagead2.googlesyndication.com` (`142.250.120.155`), `pagead2.googlesyndication.com` (`142.250.120.156`), `pagead2.googlesyndication.com` (`142.250.120.157`), `www.google-analytics.com` (`142.250.120.100`), `www.google-analytics.com` (`142.250.120.101`), `www.google-analytics.com` (`142.250.120.102`), `www.google-analytics.com` (`142.250.120.113`), `www.google-analytics.com` (`142.250.120.138`), `www.google-analytics.com` (`142.250.120.139`), `www.google.ru` (`142.250.120.94`), `www.googletagmanager.com` (`142.250.120.97`) |
-| `142.250.121.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.122.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.123.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.124.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.125.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.126.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.127.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.128.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.129.0/24` | `142.250.0.0/15` | `fonts.googleapis.com` (`142.250.129.95`), `googleads.g.doubleclick.net` (`142.250.129.154`), `googleads.g.doubleclick.net` (`142.250.129.155`), `googleads.g.doubleclick.net` (`142.250.129.156`), `googleads.g.doubleclick.net` (`142.250.129.157`), `pagead2.googlesyndication.com` (`142.250.129.154`), `pagead2.googlesyndication.com` (`142.250.129.155`), `pagead2.googlesyndication.com` (`142.250.129.156`), `pagead2.googlesyndication.com` (`142.250.129.157`), `www.google.ru` (`142.250.129.94`), `www.googletagmanager.com` (`142.250.129.97`) |
-| `142.250.130.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.250.130.148`), `ad.doubleclick.net` (`142.250.130.149`), `fonts.googleapis.com` (`142.250.130.95`), `fonts.gstatic.com` (`142.250.130.94`), `googleads.g.doubleclick.net` (`142.250.130.154`), `googleads.g.doubleclick.net` (`142.250.130.155`), `googleads.g.doubleclick.net` (`142.250.130.156`), `googleads.g.doubleclick.net` (`142.250.130.157`), `pagead2.googlesyndication.com` (`142.250.130.154`), `pagead2.googlesyndication.com` (`142.250.130.155`), `pagead2.googlesyndication.com` (`142.250.130.156`), `pagead2.googlesyndication.com` (`142.250.130.157`), `www.google-analytics.com` (`142.250.130.100`), `www.google-analytics.com` (`142.250.130.101`), `www.google-analytics.com` (`142.250.130.102`), `www.google-analytics.com` (`142.250.130.113`), `www.google-analytics.com` (`142.250.130.138`), `www.google-analytics.com` (`142.250.130.139`), `www.google.ru` (`142.250.130.94`), `www.googletagmanager.com` (`142.250.130.97`), `www.gstatic.com` (`142.250.130.94`) |
-| `142.250.131.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.132.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.133.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.134.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.250.134.154`), `pagead2.googlesyndication.com` (`142.250.134.155`), `pagead2.googlesyndication.com` (`142.250.134.156`), `pagead2.googlesyndication.com` (`142.250.134.157`) |
-| `142.250.135.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.136.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.137.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.138.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.139.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.140.0/24` | `142.250.0.0/15` | `fonts.gstatic.com` (`142.250.140.94`) |
-| `142.250.141.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.142.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.143.0/24` | `142.250.0.0/15` | `fonts.gstatic.com` (`142.250.143.94`) |
-| `142.250.144.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.145.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.146.0/24` | `142.250.0.0/15` | `www.googletagmanager.com` (`142.250.146.97`) |
-| `142.250.147.0/24` | `142.250.0.0/15` | `stats.g.doubleclick.net` (`142.250.147.154`), `stats.g.doubleclick.net` (`142.250.147.155`), `stats.g.doubleclick.net` (`142.250.147.156`), `stats.g.doubleclick.net` (`142.250.147.157`) |
-| `142.250.148.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.149.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.150.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.151.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.250.151.148`), `ad.doubleclick.net` (`142.250.151.149`), `fonts.googleapis.com` (`142.250.151.95`), `googleads.g.doubleclick.net` (`142.250.151.154`), `googleads.g.doubleclick.net` (`142.250.151.155`), `googleads.g.doubleclick.net` (`142.250.151.156`), `googleads.g.doubleclick.net` (`142.250.151.157`), `pagead2.googlesyndication.com` (`142.250.151.154`), `pagead2.googlesyndication.com` (`142.250.151.155`), `pagead2.googlesyndication.com` (`142.250.151.156`), `pagead2.googlesyndication.com` (`142.250.151.157`), `www.google.ru` (`142.250.151.94`) |
-| `142.250.152.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.153.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.154.0/24` | `142.250.0.0/15` | `fonts.googleapis.com` (`142.250.154.95`), `fonts.gstatic.com` (`142.250.154.94`), `googleads.g.doubleclick.net` (`142.250.154.154`), `googleads.g.doubleclick.net` (`142.250.154.155`), `googleads.g.doubleclick.net` (`142.250.154.156`), `googleads.g.doubleclick.net` (`142.250.154.157`), `pagead2.googlesyndication.com` (`142.250.154.154`), `pagead2.googlesyndication.com` (`142.250.154.155`), `pagead2.googlesyndication.com` (`142.250.154.156`), `pagead2.googlesyndication.com` (`142.250.154.157`), `www.googletagmanager.com` (`142.250.154.97`) |
-| `142.250.155.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.156.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.157.0/24` | `142.250.0.0/15` | `fonts.googleapis.com` (`142.250.157.95`) |
-| `142.250.158.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.159.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.176.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.250.176.66`) |
-| `142.250.178.0/24` | `142.250.0.0/15` | `fonts.gstatic.com` (`142.250.178.35`), `fonts.gstatic.com` (`142.250.178.67`), `fonts.gstatic.com` (`142.250.178.99`), `googleads.g.doubleclick.net` (`142.250.178.2`), `www.google-analytics.com` (`142.250.178.110`), `www.google-analytics.com` (`142.250.178.14`) |
-| `142.250.179.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.180.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.181.0/24` | `142.250.0.0/15` | `analytics.google.com` (`142.250.181.142`), `fonts.googleapis.com` (`142.250.181.170`), `googleads.g.doubleclick.net` (`142.250.181.162`) |
-| `142.250.182.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.183.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.184.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.185.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.186.0/24` | `142.250.0.0/15` | `www.google.ru` (`142.250.186.227`) |
-| `142.250.188.0/24` | `142.250.0.0/15` | `googleads.g.doubleclick.net` (`142.250.188.2`) |
-| `142.250.189.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.190.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.250.190.230`), `analytics.google.com` (`142.250.190.238`) |
-| `142.250.196.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.199.0/24` | `142.250.0.0/15` | `fonts.gstatic.com` (`142.250.199.227`), `googleads.g.doubleclick.net` (`142.250.199.194`), `pagead2.googlesyndication.com` (`142.250.199.194`) |
-| `142.250.200.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.201.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.203.0/24` | `142.250.0.0/15` | `analytics.google.com` (`142.250.203.206`), `fonts.gstatic.com` (`142.250.203.195`) |
-| `142.250.204.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.250.204.102`), `analytics.google.com` (`142.250.204.206`), `fonts.gstatic.com` (`142.250.204.227`), `pagead2.googlesyndication.com` (`142.250.204.162`), `pagead2.googlesyndication.com` (`142.250.204.226`), `pagead2.googlesyndication.com` (`142.250.204.66`), `www.google-analytics.com` (`142.250.204.174`), `www.google.ru` (`142.250.204.99`), `www.googletagmanager.com` (`142.250.204.200`) |
-| `142.250.205.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.206.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.207.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.216.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.217.0/24` | `142.250.0.0/15` | `fonts.googleapis.com` (`142.250.217.10`), `pagead2.googlesyndication.com` (`142.250.217.130`), `www.googletagmanager.com` (`142.250.217.136`), `www.gstatic.com` (`142.250.217.3`) |
-| `142.250.218.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.250.219.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.250.219.198`) |
-| `142.251.0.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.1.0/24` | `142.250.0.0/15` | `stats.g.doubleclick.net` (`142.251.1.154`), `stats.g.doubleclick.net` (`142.251.1.155`), `stats.g.doubleclick.net` (`142.251.1.156`), `stats.g.doubleclick.net` (`142.251.1.157`), `www.google-analytics.com` (`142.251.1.100`), `www.google-analytics.com` (`142.251.1.101`), `www.google-analytics.com` (`142.251.1.102`), `www.google-analytics.com` (`142.251.1.113`), `www.google-analytics.com` (`142.251.1.138`), `www.google-analytics.com` (`142.251.1.139`) |
-| `142.251.2.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.4.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.5.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.6.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.8.0/24` | `142.250.0.0/15` | `stats.g.doubleclick.net` (`142.251.8.156`), `stats.g.doubleclick.net` (`142.251.8.157`) |
-| `142.251.9.0/24` | `142.250.0.0/15` | `stats.g.doubleclick.net` (`142.251.9.154`), `stats.g.doubleclick.net` (`142.251.9.155`), `stats.g.doubleclick.net` (`142.251.9.156`), `stats.g.doubleclick.net` (`142.251.9.157`) |
-| `142.251.10.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.10.148`), `ad.doubleclick.net` (`142.251.10.149`), `fonts.gstatic.com` (`142.251.10.94`), `googleads.g.doubleclick.net` (`142.251.10.154`), `googleads.g.doubleclick.net` (`142.251.10.155`), `googleads.g.doubleclick.net` (`142.251.10.156`), `googleads.g.doubleclick.net` (`142.251.10.157`), `www.google-analytics.com` (`142.251.10.100`), `www.google-analytics.com` (`142.251.10.101`), `www.google-analytics.com` (`142.251.10.102`), `www.google-analytics.com` (`142.251.10.113`), `www.google-analytics.com` (`142.251.10.138`), `www.google-analytics.com` (`142.251.10.139`), `www.googletagmanager.com` (`142.251.10.97`) |
-| `142.251.11.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.12.0/24` | `142.250.0.0/15` | `fonts.gstatic.com` (`142.251.12.94`), `googleads.g.doubleclick.net` (`142.251.12.154`), `googleads.g.doubleclick.net` (`142.251.12.155`), `googleads.g.doubleclick.net` (`142.251.12.156`), `googleads.g.doubleclick.net` (`142.251.12.157`), `pagead2.googlesyndication.com` (`142.251.12.154`), `pagead2.googlesyndication.com` (`142.251.12.155`), `pagead2.googlesyndication.com` (`142.251.12.156`), `pagead2.googlesyndication.com` (`142.251.12.157`), `www.googletagmanager.com` (`142.251.12.97`) |
-| `142.251.13.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.13.148`), `ad.doubleclick.net` (`142.251.13.149`), `analytics.google.com` (`142.251.13.100`), `analytics.google.com` (`142.251.13.101`), `analytics.google.com` (`142.251.13.102`), `analytics.google.com` (`142.251.13.113`), `analytics.google.com` (`142.251.13.138`), `analytics.google.com` (`142.251.13.139`), `fonts.gstatic.com` (`142.251.13.94`), `googleads.g.doubleclick.net` (`142.251.13.154`), `googleads.g.doubleclick.net` (`142.251.13.155`), `googleads.g.doubleclick.net` (`142.251.13.156`), `googleads.g.doubleclick.net` (`142.251.13.157`), `pagead2.googlesyndication.com` (`142.251.13.154`), `pagead2.googlesyndication.com` (`142.251.13.155`), `pagead2.googlesyndication.com` (`142.251.13.156`), `pagead2.googlesyndication.com` (`142.251.13.157`), `www.google-analytics.com` (`142.251.13.100`), `www.google-analytics.com` (`142.251.13.101`), `www.google-analytics.com` (`142.251.13.102`), `www.google-analytics.com` (`142.251.13.113`), `www.google-analytics.com` (`142.251.13.138`), `www.google-analytics.com` (`142.251.13.139`), `www.google.ru` (`142.251.13.94`) |
-| `142.251.14.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.14.148`), `ad.doubleclick.net` (`142.251.14.149`), `analytics.google.com` (`142.251.14.100`), `analytics.google.com` (`142.251.14.101`), `analytics.google.com` (`142.251.14.102`), `analytics.google.com` (`142.251.14.113`), `analytics.google.com` (`142.251.14.138`), `analytics.google.com` (`142.251.14.139`), `fonts.googleapis.com` (`142.251.14.95`), `pagead2.googlesyndication.com` (`142.251.14.154`), `pagead2.googlesyndication.com` (`142.251.14.155`), `pagead2.googlesyndication.com` (`142.251.14.156`), `pagead2.googlesyndication.com` (`142.251.14.157`), `www.google-analytics.com` (`142.251.14.100`), `www.google-analytics.com` (`142.251.14.101`), `www.google-analytics.com` (`142.251.14.102`), `www.google-analytics.com` (`142.251.14.113`), `www.google-analytics.com` (`142.251.14.138`), `www.google-analytics.com` (`142.251.14.139`), `www.google.ru` (`142.251.14.94`), `www.googletagmanager.com` (`142.251.14.97`), `www.gstatic.com` (`142.251.14.94`) |
-| `142.251.15.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.16.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.17.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.18.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.19.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.20.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.20.148`), `ad.doubleclick.net` (`142.251.20.149`), `analytics.google.com` (`142.251.20.100`), `analytics.google.com` (`142.251.20.101`), `analytics.google.com` (`142.251.20.102`), `analytics.google.com` (`142.251.20.113`), `analytics.google.com` (`142.251.20.138`), `analytics.google.com` (`142.251.20.139`), `fonts.googleapis.com` (`142.251.20.95`), `fonts.gstatic.com` (`142.251.20.94`), `googleads.g.doubleclick.net` (`142.251.20.154`), `googleads.g.doubleclick.net` (`142.251.20.155`), `googleads.g.doubleclick.net` (`142.251.20.156`), `googleads.g.doubleclick.net` (`142.251.20.157`), `pagead2.googlesyndication.com` (`142.251.20.154`), `pagead2.googlesyndication.com` (`142.251.20.155`), `pagead2.googlesyndication.com` (`142.251.20.156`), `pagead2.googlesyndication.com` (`142.251.20.157`), `www.google-analytics.com` (`142.251.20.100`), `www.google-analytics.com` (`142.251.20.101`), `www.google-analytics.com` (`142.251.20.102`), `www.google-analytics.com` (`142.251.20.113`), `www.google-analytics.com` (`142.251.20.138`), `www.google-analytics.com` (`142.251.20.139`), `www.google.ru` (`142.251.20.94`), `www.googletagmanager.com` (`142.251.20.97`), `www.gstatic.com` (`142.251.20.94`) |
-| `142.251.21.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.22.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.23.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.23.148`), `ad.doubleclick.net` (`142.251.23.149`), `googleads.g.doubleclick.net` (`142.251.23.154`), `googleads.g.doubleclick.net` (`142.251.23.155`), `googleads.g.doubleclick.net` (`142.251.23.156`), `googleads.g.doubleclick.net` (`142.251.23.157`) |
-| `142.251.24.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.24.148`), `ad.doubleclick.net` (`142.251.24.149`), `googleads.g.doubleclick.net` (`142.251.24.154`), `googleads.g.doubleclick.net` (`142.251.24.155`), `googleads.g.doubleclick.net` (`142.251.24.156`), `googleads.g.doubleclick.net` (`142.251.24.157`), `pagead2.googlesyndication.com` (`142.251.24.154`), `pagead2.googlesyndication.com` (`142.251.24.155`), `pagead2.googlesyndication.com` (`142.251.24.156`), `pagead2.googlesyndication.com` (`142.251.24.157`) |
-| `142.251.25.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.26.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.27.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.27.148`), `ad.doubleclick.net` (`142.251.27.149`), `fonts.googleapis.com` (`142.251.27.95`), `fonts.gstatic.com` (`142.251.27.94`), `pagead2.googlesyndication.com` (`142.251.27.154`), `pagead2.googlesyndication.com` (`142.251.27.155`), `pagead2.googlesyndication.com` (`142.251.27.156`), `pagead2.googlesyndication.com` (`142.251.27.157`) |
-| `142.251.28.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.29.0/24` | `142.250.0.0/15` | `analytics.google.com` (`142.251.29.100`), `analytics.google.com` (`142.251.29.101`), `analytics.google.com` (`142.251.29.102`), `analytics.google.com` (`142.251.29.113`), `analytics.google.com` (`142.251.29.138`), `analytics.google.com` (`142.251.29.139`), `pagead2.googlesyndication.com` (`142.251.29.154`), `pagead2.googlesyndication.com` (`142.251.29.155`), `pagead2.googlesyndication.com` (`142.251.29.156`), `pagead2.googlesyndication.com` (`142.251.29.157`), `www.google-analytics.com` (`142.251.29.100`), `www.google-analytics.com` (`142.251.29.101`), `www.google-analytics.com` (`142.251.29.102`), `www.google-analytics.com` (`142.251.29.113`), `www.google-analytics.com` (`142.251.29.138`), `www.google-analytics.com` (`142.251.29.139`) |
-| `142.251.30.0/24` | `142.250.0.0/15` | `fonts.gstatic.com` (`142.251.30.94`), `googleads.g.doubleclick.net` (`142.251.30.154`), `googleads.g.doubleclick.net` (`142.251.30.155`), `googleads.g.doubleclick.net` (`142.251.30.156`), `googleads.g.doubleclick.net` (`142.251.30.157`), `www.gstatic.com` (`142.251.30.94`) |
-| `142.251.31.0/24` | `142.250.0.0/15` | `stats.g.doubleclick.net` (`142.251.31.154`), `stats.g.doubleclick.net` (`142.251.31.155`), `stats.g.doubleclick.net` (`142.251.31.156`), `stats.g.doubleclick.net` (`142.251.31.157`) |
-| `142.251.32.0/24` | `142.250.0.0/15` | `googleads.g.doubleclick.net` (`142.251.32.162`) |
-| `142.251.33.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.34.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.34.194`), `pagead2.googlesyndication.com` (`142.251.34.66`), `www.google.ru` (`142.251.34.67`), `www.gstatic.com` (`142.251.34.131`) |
-| `142.251.35.0/24` | `142.250.0.0/15` | `fonts.googleapis.com` (`142.251.35.106`), `fonts.gstatic.com` (`142.251.35.227`) |
-| `142.251.36.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.36.38`), `pagead2.googlesyndication.com` (`142.251.36.130`) |
-| `142.251.37.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.38.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.38.102`), `ad.doubleclick.net` (`142.251.38.134`), `ad.doubleclick.net` (`142.251.38.230`), `googleads.g.doubleclick.net` (`142.251.38.98`), `pagead2.googlesyndication.com` (`142.251.38.226`), `pagead2.googlesyndication.com` (`142.251.38.98`), `www.google-analytics.com` (`142.251.38.238`), `www.google-analytics.com` (`142.251.38.46`), `www.google.ru` (`142.251.38.99`), `www.googletagmanager.com` (`142.251.38.40`) |
-| `142.251.39.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.39.102`), `ad.doubleclick.net` (`142.251.39.134`), `ad.doubleclick.net` (`142.251.39.198`), `fonts.gstatic.com` (`142.251.39.131`), `googleads.g.doubleclick.net` (`142.251.39.130`), `googleads.g.doubleclick.net` (`142.251.39.194`), `pagead2.googlesyndication.com` (`142.251.39.130`), `pagead2.googlesyndication.com` (`142.251.39.98`), `www.google-analytics.com` (`142.251.39.142`), `www.google-analytics.com` (`142.251.39.174`) |
-| `142.251.40.0/24` | `142.250.0.0/15` | `fonts.gstatic.com` (`142.251.40.227`), `pagead2.googlesyndication.com` (`142.251.40.98`) |
-| `142.251.41.0/24` | `142.250.0.0/15` | `fonts.googleapis.com` (`142.251.41.10`), `fonts.gstatic.com` (`142.251.41.3`) |
-| `142.251.42.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.42.226`) |
-| `142.251.43.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.44.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.45.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.45.134`), `googleads.g.doubleclick.net` (`142.251.45.130`), `pagead2.googlesyndication.com` (`142.251.45.130`), `www.google-analytics.com` (`142.251.45.206`), `www.google.ru` (`142.251.45.195`) |
-| `142.251.46.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.46.70`) |
-| `142.251.47.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.48.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.49.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.50.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.51.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.52.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.53.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.54.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.55.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.56.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.57.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.58.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.59.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.60.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.61.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.62.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.63.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.96.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.97.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.98.0/24` | `142.250.0.0/15` | `fonts.googleapis.com` (`142.251.98.95`), `googleads.g.doubleclick.net` (`142.251.98.154`), `googleads.g.doubleclick.net` (`142.251.98.155`), `googleads.g.doubleclick.net` (`142.251.98.156`), `googleads.g.doubleclick.net` (`142.251.98.157`), `pagead2.googlesyndication.com` (`142.251.98.154`), `pagead2.googlesyndication.com` (`142.251.98.155`), `pagead2.googlesyndication.com` (`142.251.98.156`), `pagead2.googlesyndication.com` (`142.251.98.157`) |
-| `142.251.99.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.100.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.101.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.102.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.103.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.104.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.105.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.106.0/24` | `142.250.0.0/15` | `www.google-analytics.com` (`142.251.106.100`), `www.google-analytics.com` (`142.251.106.101`), `www.google-analytics.com` (`142.251.106.102`), `www.google-analytics.com` (`142.251.106.113`), `www.google-analytics.com` (`142.251.106.138`), `www.google-analytics.com` (`142.251.106.139`) |
-| `142.251.107.0/24` | `142.250.0.0/15` | `stats.g.doubleclick.net` (`142.251.107.154`), `stats.g.doubleclick.net` (`142.251.107.155`), `stats.g.doubleclick.net` (`142.251.107.156`), `stats.g.doubleclick.net` (`142.251.107.157`) |
-| `142.251.108.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.109.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.110.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.110.148`), `ad.doubleclick.net` (`142.251.110.149`), `fonts.gstatic.com` (`142.251.110.94`), `googleads.g.doubleclick.net` (`142.251.110.154`), `googleads.g.doubleclick.net` (`142.251.110.155`), `googleads.g.doubleclick.net` (`142.251.110.156`), `googleads.g.doubleclick.net` (`142.251.110.157`), `pagead2.googlesyndication.com` (`142.251.110.154`), `pagead2.googlesyndication.com` (`142.251.110.155`), `pagead2.googlesyndication.com` (`142.251.110.156`), `pagead2.googlesyndication.com` (`142.251.110.157`), `www.google-analytics.com` (`142.251.110.100`), `www.google-analytics.com` (`142.251.110.101`), `www.google-analytics.com` (`142.251.110.102`), `www.google-analytics.com` (`142.251.110.113`), `www.google-analytics.com` (`142.251.110.138`), `www.google-analytics.com` (`142.251.110.139`), `www.google.ru` (`142.251.110.94`), `www.googletagmanager.com` (`142.251.110.97`) |
-| `142.251.111.0/24` | `142.250.0.0/15` | `stats.g.doubleclick.net` (`142.251.111.154`), `stats.g.doubleclick.net` (`142.251.111.155`) |
-| `142.251.112.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.113.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.114.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.115.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.116.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.116.154`), `pagead2.googlesyndication.com` (`142.251.116.155`), `pagead2.googlesyndication.com` (`142.251.116.156`), `pagead2.googlesyndication.com` (`142.251.116.157`) |
-| `142.251.117.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.118.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.119.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.120.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.121.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.122.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.123.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.124.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.125.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.126.0/24` | `142.250.0.0/15` | `googleads.g.doubleclick.net` (`142.251.126.154`), `googleads.g.doubleclick.net` (`142.251.126.155`), `googleads.g.doubleclick.net` (`142.251.126.156`), `googleads.g.doubleclick.net` (`142.251.126.157`), `www.google.ru` (`142.251.126.94`) |
-| `142.251.127.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.127.154`), `pagead2.googlesyndication.com` (`142.251.127.155`), `pagead2.googlesyndication.com` (`142.251.127.156`), `pagead2.googlesyndication.com` (`142.251.127.157`), `stats.g.doubleclick.net` (`142.251.127.154`), `stats.g.doubleclick.net` (`142.251.127.155`), `stats.g.doubleclick.net` (`142.251.127.156`), `stats.g.doubleclick.net` (`142.251.127.157`) |
-| `142.251.128.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.129.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.129.194`) |
-| `142.251.132.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.140.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.140.230`), `googleads.g.doubleclick.net` (`142.251.140.98`), `www.google-analytics.com` (`142.251.140.238`) |
-| `142.251.141.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.141.38`), `googleads.g.doubleclick.net` (`142.251.141.34`), `pagead2.googlesyndication.com` (`142.251.141.34`), `www.google-analytics.com` (`142.251.141.174`), `www.google-analytics.com` (`142.251.141.46`) |
-| `142.251.143.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.143.134`), `googleads.g.doubleclick.net` (`142.251.143.130`), `googleads.g.doubleclick.net` (`142.251.143.2`), `pagead2.googlesyndication.com` (`142.251.143.130`), `pagead2.googlesyndication.com` (`142.251.143.2`) |
-| `142.251.144.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.145.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.146.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.147.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.148.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.149.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.150.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.150.155`), `www.google.com` (`142.251.150.119`), `www.gstatic.com` (`142.251.150.120`) |
-| `142.251.151.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.151.155`), `www.google.com` (`142.251.151.119`), `www.gstatic.com` (`142.251.151.120`) |
-| `142.251.152.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.152.155`), `www.google.com` (`142.251.152.119`), `www.gstatic.com` (`142.251.152.120`) |
-| `142.251.153.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.153.155`), `www.google.com` (`142.251.153.119`), `www.gstatic.com` (`142.251.153.120`) |
-| `142.251.154.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.154.155`), `www.google.com` (`142.251.154.119`), `www.gstatic.com` (`142.251.154.120`) |
-| `142.251.155.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.155.155`), `www.google.com` (`142.251.155.119`), `www.gstatic.com` (`142.251.155.120`) |
-| `142.251.156.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.156.155`), `www.google.com` (`142.251.156.119`), `www.gstatic.com` (`142.251.156.120`) |
-| `142.251.157.0/24` | `142.250.0.0/15` | `pagead2.googlesyndication.com` (`142.251.157.155`), `www.google.com` (`142.251.157.119`), `www.gstatic.com` (`142.251.157.120`) |
-| `142.251.158.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.159.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.160.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.161.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.162.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.163.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.164.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.165.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.166.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.167.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.168.0/24` | `142.250.0.0/15` | `googleads.g.doubleclick.net` (`142.251.168.154`), `googleads.g.doubleclick.net` (`142.251.168.155`), `googleads.g.doubleclick.net` (`142.251.168.156`), `googleads.g.doubleclick.net` (`142.251.168.157`) |
-| `142.251.169.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.170.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.171.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.172.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.173.0/24` | `142.250.0.0/15` | `stats.g.doubleclick.net` (`142.251.173.154`), `stats.g.doubleclick.net` (`142.251.173.155`), `stats.g.doubleclick.net` (`142.251.173.156`), `stats.g.doubleclick.net` (`142.251.173.157`) |
-| `142.251.174.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.175.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.175.148`), `ad.doubleclick.net` (`142.251.175.149`), `googleads.g.doubleclick.net` (`142.251.175.154`), `googleads.g.doubleclick.net` (`142.251.175.155`), `googleads.g.doubleclick.net` (`142.251.175.156`), `googleads.g.doubleclick.net` (`142.251.175.157`), `stats.g.doubleclick.net` (`142.251.175.154`), `stats.g.doubleclick.net` (`142.251.175.155`), `stats.g.doubleclick.net` (`142.251.175.156`), `stats.g.doubleclick.net` (`142.251.175.157`), `www.gstatic.com` (`142.251.175.94`) |
-| `142.251.176.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.177.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.178.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.179.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.180.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.181.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.182.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.183.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.184.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.185.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.186.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.186.148`), `ad.doubleclick.net` (`142.251.186.149`), `pagead2.googlesyndication.com` (`142.251.186.154`), `pagead2.googlesyndication.com` (`142.251.186.155`), `pagead2.googlesyndication.com` (`142.251.186.156`), `pagead2.googlesyndication.com` (`142.251.186.157`) |
-| `142.251.187.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.188.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.189.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.190.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.191.0/24` | `142.250.0.0/15` | Нет наблюдений |
-| `142.251.208.0/24` | `142.250.0.0/15` | `ad.doubleclick.net` (`142.251.208.102`), `pagead2.googlesyndication.com` (`142.251.208.98`), `www.google-analytics.com` (`142.251.208.110`), `www.google.ru` (`142.251.208.99`), `www.googletagmanager.com` (`142.251.208.104`), `www.googletagmanager.com` (`142.251.208.136`), `www.googletagmanager.com` (`142.251.208.232`) |
-| `142.251.209.0/24` | `142.250.0.0/15` | `analytics.google.com` (`142.251.209.14`), `fonts.googleapis.com` (`142.251.209.42`), `fonts.gstatic.com` (`142.251.209.35`), `fonts.gstatic.com` (`142.251.209.99`), `pagead2.googlesyndication.com` (`142.251.209.130`), `pagead2.googlesyndication.com` (`142.251.209.226`), `pagead2.googlesyndication.com` (`142.251.209.98`), `www.google.ru` (`142.251.209.99`), `www.googletagmanager.com` (`142.251.209.8`), `www.gstatic.com` (`142.251.209.3`), `www.gstatic.com` (`142.251.209.67`) |
-| `142.251.211.0/24` | `142.250.0.0/15` | `googleads.g.doubleclick.net` (`142.251.211.194`), `googleads.g.doubleclick.net` (`142.251.211.226`), `pagead2.googlesyndication.com` (`142.251.211.162`), `pagead2.googlesyndication.com` (`142.251.211.226`), `pagead2.googlesyndication.com` (`142.251.211.66`) |
-| `142.251.215.0/24` | `142.250.0.0/15` | `analytics.google.com` (`142.251.215.46`), `googleads.g.doubleclick.net` (`142.251.215.226`), `pagead2.googlesyndication.com` (`142.251.215.34`), `www.googletagmanager.com` (`142.251.215.200`) |
-| `172.217.0.0/16` | `172.217.0.0/16` | `ad.doubleclick.net` (`172.217.162.102`), `ad.doubleclick.net` (`172.217.168.134`), `ad.doubleclick.net` (`172.217.171.102`), `ad.doubleclick.net` (`172.217.171.70`), `ad.doubleclick.net` (`172.217.19.230`), `ad.doubleclick.net` (`172.217.20.166`), `ad.doubleclick.net` (`172.217.208.148`), `ad.doubleclick.net` (`172.217.208.149`), `ad.doubleclick.net` (`172.217.21.230`), `ad.doubleclick.net` (`172.217.23.230`), `analytics.google.com` (`172.217.16.142`), `analytics.google.com` (`172.217.171.110`), `analytics.google.com` (`172.217.208.100`), `analytics.google.com` (`172.217.208.101`), `analytics.google.com` (`172.217.208.102`), `analytics.google.com` (`172.217.208.113`), `analytics.google.com` (`172.217.208.138`), `analytics.google.com` (`172.217.208.139`), `analytics.google.com` (`172.217.22.110`), `fonts.googleapis.com` (`172.217.194.95`), `fonts.googleapis.com` (`172.217.208.95`), `fonts.googleapis.com` (`172.217.23.74`), `fonts.gstatic.com` (`172.217.17.195`), `fonts.gstatic.com` (`172.217.20.163`), `fonts.gstatic.com` (`172.217.20.35`), `fonts.gstatic.com` (`172.217.30.99`), `googleads.g.doubleclick.net` (`172.217.171.34`), `googleads.g.doubleclick.net` (`172.217.19.162`), `googleads.g.doubleclick.net` (`172.217.19.226`), `googleads.g.doubleclick.net` (`172.217.194.154`), `googleads.g.doubleclick.net` (`172.217.194.155`), `googleads.g.doubleclick.net` (`172.217.194.156`), `googleads.g.doubleclick.net` (`172.217.194.157`), `googleads.g.doubleclick.net` (`172.217.20.162`), `googleads.g.doubleclick.net` (`172.217.20.34`), `googleads.g.doubleclick.net` (`172.217.20.66`), `googleads.g.doubleclick.net` (`172.217.208.154`), `googleads.g.doubleclick.net` (`172.217.208.155`), `googleads.g.doubleclick.net` (`172.217.208.156`), `googleads.g.doubleclick.net` (`172.217.208.157`), `googleads.g.doubleclick.net` (`172.217.21.194`), `googleads.g.doubleclick.net` (`172.217.21.226`), `googleads.g.doubleclick.net` (`172.217.22.34`), `googleads.g.doubleclick.net` (`172.217.23.130`), `googleads.g.doubleclick.net` (`172.217.29.66`), `pagead2.googlesyndication.com` (`172.217.16.130`), `pagead2.googlesyndication.com` (`172.217.162.162`), `pagead2.googlesyndication.com` (`172.217.165.194`), `pagead2.googlesyndication.com` (`172.217.17.34`), `pagead2.googlesyndication.com` (`172.217.171.34`), `pagead2.googlesyndication.com` (`172.217.171.66`), `pagead2.googlesyndication.com` (`172.217.19.226`), `pagead2.googlesyndication.com` (`172.217.19.2`), `pagead2.googlesyndication.com` (`172.217.194.154`), `pagead2.googlesyndication.com` (`172.217.194.155`), `pagead2.googlesyndication.com` (`172.217.194.156`), `pagead2.googlesyndication.com` (`172.217.194.157`), `pagead2.googlesyndication.com` (`172.217.20.162`), `pagead2.googlesyndication.com` (`172.217.20.66`), `pagead2.googlesyndication.com` (`172.217.208.154`), `pagead2.googlesyndication.com` (`172.217.208.155`), `pagead2.googlesyndication.com` (`172.217.208.156`), `pagead2.googlesyndication.com` (`172.217.208.157`), `pagead2.googlesyndication.com` (`172.217.21.226`), `pagead2.googlesyndication.com` (`172.217.22.34`), `pagead2.googlesyndication.com` (`172.217.23.226`), `pagead2.googlesyndication.com` (`172.217.28.98`), `pagead2.googlesyndication.com` (`172.217.72.154`), `pagead2.googlesyndication.com` (`172.217.72.155`), `pagead2.googlesyndication.com` (`172.217.72.156`), `pagead2.googlesyndication.com` (`172.217.72.157`), `pagead2.googlesyndication.com` (`172.217.76.154`), `pagead2.googlesyndication.com` (`172.217.76.155`), `pagead2.googlesyndication.com` (`172.217.76.156`), `pagead2.googlesyndication.com` (`172.217.76.157`), `www.google-analytics.com` (`172.217.194.100`), `www.google-analytics.com` (`172.217.194.101`), `www.google-analytics.com` (`172.217.194.102`), `www.google-analytics.com` (`172.217.194.113`), `www.google-analytics.com` (`172.217.194.138`), `www.google-analytics.com` (`172.217.194.139`), `www.google-analytics.com` (`172.217.20.174`), `www.google-analytics.com` (`172.217.20.78`), `www.google-analytics.com` (`172.217.22.174`), `www.google-analytics.com` (`172.217.29.238`), `www.google.ru` (`172.217.16.131`), `www.google.ru` (`172.217.16.227`), `www.google.ru` (`172.217.18.99`), `www.google.ru` (`172.217.19.3`), `www.google.ru` (`172.217.20.99`), `www.google.ru` (`172.217.208.94`), `www.google.ru` (`172.217.22.99`), `www.google.ru` (`172.217.23.163`), `www.google.ru` (`172.217.29.195`), `www.googletagmanager.com` (`172.217.17.40`), `www.googletagmanager.com` (`172.217.20.168`), `www.googletagmanager.com` (`172.217.20.72`), `www.googletagmanager.com` (`172.217.22.168`), `www.googletagmanager.com` (`172.217.23.136`), `www.googletagmanager.com` (`172.217.23.232`), `www.googletagmanager.com` (`172.217.30.72`), `www.gstatic.com` (`172.217.20.67`), `www.gstatic.com` (`172.217.22.99`), `www.gstatic.com` (`172.217.30.3`), `www.gstatic.com` (`172.217.72.94`) |
-| `172.217.0.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.1.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.2.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.3.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.4.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.5.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.6.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.7.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.8.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.9.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.10.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.11.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.12.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.13.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.14.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.15.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.16.0/24` | `172.217.0.0/16` | `analytics.google.com` (`172.217.16.142`), `pagead2.googlesyndication.com` (`172.217.16.130`), `www.google.ru` (`172.217.16.131`), `www.google.ru` (`172.217.16.227`) |
-| `172.217.17.0/24` | `172.217.0.0/16` | `fonts.gstatic.com` (`172.217.17.195`), `pagead2.googlesyndication.com` (`172.217.17.34`), `www.googletagmanager.com` (`172.217.17.40`) |
-| `172.217.18.0/24` | `172.217.0.0/16` | `www.google.ru` (`172.217.18.99`) |
-| `172.217.19.0/24` | `172.217.0.0/16` | `ad.doubleclick.net` (`172.217.19.230`), `googleads.g.doubleclick.net` (`172.217.19.162`), `googleads.g.doubleclick.net` (`172.217.19.226`), `pagead2.googlesyndication.com` (`172.217.19.226`), `pagead2.googlesyndication.com` (`172.217.19.2`), `www.google.ru` (`172.217.19.3`) |
-| `172.217.20.0/24` | `172.217.0.0/16` | `ad.doubleclick.net` (`172.217.20.166`), `fonts.gstatic.com` (`172.217.20.163`), `fonts.gstatic.com` (`172.217.20.35`), `googleads.g.doubleclick.net` (`172.217.20.162`), `googleads.g.doubleclick.net` (`172.217.20.34`), `googleads.g.doubleclick.net` (`172.217.20.66`), `pagead2.googlesyndication.com` (`172.217.20.162`), `pagead2.googlesyndication.com` (`172.217.20.66`), `www.google-analytics.com` (`172.217.20.174`), `www.google-analytics.com` (`172.217.20.78`), `www.google.ru` (`172.217.20.99`), `www.googletagmanager.com` (`172.217.20.168`), `www.googletagmanager.com` (`172.217.20.72`), `www.gstatic.com` (`172.217.20.67`) |
-| `172.217.21.0/24` | `172.217.0.0/16` | `ad.doubleclick.net` (`172.217.21.230`), `googleads.g.doubleclick.net` (`172.217.21.194`), `googleads.g.doubleclick.net` (`172.217.21.226`), `pagead2.googlesyndication.com` (`172.217.21.226`) |
-| `172.217.22.0/24` | `172.217.0.0/16` | `analytics.google.com` (`172.217.22.110`), `googleads.g.doubleclick.net` (`172.217.22.34`), `pagead2.googlesyndication.com` (`172.217.22.34`), `www.google-analytics.com` (`172.217.22.174`), `www.google.ru` (`172.217.22.99`), `www.googletagmanager.com` (`172.217.22.168`), `www.gstatic.com` (`172.217.22.99`) |
-| `172.217.23.0/24` | `172.217.0.0/16` | `ad.doubleclick.net` (`172.217.23.230`), `fonts.googleapis.com` (`172.217.23.74`), `googleads.g.doubleclick.net` (`172.217.23.130`), `pagead2.googlesyndication.com` (`172.217.23.226`), `www.google.ru` (`172.217.23.163`), `www.googletagmanager.com` (`172.217.23.136`), `www.googletagmanager.com` (`172.217.23.232`) |
-| `172.217.24.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.25.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.26.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.27.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.28.0/24` | `172.217.0.0/16` | `pagead2.googlesyndication.com` (`172.217.28.98`) |
-| `172.217.29.0/24` | `172.217.0.0/16` | `googleads.g.doubleclick.net` (`172.217.29.66`), `www.google-analytics.com` (`172.217.29.238`), `www.google.ru` (`172.217.29.195`) |
-| `172.217.30.0/24` | `172.217.0.0/16` | `fonts.gstatic.com` (`172.217.30.99`), `www.googletagmanager.com` (`172.217.30.72`), `www.gstatic.com` (`172.217.30.3`) |
-| `172.217.31.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.64.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.65.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.66.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.67.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.68.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.69.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.70.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.71.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.72.0/24` | `172.217.0.0/16` | `pagead2.googlesyndication.com` (`172.217.72.154`), `pagead2.googlesyndication.com` (`172.217.72.155`), `pagead2.googlesyndication.com` (`172.217.72.156`), `pagead2.googlesyndication.com` (`172.217.72.157`), `www.gstatic.com` (`172.217.72.94`) |
-| `172.217.73.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.74.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.75.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.76.0/24` | `172.217.0.0/16` | `pagead2.googlesyndication.com` (`172.217.76.154`), `pagead2.googlesyndication.com` (`172.217.76.155`), `pagead2.googlesyndication.com` (`172.217.76.156`), `pagead2.googlesyndication.com` (`172.217.76.157`) |
-| `172.217.77.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.78.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.79.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.112.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.113.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.114.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.115.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.116.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.117.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.118.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.119.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.128.0/19` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.168.0/24` | `172.217.0.0/16` | `ad.doubleclick.net` (`172.217.168.134`) |
-| `172.217.169.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.171.0/24` | `172.217.0.0/16` | `ad.doubleclick.net` (`172.217.171.102`), `ad.doubleclick.net` (`172.217.171.70`), `analytics.google.com` (`172.217.171.110`), `googleads.g.doubleclick.net` (`172.217.171.34`), `pagead2.googlesyndication.com` (`172.217.171.34`), `pagead2.googlesyndication.com` (`172.217.171.66`) |
-| `172.217.176.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.177.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.178.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.179.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.192.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.193.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.194.0/24` | `172.217.0.0/16` | `fonts.googleapis.com` (`172.217.194.95`), `googleads.g.doubleclick.net` (`172.217.194.154`), `googleads.g.doubleclick.net` (`172.217.194.155`), `googleads.g.doubleclick.net` (`172.217.194.156`), `googleads.g.doubleclick.net` (`172.217.194.157`), `pagead2.googlesyndication.com` (`172.217.194.154`), `pagead2.googlesyndication.com` (`172.217.194.155`), `pagead2.googlesyndication.com` (`172.217.194.156`), `pagead2.googlesyndication.com` (`172.217.194.157`), `www.google-analytics.com` (`172.217.194.100`), `www.google-analytics.com` (`172.217.194.101`), `www.google-analytics.com` (`172.217.194.102`), `www.google-analytics.com` (`172.217.194.113`), `www.google-analytics.com` (`172.217.194.138`), `www.google-analytics.com` (`172.217.194.139`) |
-| `172.217.195.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.196.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.197.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.198.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.199.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.200.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.201.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.202.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.203.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.204.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.205.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.206.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.207.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.208.0/24` | `172.217.0.0/16` | `ad.doubleclick.net` (`172.217.208.148`), `ad.doubleclick.net` (`172.217.208.149`), `analytics.google.com` (`172.217.208.100`), `analytics.google.com` (`172.217.208.101`), `analytics.google.com` (`172.217.208.102`), `analytics.google.com` (`172.217.208.113`), `analytics.google.com` (`172.217.208.138`), `analytics.google.com` (`172.217.208.139`), `fonts.googleapis.com` (`172.217.208.95`), `googleads.g.doubleclick.net` (`172.217.208.154`), `googleads.g.doubleclick.net` (`172.217.208.155`), `googleads.g.doubleclick.net` (`172.217.208.156`), `googleads.g.doubleclick.net` (`172.217.208.157`), `pagead2.googlesyndication.com` (`172.217.208.154`), `pagead2.googlesyndication.com` (`172.217.208.155`), `pagead2.googlesyndication.com` (`172.217.208.156`), `pagead2.googlesyndication.com` (`172.217.208.157`), `www.google.ru` (`172.217.208.94`) |
-| `172.217.209.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.210.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.211.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.212.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.213.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.214.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.215.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.216.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.217.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.218.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.219.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.220.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.221.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.222.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.223.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.253.0.0/16` | `172.253.63.0/24`, `172.253.115.0/24`, `172.253.118.0/24`, `172.253.124.0/24`, `172.253.135.0/24`, `172.253.143.0/24`, `172.253.144.0/24`, `172.253.152.0/24`, `172.253.156.0/23` | `ad.doubleclick.net` (`172.253.118.148`), `ad.doubleclick.net` (`172.253.118.149`), `ad.doubleclick.net` (`172.253.156.148`), `ad.doubleclick.net` (`172.253.156.149`), `analytics.google.com` (`172.253.118.100`), `analytics.google.com` (`172.253.118.101`), `analytics.google.com` (`172.253.118.102`), `analytics.google.com` (`172.253.118.113`), `analytics.google.com` (`172.253.118.138`), `analytics.google.com` (`172.253.118.139`), `googleads.g.doubleclick.net` (`172.253.118.154`), `googleads.g.doubleclick.net` (`172.253.118.155`), `googleads.g.doubleclick.net` (`172.253.118.156`), `googleads.g.doubleclick.net` (`172.253.118.157`), `googleads.g.doubleclick.net` (`172.253.135.154`), `googleads.g.doubleclick.net` (`172.253.135.155`), `googleads.g.doubleclick.net` (`172.253.135.156`), `googleads.g.doubleclick.net` (`172.253.135.157`), `pagead2.googlesyndication.com` (`172.253.124.154`), `pagead2.googlesyndication.com` (`172.253.124.155`), `pagead2.googlesyndication.com` (`172.253.124.156`), `pagead2.googlesyndication.com` (`172.253.124.157`), `stats.g.doubleclick.net` (`172.253.143.154`), `stats.g.doubleclick.net` (`172.253.143.155`), `stats.g.doubleclick.net` (`172.253.143.156`), `stats.g.doubleclick.net` (`172.253.143.157`), `stats.g.doubleclick.net` (`172.253.156.154`), `stats.g.doubleclick.net` (`172.253.156.155`), `stats.g.doubleclick.net` (`172.253.156.156`), `stats.g.doubleclick.net` (`172.253.156.157`), `stats.g.doubleclick.net` (`172.253.157.154`), `stats.g.doubleclick.net` (`172.253.157.155`), `stats.g.doubleclick.net` (`172.253.157.156`), `stats.g.doubleclick.net` (`172.253.157.157`), `www.google-analytics.com` (`172.253.135.100`), `www.google-analytics.com` (`172.253.135.101`), `www.google-analytics.com` (`172.253.135.102`), `www.google-analytics.com` (`172.253.135.113`), `www.google-analytics.com` (`172.253.135.138`), `www.google-analytics.com` (`172.253.135.139`), `www.google.ru` (`172.253.124.94`), `www.googletagmanager.com` (`172.253.124.97`), `www.googletagmanager.com` (`172.253.144.97`), `www.gstatic.com` (`172.253.118.94`) |
-| `172.253.63.0/24` | `172.253.63.0/24` | Нет наблюдений |
-| `172.253.115.0/24` | `172.253.115.0/24` | Нет наблюдений |
-| `172.253.118.0/24` | `172.253.118.0/24` | `ad.doubleclick.net` (`172.253.118.148`), `ad.doubleclick.net` (`172.253.118.149`), `analytics.google.com` (`172.253.118.100`), `analytics.google.com` (`172.253.118.101`), `analytics.google.com` (`172.253.118.102`), `analytics.google.com` (`172.253.118.113`), `analytics.google.com` (`172.253.118.138`), `analytics.google.com` (`172.253.118.139`), `googleads.g.doubleclick.net` (`172.253.118.154`), `googleads.g.doubleclick.net` (`172.253.118.155`), `googleads.g.doubleclick.net` (`172.253.118.156`), `googleads.g.doubleclick.net` (`172.253.118.157`), `www.gstatic.com` (`172.253.118.94`) |
-| `172.253.124.0/24` | `172.253.124.0/24` | `pagead2.googlesyndication.com` (`172.253.124.154`), `pagead2.googlesyndication.com` (`172.253.124.155`), `pagead2.googlesyndication.com` (`172.253.124.156`), `pagead2.googlesyndication.com` (`172.253.124.157`), `www.google.ru` (`172.253.124.94`), `www.googletagmanager.com` (`172.253.124.97`) |
-| `172.253.135.0/24` | `172.253.135.0/24` | `googleads.g.doubleclick.net` (`172.253.135.154`), `googleads.g.doubleclick.net` (`172.253.135.155`), `googleads.g.doubleclick.net` (`172.253.135.156`), `googleads.g.doubleclick.net` (`172.253.135.157`), `www.google-analytics.com` (`172.253.135.100`), `www.google-analytics.com` (`172.253.135.101`), `www.google-analytics.com` (`172.253.135.102`), `www.google-analytics.com` (`172.253.135.113`), `www.google-analytics.com` (`172.253.135.138`), `www.google-analytics.com` (`172.253.135.139`) |
-| `172.253.143.0/24` | `172.253.143.0/24` | `stats.g.doubleclick.net` (`172.253.143.154`), `stats.g.doubleclick.net` (`172.253.143.155`), `stats.g.doubleclick.net` (`172.253.143.156`), `stats.g.doubleclick.net` (`172.253.143.157`) |
-| `172.253.144.0/24` | `172.253.144.0/24` | `www.googletagmanager.com` (`172.253.144.97`) |
-| `172.253.152.0/24` | `172.253.152.0/24` | Нет наблюдений |
-| `172.253.156.0/24` | `172.253.156.0/23` | `ad.doubleclick.net` (`172.253.156.148`), `ad.doubleclick.net` (`172.253.156.149`), `stats.g.doubleclick.net` (`172.253.156.154`), `stats.g.doubleclick.net` (`172.253.156.155`), `stats.g.doubleclick.net` (`172.253.156.156`), `stats.g.doubleclick.net` (`172.253.156.157`) |
-| `172.253.157.0/24` | `172.253.156.0/23` | `stats.g.doubleclick.net` (`172.253.157.154`), `stats.g.doubleclick.net` (`172.253.157.155`), `stats.g.doubleclick.net` (`172.253.157.156`), `stats.g.doubleclick.net` (`172.253.157.157`) |
-| `173.194.0.0/16` | `173.194.43.0/24`, `173.194.73.0/24`, `173.194.76.0/24`, `173.194.202.0/23`, `173.194.208.0/24`, `173.194.217.0/24`, `173.194.219.0/24`, `173.194.220.0/23`, `173.194.222.0/24` | `analytics.google.com` (`173.194.221.100`), `analytics.google.com` (`173.194.221.101`), `analytics.google.com` (`173.194.221.102`), `analytics.google.com` (`173.194.221.113`), `analytics.google.com` (`173.194.221.138`), `analytics.google.com` (`173.194.221.139`), `fonts.googleapis.com` (`173.194.208.95`), `fonts.googleapis.com` (`173.194.221.95`), `fonts.gstatic.com` (`173.194.219.94`), `pagead2.googlesyndication.com` (`173.194.222.154`), `pagead2.googlesyndication.com` (`173.194.222.155`), `pagead2.googlesyndication.com` (`173.194.222.156`), `pagead2.googlesyndication.com` (`173.194.222.157`), `pagead2.googlesyndication.com` (`173.194.73.154`), `pagead2.googlesyndication.com` (`173.194.73.155`), `pagead2.googlesyndication.com` (`173.194.73.156`), `pagead2.googlesyndication.com` (`173.194.73.157`), `stats.g.doubleclick.net` (`173.194.217.154`), `stats.g.doubleclick.net` (`173.194.217.155`), `stats.g.doubleclick.net` (`173.194.217.156`), `stats.g.doubleclick.net` (`173.194.217.157`), `stats.g.doubleclick.net` (`173.194.221.154`), `stats.g.doubleclick.net` (`173.194.221.155`), `stats.g.doubleclick.net` (`173.194.221.156`), `stats.g.doubleclick.net` (`173.194.221.157`), `stats.g.doubleclick.net` (`173.194.222.154`), `stats.g.doubleclick.net` (`173.194.222.155`), `stats.g.doubleclick.net` (`173.194.222.156`), `stats.g.doubleclick.net` (`173.194.222.157`), `www.google.ru` (`173.194.208.94`), `www.googletagmanager.com` (`173.194.220.97`) |
-| `173.194.43.0/24` | `173.194.43.0/24` | Нет наблюдений |
-| `173.194.73.0/24` | `173.194.73.0/24` | `pagead2.googlesyndication.com` (`173.194.73.154`), `pagead2.googlesyndication.com` (`173.194.73.155`), `pagead2.googlesyndication.com` (`173.194.73.156`), `pagead2.googlesyndication.com` (`173.194.73.157`) |
-| `173.194.76.0/24` | `173.194.76.0/24` | Нет наблюдений |
-| `173.194.202.0/24` | `173.194.202.0/23` | Нет наблюдений |
-| `173.194.203.0/24` | `173.194.202.0/23` | Нет наблюдений |
-| `173.194.208.0/24` | `173.194.208.0/24` | `fonts.googleapis.com` (`173.194.208.95`), `www.google.ru` (`173.194.208.94`) |
-| `173.194.217.0/24` | `173.194.217.0/24` | `stats.g.doubleclick.net` (`173.194.217.154`), `stats.g.doubleclick.net` (`173.194.217.155`), `stats.g.doubleclick.net` (`173.194.217.156`), `stats.g.doubleclick.net` (`173.194.217.157`) |
-| `173.194.219.0/24` | `173.194.219.0/24` | `fonts.gstatic.com` (`173.194.219.94`) |
-| `173.194.220.0/24` | `173.194.220.0/23` | `www.googletagmanager.com` (`173.194.220.97`) |
-| `173.194.221.0/24` | `173.194.220.0/23` | `analytics.google.com` (`173.194.221.100`), `analytics.google.com` (`173.194.221.101`), `analytics.google.com` (`173.194.221.102`), `analytics.google.com` (`173.194.221.113`), `analytics.google.com` (`173.194.221.138`), `analytics.google.com` (`173.194.221.139`), `fonts.googleapis.com` (`173.194.221.95`), `stats.g.doubleclick.net` (`173.194.221.154`), `stats.g.doubleclick.net` (`173.194.221.155`), `stats.g.doubleclick.net` (`173.194.221.156`), `stats.g.doubleclick.net` (`173.194.221.157`) |
-| `173.194.222.0/24` | `173.194.222.0/24` | `pagead2.googlesyndication.com` (`173.194.222.154`), `pagead2.googlesyndication.com` (`173.194.222.155`), `pagead2.googlesyndication.com` (`173.194.222.156`), `pagead2.googlesyndication.com` (`173.194.222.157`), `stats.g.doubleclick.net` (`173.194.222.154`), `stats.g.doubleclick.net` (`173.194.222.155`), `stats.g.doubleclick.net` (`173.194.222.156`), `stats.g.doubleclick.net` (`173.194.222.157`) |
-| `192.178.0.0/15` | `192.178.0.0/15` | `ad.doubleclick.net` (`192.178.183.148`), `ad.doubleclick.net` (`192.178.183.149`), `ad.doubleclick.net` (`192.178.223.148`), `ad.doubleclick.net` (`192.178.223.149`), `ad.doubleclick.net` (`192.178.24.166`), `ad.doubleclick.net` (`192.178.24.38`), `ad.doubleclick.net` (`192.178.24.70`), `ad.doubleclick.net` (`192.178.50.70`), `analytics.google.com` (`192.178.174.100`), `analytics.google.com` (`192.178.174.101`), `analytics.google.com` (`192.178.174.102`), `analytics.google.com` (`192.178.174.113`), `analytics.google.com` (`192.178.174.138`), `analytics.google.com` (`192.178.174.139`), `analytics.google.com` (`192.178.183.100`), `analytics.google.com` (`192.178.183.101`), `analytics.google.com` (`192.178.183.102`), `analytics.google.com` (`192.178.183.113`), `analytics.google.com` (`192.178.183.138`), `analytics.google.com` (`192.178.183.139`), `analytics.google.com` (`192.178.194.100`), `analytics.google.com` (`192.178.194.101`), `analytics.google.com` (`192.178.194.102`), `analytics.google.com` (`192.178.194.113`), `analytics.google.com` (`192.178.194.138`), `analytics.google.com` (`192.178.194.139`), `analytics.google.com` (`192.178.24.78`), `fonts.googleapis.com` (`192.178.170.95`), `fonts.googleapis.com` (`192.178.174.95`), `fonts.googleapis.com` (`192.178.183.95`), `fonts.googleapis.com` (`192.178.194.95`), `fonts.googleapis.com` (`192.178.203.95`), `fonts.googleapis.com` (`192.178.50.42`), `fonts.gstatic.com` (`192.178.194.94`), `fonts.gstatic.com` (`192.178.24.67`), `fonts.gstatic.com` (`192.178.25.227`), `googleads.g.doubleclick.net` (`192.178.183.154`), `googleads.g.doubleclick.net` (`192.178.183.155`), `googleads.g.doubleclick.net` (`192.178.183.156`), `googleads.g.doubleclick.net` (`192.178.183.157`), `googleads.g.doubleclick.net` (`192.178.220.154`), `googleads.g.doubleclick.net` (`192.178.220.155`), `googleads.g.doubleclick.net` (`192.178.220.156`), `googleads.g.doubleclick.net` (`192.178.220.157`), `googleads.g.doubleclick.net` (`192.178.24.2`), `googleads.g.doubleclick.net` (`192.178.24.98`), `googleads.g.doubleclick.net` (`192.178.25.226`), `googleads.g.doubleclick.net` (`192.178.50.66`), `pagead2.googlesyndication.com` (`192.178.183.154`), `pagead2.googlesyndication.com` (`192.178.183.155`), `pagead2.googlesyndication.com` (`192.178.183.156`), `pagead2.googlesyndication.com` (`192.178.183.157`), `pagead2.googlesyndication.com` (`192.178.193.154`), `pagead2.googlesyndication.com` (`192.178.193.155`), `pagead2.googlesyndication.com` (`192.178.193.156`), `pagead2.googlesyndication.com` (`192.178.193.157`), `pagead2.googlesyndication.com` (`192.178.194.154`), `pagead2.googlesyndication.com` (`192.178.194.155`), `pagead2.googlesyndication.com` (`192.178.194.156`), `pagead2.googlesyndication.com` (`192.178.194.157`), `pagead2.googlesyndication.com` (`192.178.220.154`), `pagead2.googlesyndication.com` (`192.178.220.155`), `pagead2.googlesyndication.com` (`192.178.220.156`), `pagead2.googlesyndication.com` (`192.178.220.157`), `pagead2.googlesyndication.com` (`192.178.223.154`), `pagead2.googlesyndication.com` (`192.178.223.155`), `pagead2.googlesyndication.com` (`192.178.223.156`), `pagead2.googlesyndication.com` (`192.178.223.157`), `pagead2.googlesyndication.com` (`192.178.24.130`), `pagead2.googlesyndication.com` (`192.178.24.162`), `pagead2.googlesyndication.com` (`192.178.24.2`), `pagead2.googlesyndication.com` (`192.178.24.34`), `pagead2.googlesyndication.com` (`192.178.24.66`), `pagead2.googlesyndication.com` (`192.178.25.98`), `pagead2.googlesyndication.com` (`192.178.50.34`), `stats.g.doubleclick.net` (`192.178.211.154`), `stats.g.doubleclick.net` (`192.178.211.155`), `stats.g.doubleclick.net` (`192.178.211.156`), `stats.g.doubleclick.net` (`192.178.211.157`), `stats.g.doubleclick.net` (`192.178.223.154`), `stats.g.doubleclick.net` (`192.178.223.155`), `stats.g.doubleclick.net` (`192.178.223.156`), `stats.g.doubleclick.net` (`192.178.223.157`), `stats.g.doubleclick.net` (`192.178.226.154`), `stats.g.doubleclick.net` (`192.178.226.155`), `stats.g.doubleclick.net` (`192.178.226.156`), `stats.g.doubleclick.net` (`192.178.226.157`), `www.google-analytics.com` (`192.178.183.100`), `www.google-analytics.com` (`192.178.183.101`), `www.google-analytics.com` (`192.178.183.102`), `www.google-analytics.com` (`192.178.183.113`), `www.google-analytics.com` (`192.178.183.138`), `www.google-analytics.com` (`192.178.183.139`), `www.google-analytics.com` (`192.178.194.100`), `www.google-analytics.com` (`192.178.194.101`), `www.google-analytics.com` (`192.178.194.102`), `www.google-analytics.com` (`192.178.194.113`), `www.google-analytics.com` (`192.178.194.138`), `www.google-analytics.com` (`192.178.194.139`), `www.google-analytics.com` (`192.178.25.238`), `www.google.ru` (`192.178.24.99`), `www.google.ru` (`192.178.25.227`), `www.googletagmanager.com` (`192.178.183.97`), `www.googletagmanager.com` (`192.178.194.97`), `www.googletagmanager.com` (`192.178.25.232`), `www.gstatic.com` (`192.178.170.94`), `www.gstatic.com` (`192.178.183.94`), `www.gstatic.com` (`192.178.24.131`) |
-| `192.178.40.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.41.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.42.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.43.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.128.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.129.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.130.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.131.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.132.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.133.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.134.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.135.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.136.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.137.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.138.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.139.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.140.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.141.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.142.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.143.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.144.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.145.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.146.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.147.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.148.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.149.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.150.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.151.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.152.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.153.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.154.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.155.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.156.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.157.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.158.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.159.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.160.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.161.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.162.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.163.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.164.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.165.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.166.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.167.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.168.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.169.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.170.0/24` | `192.178.0.0/15` | `fonts.googleapis.com` (`192.178.170.95`), `www.gstatic.com` (`192.178.170.94`) |
-| `192.178.171.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.172.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.173.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.174.0/24` | `192.178.0.0/15` | `analytics.google.com` (`192.178.174.100`), `analytics.google.com` (`192.178.174.101`), `analytics.google.com` (`192.178.174.102`), `analytics.google.com` (`192.178.174.113`), `analytics.google.com` (`192.178.174.138`), `analytics.google.com` (`192.178.174.139`), `fonts.googleapis.com` (`192.178.174.95`) |
-| `192.178.175.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.176.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.177.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.178.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.179.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.180.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.181.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.182.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.183.0/24` | `192.178.0.0/15` | `ad.doubleclick.net` (`192.178.183.148`), `ad.doubleclick.net` (`192.178.183.149`), `analytics.google.com` (`192.178.183.100`), `analytics.google.com` (`192.178.183.101`), `analytics.google.com` (`192.178.183.102`), `analytics.google.com` (`192.178.183.113`), `analytics.google.com` (`192.178.183.138`), `analytics.google.com` (`192.178.183.139`), `fonts.googleapis.com` (`192.178.183.95`), `googleads.g.doubleclick.net` (`192.178.183.154`), `googleads.g.doubleclick.net` (`192.178.183.155`), `googleads.g.doubleclick.net` (`192.178.183.156`), `googleads.g.doubleclick.net` (`192.178.183.157`), `pagead2.googlesyndication.com` (`192.178.183.154`), `pagead2.googlesyndication.com` (`192.178.183.155`), `pagead2.googlesyndication.com` (`192.178.183.156`), `pagead2.googlesyndication.com` (`192.178.183.157`), `www.google-analytics.com` (`192.178.183.100`), `www.google-analytics.com` (`192.178.183.101`), `www.google-analytics.com` (`192.178.183.102`), `www.google-analytics.com` (`192.178.183.113`), `www.google-analytics.com` (`192.178.183.138`), `www.google-analytics.com` (`192.178.183.139`), `www.googletagmanager.com` (`192.178.183.97`), `www.gstatic.com` (`192.178.183.94`) |
-| `192.178.184.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.185.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.186.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.187.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.188.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.189.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.190.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.191.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.192.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.193.0/24` | `192.178.0.0/15` | `pagead2.googlesyndication.com` (`192.178.193.154`), `pagead2.googlesyndication.com` (`192.178.193.155`), `pagead2.googlesyndication.com` (`192.178.193.156`), `pagead2.googlesyndication.com` (`192.178.193.157`) |
-| `192.178.194.0/24` | `192.178.0.0/15` | `analytics.google.com` (`192.178.194.100`), `analytics.google.com` (`192.178.194.101`), `analytics.google.com` (`192.178.194.102`), `analytics.google.com` (`192.178.194.113`), `analytics.google.com` (`192.178.194.138`), `analytics.google.com` (`192.178.194.139`), `fonts.googleapis.com` (`192.178.194.95`), `fonts.gstatic.com` (`192.178.194.94`), `pagead2.googlesyndication.com` (`192.178.194.154`), `pagead2.googlesyndication.com` (`192.178.194.155`), `pagead2.googlesyndication.com` (`192.178.194.156`), `pagead2.googlesyndication.com` (`192.178.194.157`), `www.google-analytics.com` (`192.178.194.100`), `www.google-analytics.com` (`192.178.194.101`), `www.google-analytics.com` (`192.178.194.102`), `www.google-analytics.com` (`192.178.194.113`), `www.google-analytics.com` (`192.178.194.138`), `www.google-analytics.com` (`192.178.194.139`), `www.googletagmanager.com` (`192.178.194.97`) |
-| `192.178.195.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.196.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.197.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.198.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.199.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.200.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.201.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.202.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.203.0/24` | `192.178.0.0/15` | `fonts.googleapis.com` (`192.178.203.95`) |
-| `192.178.204.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.205.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.206.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.207.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.208.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.209.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.210.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.211.0/24` | `192.178.0.0/15` | `stats.g.doubleclick.net` (`192.178.211.154`), `stats.g.doubleclick.net` (`192.178.211.155`), `stats.g.doubleclick.net` (`192.178.211.156`), `stats.g.doubleclick.net` (`192.178.211.157`) |
-| `192.178.212.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.213.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.214.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.215.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.216.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.217.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.218.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.219.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.220.0/24` | `192.178.0.0/15` | `googleads.g.doubleclick.net` (`192.178.220.154`), `googleads.g.doubleclick.net` (`192.178.220.155`), `googleads.g.doubleclick.net` (`192.178.220.156`), `googleads.g.doubleclick.net` (`192.178.220.157`), `pagead2.googlesyndication.com` (`192.178.220.154`), `pagead2.googlesyndication.com` (`192.178.220.155`), `pagead2.googlesyndication.com` (`192.178.220.156`), `pagead2.googlesyndication.com` (`192.178.220.157`) |
-| `192.178.221.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.222.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.223.0/24` | `192.178.0.0/15` | `ad.doubleclick.net` (`192.178.223.148`), `ad.doubleclick.net` (`192.178.223.149`), `pagead2.googlesyndication.com` (`192.178.223.154`), `pagead2.googlesyndication.com` (`192.178.223.155`), `pagead2.googlesyndication.com` (`192.178.223.156`), `pagead2.googlesyndication.com` (`192.178.223.157`), `stats.g.doubleclick.net` (`192.178.223.154`), `stats.g.doubleclick.net` (`192.178.223.155`), `stats.g.doubleclick.net` (`192.178.223.156`), `stats.g.doubleclick.net` (`192.178.223.157`) |
-| `192.178.224.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.225.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.226.0/24` | `192.178.0.0/15` | `stats.g.doubleclick.net` (`192.178.226.154`), `stats.g.doubleclick.net` (`192.178.226.155`), `stats.g.doubleclick.net` (`192.178.226.156`), `stats.g.doubleclick.net` (`192.178.226.157`) |
-| `192.178.227.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.228.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.229.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.230.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.231.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.232.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.233.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.234.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.235.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.236.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.237.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.238.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.178.239.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.16.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.17.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.18.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.19.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.20.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.21.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.22.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.23.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.24.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.25.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.26.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.27.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.28.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.29.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.30.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.31.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.32.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.33.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.34.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.35.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.36.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.37.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.38.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.39.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.48.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.49.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.50.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.51.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.52.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.53.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.54.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.55.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.56.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.57.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.58.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.59.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.60.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.61.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.62.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.63.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `192.179.80.0/24` | `192.178.0.0/15` | Нет наблюдений |
-| `209.85.128.0/17` | `209.85.233.0/24` | `fonts.gstatic.com` (`209.85.233.94`), `pagead2.googlesyndication.com` (`209.85.233.154`), `pagead2.googlesyndication.com` (`209.85.233.155`), `pagead2.googlesyndication.com` (`209.85.233.156`), `pagead2.googlesyndication.com` (`209.85.233.157`), `www.google.ru` (`209.85.233.94`) |
-| `209.85.233.0/24` | `209.85.233.0/24` | `fonts.gstatic.com` (`209.85.233.94`), `pagead2.googlesyndication.com` (`209.85.233.154`), `pagead2.googlesyndication.com` (`209.85.233.155`), `pagead2.googlesyndication.com` (`209.85.233.156`), `pagead2.googlesyndication.com` (`209.85.233.157`), `www.google.ru` (`209.85.233.94`) |
-| `216.58.192.0/19` | `216.58.204.0/22` | `ad.doubleclick.net` (`216.58.204.166`), `googleads.g.doubleclick.net` (`216.58.206.2`), `pagead2.googlesyndication.com` (`216.58.204.162`), `pagead2.googlesyndication.com` (`216.58.206.2`), `www.google.ru` (`216.58.205.163`) |
-| `216.58.204.0/23` | `216.58.204.0/22` | `ad.doubleclick.net` (`216.58.204.166`), `pagead2.googlesyndication.com` (`216.58.204.162`), `www.google.ru` (`216.58.205.163`) |
-| `216.58.206.0/23` | `216.58.204.0/22` | `googleads.g.doubleclick.net` (`216.58.206.2`), `pagead2.googlesyndication.com` (`216.58.206.2`) |
-| `216.239.32.0/19` | `216.239.32.0/24`, `216.239.34.0/24`, `216.239.36.0/24`, `216.239.38.0/24` | `analytics.google.com` (`216.239.32.181`), `analytics.google.com` (`216.239.34.181`), `analytics.google.com` (`216.239.36.181`), `analytics.google.com` (`216.239.38.181`), `www.google-analytics.com` (`216.239.32.178`), `www.google-analytics.com` (`216.239.34.178`), `www.google-analytics.com` (`216.239.36.178`), `www.google-analytics.com` (`216.239.38.178`), `www.google.com` (`216.239.38.120`), `www.google.ru` (`216.239.38.120`) |
-| `216.239.32.0/24` | `216.239.32.0/24` | `analytics.google.com` (`216.239.32.181`), `www.google-analytics.com` (`216.239.32.178`) |
-| `216.239.34.0/24` | `216.239.34.0/24` | `analytics.google.com` (`216.239.34.181`), `www.google-analytics.com` (`216.239.34.178`) |
-| `216.239.36.0/24` | `216.239.36.0/24` | `analytics.google.com` (`216.239.36.181`), `www.google-analytics.com` (`216.239.36.178`) |
-| `216.239.38.0/24` | `216.239.38.0/24` | `analytics.google.com` (`216.239.38.181`), `www.google-analytics.com` (`216.239.38.178`), `www.google.com` (`216.239.38.120`), `www.google.ru` (`216.239.38.120`) |
-
 ## AS15632 — JSC "Alfa-Bank"
 
 | Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
@@ -2036,19 +1395,6 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | `118.69.0.0/18` | `118.69.17.0/24` | `snap.licdn.com` (`118.69.17.163`), `snap.licdn.com` (`118.69.17.169`) |
 | `118.69.16.0/20` | `118.69.17.0/24` | `snap.licdn.com` (`118.69.17.163`), `snap.licdn.com` (`118.69.17.169`) |
 | `118.69.17.0/24` | `118.69.17.0/24` | `snap.licdn.com` (`118.69.17.163`), `snap.licdn.com` (`118.69.17.169`) |
-
-## AS19527 — Google LLC (Google Cloud)
-
-| Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
-| --- | --- | --- |
-| `34.0.0.0/15` | `34.1.224.0/19` | Нет наблюдений |
-| `34.1.224.0/19` | `34.1.224.0/19` | Нет наблюдений |
-| `35.208.0.0/14` | `35.211.0.0/16` | Нет наблюдений |
-| `35.211.0.0/16` | `35.211.0.0/16` | Нет наблюдений |
-| `35.212.0.0/14` | `35.212.128.0/17`, `35.213.0.0/17`, `35.214.128.0/17` | `pool.liftdsp.com` (`35.213.45.194`), `x.bidswitch.net` (`35.212.160.220`), `x.bidswitch.net` (`35.213.7.90`) |
-| `35.212.128.0/17` | `35.212.128.0/17` | `x.bidswitch.net` (`35.212.160.220`) |
-| `35.213.0.0/17` | `35.213.0.0/17` | `pool.liftdsp.com` (`35.213.45.194`), `x.bidswitch.net` (`35.213.7.90`) |
-| `35.214.128.0/17` | `35.214.128.0/17` | Нет наблюдений |
 
 ## AS20454 — SECURED SERVERS LLC
 
@@ -3140,18 +2486,6 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | --- | --- | --- |
 | `31.177.70.0/24` | `31.177.64.0/19` | Ручной импорт |
 
-## AS43515 — Google Ireland Limited
-
-| Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
-| --- | --- | --- |
-| `34.0.0.0/15` | `34.1.224.0/19` | Нет наблюдений |
-| `34.1.224.0/19` | `34.1.224.0/19` | Нет наблюдений |
-| `35.208.0.0/14` | `35.211.0.0/16` | `x.bidswitch.net` (`35.211.202.130`) |
-| `35.211.0.0/16` | `35.211.0.0/16` | `x.bidswitch.net` (`35.211.202.130`) |
-| `35.212.0.0/14` | `35.212.128.0/17`, `35.213.0.0/17`, `35.214.128.0/17` | Нет наблюдений |
-| `35.212.128.0/17` | `35.212.128.0/17` | Нет наблюдений |
-| `35.214.128.0/17` | `35.214.128.0/17` | Нет наблюдений |
-
 ## AS43581 — ZTV CORP LLC
 
 | Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
@@ -3807,9 +3141,9 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | `89.248.192.0/23` | `89.248.193.0/24` | `sp.linkssp.ru` (`89.248.193.53`) |
 | `89.248.193.0/24` | `89.248.193.0/24` | `sp.linkssp.ru` (`89.248.193.53`) |
 | `92.42.14.0/23` | `92.42.15.0/24` | Нет наблюдений |
-| `92.53.64.0/19` | `92.53.64.0/18` | `am9.bigdata-it.ru` (`92.53.65.242`), `crm.allbdata.ru` (`92.53.65.242`), `crm.deepcall.ru` (`92.53.65.242`), `crm.info-it-data.ru` (`92.53.65.242`), `crm.megabigteh.ru` (`92.53.65.242`), `crm.viva-lead.ru` (`92.53.65.242`), `gck.needcallbuy.ru` (`92.53.65.242`), `qoopler.ru` (`92.53.65.242`) |
+| `92.53.64.0/19` | `92.53.64.0/18` | `am9.bigdata-it.ru` (`92.53.65.242`), `crm.allbdata.ru` (`92.53.65.242`), `crm.deepcall.ru` (`92.53.65.242`), `crm.info-it-data.ru` (`92.53.65.242`), `crm.megabigteh.ru` (`92.53.65.242`), `crm.r3ka.ru` (`92.53.65.242`), `crm.viva-lead.ru` (`92.53.65.242`), `gck.needcallbuy.ru` (`92.53.65.242`), `qoopler.ru` (`92.53.65.242`) |
 | `92.53.64.0/24` | `92.53.64.0/18` | Ручной импорт |
-| `92.53.65.0/24` | `92.53.64.0/18` | `am9.bigdata-it.ru` (`92.53.65.242`), `crm.allbdata.ru` (`92.53.65.242`), `crm.deepcall.ru` (`92.53.65.242`), `crm.info-it-data.ru` (`92.53.65.242`), `crm.megabigteh.ru` (`92.53.65.242`), `crm.viva-lead.ru` (`92.53.65.242`), `gck.needcallbuy.ru` (`92.53.65.242`), `qoopler.ru` (`92.53.65.242`) |
+| `92.53.65.0/24` | `92.53.64.0/18` | `am9.bigdata-it.ru` (`92.53.65.242`), `crm.allbdata.ru` (`92.53.65.242`), `crm.deepcall.ru` (`92.53.65.242`), `crm.info-it-data.ru` (`92.53.65.242`), `crm.megabigteh.ru` (`92.53.65.242`), `crm.r3ka.ru` (`92.53.65.242`), `crm.viva-lead.ru` (`92.53.65.242`), `gck.needcallbuy.ru` (`92.53.65.242`), `qoopler.ru` (`92.53.65.242`) |
 | `92.53.66.0/24` | `92.53.64.0/18` | Ручной импорт |
 | `92.53.71.0/24` | `92.53.64.0/18` | Ручной импорт |
 | `92.53.72.0/24` | `92.53.64.0/18` | Ручной импорт |
@@ -4295,8 +3629,8 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | `178.248.236.0/23` | `178.248.232.0/21` | `mws.ru` (`178.248.237.192`) |
 | `178.248.237.0/24` | `178.248.232.0/21` | `mws.ru` (`178.248.237.192`) |
 | `178.248.238.0/23` | `178.248.232.0/21` | `login.mts.ru` (`178.248.238.28`), `mts.ru` (`178.248.238.27`), `spb.mts.ru` (`178.248.238.27`), `static.mts.ru` (`178.248.238.27`), `timeweb.cloud` (`178.248.239.157`) |
-| `185.65.148.0/22` | `185.65.148.0/22` | `1686587501794300151369.cm.a.mts.ru` (`185.65.149.228`), `2260358961794266483993.cm.a.mts.ru` (`185.65.149.228`), `2399342921794300238215.cm.a.mts.ru` (`185.65.149.228`), `2934199061794266471230.cm.a.mts.ru` (`185.65.149.228`), `3182419811793495384628.cm.a.mts.ru` (`185.65.149.228`), `4394285141794261891524.cm.a.mts.ru` (`185.65.149.228`), `4636494031794306066312.cm.a.mts.ru` (`185.65.149.228`), `4830143981794300251190.cm.a.mts.ru` (`185.65.149.228`), `5817185321794261790587.cm.a.mts.ru` (`185.65.149.228`), `5819685921794266382441.cm.a.mts.ru` (`185.65.149.228`), `5882964711793495484340.cm.a.mts.ru` (`185.65.149.228`), `6655435111794306084179.cm.a.mts.ru` (`185.65.149.228`), `6790708701793721784494.cm.a.mts.ru` (`185.65.149.228`), `7302874391794306076193.cm.a.mts.ru` (`185.65.149.228`), `9360834981794299986160.cm.a.mts.ru` (`185.65.149.228`), `9501822521794261904662.cm.a.mts.ru` (`185.65.149.228`), `api.a.mts.ru` (`185.65.149.228`), `cm.a.mts.ru` (`185.65.149.228`), `dns-shop.ru` (`185.65.148.196`), `serving.a.mts.ru` (`185.65.149.228`), `static.a.mts.ru` (`185.65.149.228`), `tag.a.mts.ru` (`185.65.149.228`), `vkusnoitochka.ru` (`185.65.148.127`), `vkusnoitochka.ru` (`185.65.149.127`) |
-| `185.65.148.0/23` | `185.65.148.0/22` | `1686587501794300151369.cm.a.mts.ru` (`185.65.149.228`), `2260358961794266483993.cm.a.mts.ru` (`185.65.149.228`), `2399342921794300238215.cm.a.mts.ru` (`185.65.149.228`), `2934199061794266471230.cm.a.mts.ru` (`185.65.149.228`), `3182419811793495384628.cm.a.mts.ru` (`185.65.149.228`), `4394285141794261891524.cm.a.mts.ru` (`185.65.149.228`), `4636494031794306066312.cm.a.mts.ru` (`185.65.149.228`), `4830143981794300251190.cm.a.mts.ru` (`185.65.149.228`), `5817185321794261790587.cm.a.mts.ru` (`185.65.149.228`), `5819685921794266382441.cm.a.mts.ru` (`185.65.149.228`), `5882964711793495484340.cm.a.mts.ru` (`185.65.149.228`), `6655435111794306084179.cm.a.mts.ru` (`185.65.149.228`), `6790708701793721784494.cm.a.mts.ru` (`185.65.149.228`), `7302874391794306076193.cm.a.mts.ru` (`185.65.149.228`), `9360834981794299986160.cm.a.mts.ru` (`185.65.149.228`), `9501822521794261904662.cm.a.mts.ru` (`185.65.149.228`), `api.a.mts.ru` (`185.65.149.228`), `cm.a.mts.ru` (`185.65.149.228`), `dns-shop.ru` (`185.65.148.196`), `serving.a.mts.ru` (`185.65.149.228`), `static.a.mts.ru` (`185.65.149.228`), `tag.a.mts.ru` (`185.65.149.228`), `vkusnoitochka.ru` (`185.65.148.127`), `vkusnoitochka.ru` (`185.65.149.127`) |
+| `185.65.148.0/22` | `185.65.148.0/22` | `1686587501794300151369.cm.a.mts.ru` (`185.65.149.228`), `2260358961794266483993.cm.a.mts.ru` (`185.65.149.228`), `2399342921794300238215.cm.a.mts.ru` (`185.65.149.228`), `2934199061794266471230.cm.a.mts.ru` (`185.65.149.228`), `3182419811793495384628.cm.a.mts.ru` (`185.65.149.228`), `4135084311794335388817.cm.a.mts.ru` (`185.65.149.228`), `4394285141794261891524.cm.a.mts.ru` (`185.65.149.228`), `4636494031794306066312.cm.a.mts.ru` (`185.65.149.228`), `4830143981794300251190.cm.a.mts.ru` (`185.65.149.228`), `5409217191794335397399.cm.a.mts.ru` (`185.65.149.228`), `5817185321794261790587.cm.a.mts.ru` (`185.65.149.228`), `5819685921794266382441.cm.a.mts.ru` (`185.65.149.228`), `5882964711793495484340.cm.a.mts.ru` (`185.65.149.228`), `6655435111794306084179.cm.a.mts.ru` (`185.65.149.228`), `6790708701793721784494.cm.a.mts.ru` (`185.65.149.228`), `7302874391794306076193.cm.a.mts.ru` (`185.65.149.228`), `9184320031794335405752.cm.a.mts.ru` (`185.65.149.228`), `9360834981794299986160.cm.a.mts.ru` (`185.65.149.228`), `9501822521794261904662.cm.a.mts.ru` (`185.65.149.228`), `api.a.mts.ru` (`185.65.149.228`), `cm.a.mts.ru` (`185.65.149.228`), `dns-shop.ru` (`185.65.148.196`), `serving.a.mts.ru` (`185.65.149.228`), `static.a.mts.ru` (`185.65.149.228`), `tag.a.mts.ru` (`185.65.149.228`), `vkusnoitochka.ru` (`185.65.148.127`), `vkusnoitochka.ru` (`185.65.149.127`) |
+| `185.65.148.0/23` | `185.65.148.0/22` | `1686587501794300151369.cm.a.mts.ru` (`185.65.149.228`), `2260358961794266483993.cm.a.mts.ru` (`185.65.149.228`), `2399342921794300238215.cm.a.mts.ru` (`185.65.149.228`), `2934199061794266471230.cm.a.mts.ru` (`185.65.149.228`), `3182419811793495384628.cm.a.mts.ru` (`185.65.149.228`), `4135084311794335388817.cm.a.mts.ru` (`185.65.149.228`), `4394285141794261891524.cm.a.mts.ru` (`185.65.149.228`), `4636494031794306066312.cm.a.mts.ru` (`185.65.149.228`), `4830143981794300251190.cm.a.mts.ru` (`185.65.149.228`), `5409217191794335397399.cm.a.mts.ru` (`185.65.149.228`), `5817185321794261790587.cm.a.mts.ru` (`185.65.149.228`), `5819685921794266382441.cm.a.mts.ru` (`185.65.149.228`), `5882964711793495484340.cm.a.mts.ru` (`185.65.149.228`), `6655435111794306084179.cm.a.mts.ru` (`185.65.149.228`), `6790708701793721784494.cm.a.mts.ru` (`185.65.149.228`), `7302874391794306076193.cm.a.mts.ru` (`185.65.149.228`), `9184320031794335405752.cm.a.mts.ru` (`185.65.149.228`), `9360834981794299986160.cm.a.mts.ru` (`185.65.149.228`), `9501822521794261904662.cm.a.mts.ru` (`185.65.149.228`), `api.a.mts.ru` (`185.65.149.228`), `cm.a.mts.ru` (`185.65.149.228`), `dns-shop.ru` (`185.65.148.196`), `serving.a.mts.ru` (`185.65.149.228`), `static.a.mts.ru` (`185.65.149.228`), `tag.a.mts.ru` (`185.65.149.228`), `vkusnoitochka.ru` (`185.65.148.127`), `vkusnoitochka.ru` (`185.65.149.127`) |
 | `185.65.150.0/23` | `185.65.148.0/22` | Входной ASN `AS51115`, Ручной импорт |
 | `185.94.108.0/22` | `185.94.108.0/22` | Входной ASN `AS51115`, Ручной импорт |
 | `185.94.108.0/23` | `185.94.108.0/22` | Входной ASN `AS51115`, Ручной импорт |
@@ -5904,6 +5238,12 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | `212.67.27.0/24` | `212.67.24.0/22` | Ручной импорт |
 | `2a0a:4d00::/29` | `2a0a:4d00::/29` | Ручной импорт |
 
+## AS201738 — UFO TECHNOLOGIES LIMITED
+
+| Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
+| --- | --- | --- |
+| `92.255.85.0/24` | `92.255.0.0/17` | Ручной импорт |
+
 ## AS201776 — Miranda-Media Ltd
 
 | Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
@@ -6609,6 +5949,7 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
 | --- | --- | --- |
 | `82.202.186.0/24` | `82.202.160.0/19` | Ручной импорт |
+| `82.202.187.0/24` | `82.202.160.0/19` | Ручной импорт |
 | `82.202.188.0/24` | `82.202.160.0/19` | Ручной импорт |
 | `82.202.189.0/24` | `82.202.160.0/19` | Ручной импорт |
 | `82.202.190.0/24` | `82.202.160.0/19` | Ручной импорт |
@@ -6772,9 +6113,10 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | `37.9.53.0/24` | `37.9.0.0/17` | Входной ASN `AS210756`, Ручной импорт |
 | `37.9.54.0/24` | `37.9.0.0/17` | Входной ASN `AS210756`, Ручной импорт |
 | `37.9.55.0/24` | `37.9.0.0/17` | Входной ASN `AS210756`, Ручной импорт |
-| `37.128.164.0/24` | `37.128.164.0/23` | Входной ASN `AS210756`, Ручной импорт |
-| `37.128.165.0/24` | `37.128.164.0/23` | Входной ASN `AS210756`, Ручной импорт |
-| `37.128.166.0/24` | `37.128.166.0/24` | Входной ASN `AS210756` |
+| `37.128.164.0/24` | `37.128.164.0/22` | Входной ASN `AS210756`, Ручной импорт |
+| `37.128.165.0/24` | `37.128.164.0/22` | Входной ASN `AS210756`, Ручной импорт |
+| `37.128.166.0/24` | `37.128.164.0/22` | Входной ASN `AS210756` |
+| `37.128.167.0/24` | `37.128.164.0/22` | Входной ASN `AS210756` |
 | `44.32.144.0/23` | `44.32.144.0/22` | Входной ASN `AS210756`, Ручной импорт |
 | `45.147.162.0/24` | `45.147.160.0/22` | Входной ASN `AS210756`, Ручной импорт |
 | `45.147.163.0/24` | `45.147.160.0/22` | Входной ASN `AS210756`, Ручной импорт |
@@ -7204,15 +6546,6 @@ SHA-256 файла IP.json: `b34b9c58a5178567dfb1b20960fbe6faa391ef63f8c8a3858f4
 | Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
 | --- | --- | --- |
 | `193.232.53.0/24` | `193.232.0.0/17` | Ручной импорт |
-
-## AS396982 — Google Cloud Platform
-
-| Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
-| --- | --- | --- |
-| `172.217.56.0/21` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.56.0/22` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.62.0/24` | `172.217.0.0/16` | Нет наблюдений |
-| `172.217.63.0/24` | `172.217.0.0/16` | Нет наблюдений |
 
 ## Подсети без совпадений в снимке BGP.tools
 
