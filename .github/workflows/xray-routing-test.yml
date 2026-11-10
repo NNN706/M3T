@@ -76,6 +76,7 @@ jobs:
           mkdir -p "$XRAY_EVIDENCE"
           python3 source/xray-test/curl_diagnostics.py source/xray-test/required-sites.json "$XRAY_EVIDENCE"
       - name: Run Xray and verify routing through local SOCKS
+        id: xray-check
         shell: bash
         env:
           XRAY_DOCKER_SUDO: '1'
@@ -83,6 +84,15 @@ jobs:
           XRAY_EVIDENCE: ${{ runner.temp }}/xray-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/xray-test-browsers
         run: bash source/xray-test/deploy.sh
+      - name: Retry failed sites directly with curl
+        if: ${{ failure() && steps.xray-check.outcome == 'failure' }}
+        shell: bash
+        env:
+          XRAY_EVIDENCE: ${{ runner.temp }}/xray-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          python3 source/xray-test/curl_diagnostics.py source/xray-test/required-sites.json \
+            "$XRAY_EVIDENCE" --after-failure | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Save diagnostic artifacts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
