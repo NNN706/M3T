@@ -46,3 +46,7 @@ spb.megafon.ru
 lk.megafon.ru
 spb.mts.ru
 dns-shop.ru
+ipinfo.io
+ifconfig.me
+2ip.io
+2ip.ru
