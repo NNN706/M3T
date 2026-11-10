@@ -29,10 +29,8 @@
         "domain:mdd.yandex.net",
         "domain:privacy-cs.mail.ru",
         "domain:sgtm.beget.com",
-        "domain:stats.g.doubleclick.net",
         "domain:top-fwz1.mail.ru",
-        "domain:vk.com",
-        "domain:www.googletagmanager.com"
+        "domain:vk.com"
       ]
     },
     {
@@ -69,7 +67,6 @@
         "domain:ads.gpm-ssp.ru",
         "domain:am9.bigdata-it.ru",
         "domain:an.yandex.ru",
-        "domain:analytics.google.com",
         "domain:api.cloud.ru",
         "domain:api.mindbox.ru",
         "domain:bid.sspnet.tech",
@@ -87,6 +84,7 @@
         "domain:crm.deepcall.ru",
         "domain:crm.info-it-data.ru",
         "domain:crm.megabigteh.ru",
+        "domain:crm.r3ka.ru",
         "domain:crm.viva-lead.ru",
         "domain:dm-eu.hybrid.ai",
         "domain:dm.hybrid.ai",
@@ -112,7 +110,6 @@
         "domain:mdd.yandex.net",
         "domain:otclick-adv.ru",
         "domain:pixel.konnektu.ru",
-        "domain:pool.liftdsp.com",
         "domain:privacy-cs.mail.ru",
         "domain:prodmp.ru",
         "domain:px.adhigh.net",
@@ -135,7 +132,6 @@
         "domain:ssp.al-adtech.com",
         "domain:ssp.bidster.net",
         "domain:st.top100.ru",
-        "domain:stats.g.doubleclick.net",
         "domain:sync.adkernel.com",
         "domain:sync.adsp.io",
         "domain:sync.adspend.space",
@@ -154,10 +150,6 @@
         "domain:vma.mts.ru",
         "domain:web-static.mindbox.ru",
         "domain:www.acint.net",
-        "domain:www.google-analytics.com",
-        "domain:www.google.ru",
-        "domain:www.googletagmanager.com",
-        "domain:x.bidswitch.net",
         "domain:x01.aidata.io"
       ]
     },
@@ -184,14 +176,11 @@
       "domain": [
         "domain:admin.verbox.ru",
         "domain:contell.ru",
-        "domain:fonts.gstatic.com",
         "domain:lk.contell.ru",
         "domain:mc.yandex.ru",
         "domain:mdd.yandex.net",
         "domain:static.me-talk.ru",
-        "domain:widget.me-talk.ru",
-        "domain:www.google.com",
-        "domain:www.gstatic.com"
+        "domain:widget.me-talk.ru"
       ]
     },
     {
@@ -220,25 +209,18 @@
       "ruleTag": "ddos-guard.net",
       "domain": [
         "domain:abt.s3.yandex.net",
-        "domain:ad.doubleclick.net",
-        "domain:analytics.google.com",
         "domain:captcha.ddos-guard.net",
         "domain:code.jivo.ru",
         "domain:code.jivosite.com",
         "domain:ddos-guard.net",
-        "domain:googleads.g.doubleclick.net",
         "domain:mc.yandex.ru",
         "domain:mdd.yandex.net",
         "domain:node-sber1-az1-23.jivosite.com",
         "domain:snap.licdn.com",
-        "domain:stats.g.doubleclick.net",
         "domain:tcd.mng.tl",
         "domain:uaas.yandex.ru",
         "domain:vi-sber1-25.jivosite.com",
-        "domain:widgets.mango-office.ru",
-        "domain:www.google.com",
-        "domain:www.google.ru",
-        "domain:www.googletagmanager.com"
+        "domain:widgets.mango-office.ru"
       ]
     },
     {
@@ -270,7 +252,6 @@
     {
       "ruleTag": "fornex.com",
       "domain": [
-        "domain:pagead2.googlesyndication.com",
         "domain:ru.fornex.com"
       ]
     },
@@ -317,8 +298,6 @@
     {
       "ruleTag": "landvps.ru",
       "domain": [
-        "domain:fonts.googleapis.com",
-        "domain:fonts.gstatic.com",
         "domain:landvps.ru",
         "domain:mc.yandex.ru",
         "domain:mdd.yandex.net",
@@ -380,6 +359,7 @@
       "ruleTag": "mws.ru",
       "domain": [
         "domain:1686587501794300151369.cm.a.mts.ru",
+        "domain:4135084311794335388817.cm.a.mts.ru",
         "domain:4636494031794306066312.cm.a.mts.ru",
         "domain:5817185321794261790587.cm.a.mts.ru",
         "domain:5819685921794266382441.cm.a.mts.ru",
@@ -476,11 +456,8 @@
         "domain:admin.verbox.ru",
         "domain:almaty-ping-test.ruvds.com",
         "domain:ams9-ping-test.ruvds.com",
-        "domain:analytics.google.com",
         "domain:astana-ping-test.ruvds.com",
         "domain:biznet-ping-test.ruvds.com",
-        "domain:fonts.googleapis.com",
-        "domain:fonts.gstatic.com",
         "domain:frn-ping-test.ruvds.com",
         "domain:itpark-ping-test.ruvds.com",
         "domain:izmir-ping-test.ruvds.com",
@@ -497,16 +474,12 @@
         "domain:smartcom-ping-test.ruvds.com",
         "domain:smarts-ping-test.ruvds.com",
         "domain:static.me-talk.ru",
-        "domain:stats.g.doubleclick.net",
         "domain:swiss-ping-test.ruvds.com",
         "domain:telemax-ping-test.ruvds.com",
         "domain:ufanet-ping-test.ruvds.com",
         "domain:uk-ping-test.ruvds.com",
         "domain:vk.com",
         "domain:widget.me-talk.ru",
-        "domain:www.google-analytics.com",
-        "domain:www.google.ru",
-        "domain:www.googletagmanager.com",
         "domain:yekat-ping-test.ruvds.com"
       ]
     },
@@ -531,7 +504,6 @@
         "domain:api.selectel.ru",
         "domain:cdn.selectel.ru",
         "domain:chatwoot.selectel.ru",
-        "domain:fonts.googleapis.com",
         "domain:hog.selectel.ru",
         "domain:mc.yandex.ru",
         "domain:metrics.selectel.ru",
@@ -549,8 +521,6 @@
       "ruleTag": "smartape.ru",
       "domain": [
         "domain:cp.smartape.ru",
-        "domain:fonts.googleapis.com",
-        "domain:fonts.gstatic.com",
         "domain:mc.yandex.ru",
         "domain:mcw.mango-office.ru",
         "domain:mdd.yandex.net",
@@ -576,6 +546,7 @@
         "domain:2399342921794300238215.cm.a.mts.ru",
         "domain:2934199061794266471230.cm.a.mts.ru",
         "domain:4394285141794261891524.cm.a.mts.ru",
+        "domain:5409217191794335397399.cm.a.mts.ru",
         "domain:7302874391794306076193.cm.a.mts.ru",
         "domain:bs.serving-sys.ru",
         "domain:cdn.mtscdn.ru",
@@ -605,6 +576,7 @@
         "domain:2w.ru",
         "domain:4830143981794300251190.cm.a.mts.ru",
         "domain:6655435111794306084179.cm.a.mts.ru",
+        "domain:9184320031794335405752.cm.a.mts.ru",
         "domain:9501822521794261904662.cm.a.mts.ru",
         "domain:api-common.tbank-online.com",
         "domain:api-common.tinkoff.ru",
