@@ -102,6 +102,7 @@
         "domain:crm.info-it-data.ru",
         "domain:crm.megabigteh.ru",
         "domain:crm.r3ka.ru",
+        "domain:crm.sertmarket.shop",
         "domain:crm.viva-lead.ru",
         "domain:dm-eu.hybrid.ai",
         "domain:dm.hybrid.ai",
@@ -345,6 +346,58 @@
       ]
     },
     {
+      "ruleTag": "mail.ru",
+      "domain": [
+        "domain:531311.ms.dzen.ru",
+        "domain:531511.ms.dzen.ru",
+        "domain:551121.ms.dzen.ru",
+        "domain:account.mail.ru",
+        "domain:ad.mail.ru",
+        "domain:an.mail.ru",
+        "domain:api.okcdn.ru",
+        "domain:api.vkvideo.ru",
+        "domain:avatars.dzeninfra.ru",
+        "domain:b2.mail.ru",
+        "domain:bs.yandex.ru",
+        "domain:counter.yadro.ru",
+        "domain:dzen.ru",
+        "domain:home.imgsmail.ru",
+        "domain:img.imgsmail.ru",
+        "domain:imgs2.imgsmail.ru",
+        "domain:iv.okcdn.ru",
+        "domain:limg.imgsmail.ru",
+        "domain:login.vk.com",
+        "domain:mail.ru",
+        "domain:media-trend.mail.ru",
+        "domain:o2.mail.ru",
+        "domain:pogoda.imgsmail.ru",
+        "domain:portal.mail.ru",
+        "domain:r.mradx.net",
+        "domain:r3.mail.ru",
+        "domain:reklama.mail.ru",
+        "domain:resizer.mail.ru",
+        "domain:rs.mail.ru",
+        "domain:st.vkvideo.ru",
+        "domain:stat.radar.imgsmail.ru",
+        "domain:static.dzeninfra.ru",
+        "domain:stats.dzen.ru",
+        "domain:sun9-39.vkuserphoto.ru",
+        "domain:sun9-48.vkuserphoto.ru",
+        "domain:sun9-53.vkuserphoto.ru",
+        "domain:sun9-6.vkuserphoto.ru",
+        "domain:sun9-81.vkuserphoto.ru",
+        "domain:telemetry.dzen.ru",
+        "domain:trk.mail.ru",
+        "domain:vd476.okcdn.ru",
+        "domain:vd483.okcdn.ru",
+        "domain:vd613.okcdn.ru",
+        "domain:vd643.okcdn.ru",
+        "domain:vd680.okcdn.ru",
+        "domain:vkvideo.ru",
+        "domain:xray.mail.ru"
+      ]
+    },
+    {
       "ruleTag": "majordomo.ru",
       "domain": [
         "domain:abt.s3.yandex.net",
@@ -395,6 +448,7 @@
         "domain:3565207081794340010766.cm.a.mts.ru",
         "domain:4135084311794335388817.cm.a.mts.ru",
         "domain:4636494031794306066312.cm.a.mts.ru",
+        "domain:5089274751794342141239.cm.a.mts.ru",
         "domain:5817185321794261790587.cm.a.mts.ru",
         "domain:5819685921794266382441.cm.a.mts.ru",
         "domain:5882964711793495484340.cm.a.mts.ru",
@@ -437,6 +491,25 @@
       "ruleTag": "nuc-cdp.digital.gov.ru",
       "domain": [
         "domain:nuc-cdp.digital.gov.ru"
+      ]
+    },
+    {
+      "ruleTag": "ok.ru",
+      "domain": [
+        "domain:732231.ms.ok.ru",
+        "domain:ad.mail.ru",
+        "domain:counter.yadro.ru",
+        "domain:dzen.ru",
+        "domain:limg.imgsmail.ru",
+        "domain:ok.ru",
+        "domain:r.mradx.net",
+        "domain:r3.mail.ru",
+        "domain:rs.mail.ru",
+        "domain:st-ok-pts.cdn-vk.ru",
+        "domain:st-ok.cdn-vk.ru",
+        "domain:st.okcdn.ru",
+        "domain:trk.mail.ru",
+        "domain:xray.mail.ru"
       ]
     },
     {
@@ -579,6 +652,7 @@
       "domain": [
         "domain:1416232981794340017831.cm.a.mts.ru",
         "domain:2399342921794300238215.cm.a.mts.ru",
+        "domain:2415138441794342153836.cm.a.mts.ru",
         "domain:2934199061794266471230.cm.a.mts.ru",
         "domain:4394285141794261891524.cm.a.mts.ru",
         "domain:5409217191794335397399.cm.a.mts.ru",
@@ -614,6 +688,7 @@
         "domain:6655435111794306084179.cm.a.mts.ru",
         "domain:9184320031794335405752.cm.a.mts.ru",
         "domain:9501822521794261904662.cm.a.mts.ru",
+        "domain:9884912371794342162126.cm.a.mts.ru",
         "domain:api-common.tbank-online.com",
         "domain:api-common.tinkoff.ru",
         "domain:as.tbank-online.com",
@@ -680,6 +755,7 @@
     {
       "ruleTag": "vkusnoitochka.ru",
       "domain": [
+        "domain:sentry-devtools.qsrapp.ru",
         "domain:vkusnoitochka.ru"
       ]
     },
