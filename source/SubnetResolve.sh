@@ -644,7 +644,7 @@ async function main() {
   browser = await chromium.launch({headless: true});
   if (process.env.SUBNET_PROBE === '1') { await browser.close(); return; }
   const seeds = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
-  const workers = Math.min(4, seeds.length);
+  const workers = Math.min(10, seeds.length);
   let next = 0, completed = 0;
   function publishProgress(i, origin, detail) {
     const status = workers > 1

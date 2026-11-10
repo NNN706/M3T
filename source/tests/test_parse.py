@@ -11,6 +11,7 @@ helper=source.split("<<'SUBNET_PARSE_JS'\n",1)[1].split('\nSUBNET_PARSE_JS',1)[0
 (root/'extracted-parse.cjs').write_text(helper)
 cache=pathlib.Path(os.environ.get('XDG_CACHE_HOME',str(pathlib.Path.home()/'.cache')))
 runtime=os.environ.get('SUBNET_PLAYWRIGHT',str(cache/'SubnetResolve/playwright-1.64.1/node_modules/playwright'))
+expected_concurrency = 10
 parallel_starts = []
 parallel_lock = threading.Lock()
 first_wave = threading.Event()
@@ -27,9 +28,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
    index = self.path.rsplit('/', 1)[-1]
    with parallel_lock:
     parallel_starts.append((index, time.monotonic()))
-    if len(parallel_starts) == 4:
+    if len(parallel_starts) == expected_concurrency:
      first_wave.set()
-   ready = first_wave.wait(8)
+   ready = first_wave.wait(15)
    self.send_response(403 if index == '1' else 200 if ready else 503)
    self.send_header('Content-Type', 'text/html')
    self.end_headers()
@@ -59,27 +60,28 @@ d=json.loads((root/'parse-discovery.json').read_text());expected={'site.localhos
 assert set(d['domains'])==expected,d
 assert d['complete'] and not p.stdout and 'Редирект: site.localhost → redirect.localhost' in p.stderr
 print('PASS real Chromium: JS, delayed fetch, dedup, iframe, WebSocket, scroll, URL path/case preserved',flush=True)
-# Four pages must reach the server before it releases the first response.
-# The fifth must wait for a slot to finish collecting requests.
-parallel_seeds = [f'http://site{i}.localhost:{server.server_port}/Parallel/{i}' for i in range(5)]
+# Ten pages must reach the server before it releases the first response.
+# The eleventh must wait for a slot to finish collecting requests.
+parallel_seeds = [f'http://site{i}.localhost:{server.server_port}/Parallel/{i}' for i in range(expected_concurrency + 1)]
 (root/'parse-seeds.json').write_text(json.dumps(parallel_seeds))
 p = subprocess.run(
  ['node', str(root/'extracted-parse.cjs'), str(root/'parse-seeds.json'),
   str(root/'parallel-discovery.json'), str(root/'parse-progress')],
- env=env, capture_output=True, text=True, timeout=50)
+ env=env, capture_output=True, text=True, timeout=65)
 assert p.returncode == 0 and not p.stdout, (p.stdout, p.stderr)
-assert {i for i, _ in parallel_starts[:4]} == {'0', '1', '2', '3'}, parallel_starts
-assert len(parallel_starts) == 5 and parallel_starts[4][0] == '4', parallel_starts
-assert parallel_starts[4][1] - parallel_starts[3][1] >= 8, parallel_starts
+assert len(parallel_starts) == expected_concurrency + 1, parallel_starts
+assert {i for i, _ in parallel_starts[:-1]} == {str(i) for i in range(expected_concurrency)}, parallel_starts
+assert parallel_starts[-1][0] == str(expected_concurrency), parallel_starts
+assert parallel_starts[-1][1] - parallel_starts[-2][1] >= 8, parallel_starts
 parallel = json.loads((root/'parallel-discovery.json').read_text())
-assert len(parallel['pages']) == 5 and not parallel['complete'], parallel
+assert len(parallel['pages']) == len(parallel_seeds) and not parallel['complete'], parallel
 for i, page in enumerate(parallel['pages']):
  assert page['site'] == f'site{i}.localhost', parallel
  assert set(page['domains']) == {f'site{i}.localhost', f'resource{i}.localhost'}, page
  assert bool(page['errors']) == (i == 1), page
 assert 'отказал' in parallel['pages'][1]['errors'][0], parallel
 assert set(parallel['domains']) == {host for page in parallel['pages'] for host in page['domains']}
-print('PASS real Chromium: four concurrent sites, fifth waits, isolated domains and failure, stable output order', flush=True)
+print('PASS real Chromium: ten concurrent sites, eleventh waits, isolated domains and failure, stable output order', flush=True)
 # Same browser through the full Bash entrypoint, with DNS/BGP mock executables.
 bin=root/'parse-bin';bin.mkdir(exist_ok=True)
 real_curl=shutil.which('curl')
