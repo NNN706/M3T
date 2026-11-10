@@ -17,7 +17,7 @@ with tempfile.TemporaryDirectory() as directory:
     subprocess.run(['git','clone',str(remote),str(repo)],check=True,capture_output=True)
     git(repo,'config','user.name','Test');git(repo,'config','user.email','test@example.invalid')
     git(repo,'checkout','-b','test')
-    for path in module.INPUTS[:-1]:
+    for path in module.LISTS + module.INPUTS[:-1]:
         target=repo/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text('initial\n')
     git(repo,'add','.');git(repo,'commit','-m','Initial');git(repo,'push','origin','test')
     base=git(repo,'rev-parse','HEAD')
@@ -59,22 +59,41 @@ with tempfile.TemporaryDirectory() as directory:
     git(other,'fetch','origin','test')
     assert git(other,'rev-parse',published+'^')==raced[0]
     assert git(other,'show',published+':unrelated.txt')=='concurrent push'
-    # A changed scan input must never publish obsolete results.
+    # A newer input list remains untouched while collected results are published.
     git(other,'reset','--hard',published)
-    (other/module.INPUTS[0]).write_text('changed.example\n')
-    git(other,'add','.');git(other,'commit','-m','Change sites');git(other,'push')
-    changed=git(other,'rev-parse','HEAD')
-    try:module.publish(repo,payload,published)
-    except RuntimeError as error:assert 'changed during scan' in str(error)
-    else:raise AssertionError('Stale scan was published')
-    assert git(other,'ls-remote','origin','refs/heads/test').split()[0]==changed
+    (other/module.LISTS[0]).write_text('changed.example\n')
+    (other/module.LISTS[1]).write_text('AS123\n')
+    git(other,'add','.');git(other,'commit','-m','Change lists');git(other,'push')
+    list_commit=git(other,'rev-parse','HEAD')
+    payload.write_text('{"rules":[{"ruleTag":"result","ip":["192.0.2.0/24"]}]}\n')
+    module.publish(repo,payload,published)
+    changed=git(other,'ls-remote','origin','refs/heads/test').split()[0]
+    git(other,'fetch','origin','test')
+    assert git(other,'rev-parse',changed+'^')==list_commit
+    assert git(other,'show',changed+':'+module.LISTS[0])=='changed.example'
+    assert git(other,'show',changed+':'+module.LISTS[1])=='AS123'
+    git(other,'reset','--hard',changed)
     # The previous output also belongs to the input snapshot used for partial unions.
     (other/module.OUTPUT).write_text('newer output\n')
     git(other,'add','.');git(other,'commit','-m','Other update');git(other,'push')
     try:module.publish(repo,payload,changed)
     except RuntimeError as error:assert 'changed during scan' in str(error)
     else:raise AssertionError('Newer IP.json was overwritten')
+    try:
+        module.publish_payloads(repo, changed, {module.REPORT: b'# Old report\n'},
+                                module.REPORT_INPUTS, 'Report')
+    except RuntimeError as error:
+        assert module.OUTPUT in str(error)
+    else:
+        raise AssertionError('Report was published for a replaced IP.json')
+    latest = git(other, 'rev-parse', 'HEAD')
+    module.publish_payloads(repo, latest, {module.REPORT: b'# Current report\n'},
+                            module.REPORT_INPUTS, 'Report')
+    report_commit = git(other, 'ls-remote', 'origin', 'refs/heads/test').split()[0]
+    git(other, 'fetch', 'origin', 'test')
+    assert git(other, 'diff-tree', '--no-commit-id', '--name-only', '-r', report_commit) == module.REPORT
+    assert git(other, 'show', f'{report_commit}:{module.REPORT}') == '# Current report'
     try:module.publish(repo,payload,changed,branch='main')
     except ValueError:pass
     else:raise AssertionError('main publication enabled')
-print('PASS latest-parent publication, concurrent edit retained, unchanged no-op, stale sites/output rejected, worktree cleaned')
+print('PASS latest-parent publication, concurrent edit retained, unchanged no-op, newer lists retained and newer output protected, worktree cleaned')

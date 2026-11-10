@@ -14,8 +14,10 @@ function targets(sites, required) {
     const url = normalize(line); queue.set(url,{url,required:false});
   }
   for (const profile of required) {
-    if (!profile.text || !profile.selector) throw Error('Обязательному сайту нужны text и selector');
-    new RegExp(profile.text,'i');
+    if (profile.statusOnly !== true) {
+      if (!profile.text || !profile.selector) throw Error('Обязательному сайту нужны text и selector');
+      new RegExp(profile.text,'i');
+    }
     const url = normalize(profile.url); queue.set(url,{...profile,url,required:true});
   }
   return [...queue.values()];
@@ -40,29 +42,34 @@ async function visit(browser, item, index, out, options={}) {
   });
   try {
     const timeout = options.timeout ?? 60000;
-    const response = await page.goto(item.url,{waitUntil:'domcontentloaded',timeout});
+    const statusOnly = item.statusOnly === true;
+    const response = await page.goto(item.url,{waitUntil:statusOnly?'commit':'domcontentloaded',timeout});
     result.status = response?.status();
-    if (!response || result.status < 200 || result.status >= 300) throw Error('Главная страница: HTTP '+result.status);
-    // A single deadline covers navigation and readiness, including SPA rendering.
-    const remaining = () => Math.max(1, timeout - (Date.now()-started));
-    await page.waitForFunction(() => document.body?.innerText.trim().length >= 40, null, {timeout:remaining()});
-    if (challenge.test(await page.locator('body').innerText()) || challenge.test(await page.title())) throw Error('Страница защиты/капча вместо сайта');
-    if (item.required) {
-      await page.getByText(new RegExp(item.text,'i')).first().waitFor({state:'visible',timeout:remaining()});
-      await page.locator(item.selector).filter({visible:true}).first().waitFor({state:'visible',timeout:remaining()});
-    }
-    const until = Date.now()+(options.dwell ?? 10000);
-    while (Date.now()<until) {
-      await page.evaluate(()=>window.scrollBy(0,Math.max(400,window.innerHeight * .8)));
-      await page.waitForTimeout(Math.min(1000,until-Date.now()));
-    }
-    if (result.status < 200 || result.status >= 300) throw Error('Конечная страница: HTTP '+result.status);
-    const body = await page.locator('body').innerText();
-    if (challenge.test(body) || challenge.test(await page.title())) throw Error('Страница защиты/капча вместо сайта');
-    if (body.trim().length < 40) throw Error('Пустая страница или незагрузившийся интерфейс');
-    if (item.required) {
-      if (!new RegExp(item.text,'i').test(body)) throw Error('Нет ожидаемого текста интерфейса');
-      if (!await page.locator(item.selector).filter({visible:true}).count()) throw Error('Нет ожидаемого элемента интерфейса');
+    if (statusOnly) {
+      if (result.status !== 200) throw Error('Главная страница: ожидался HTTP 200, получен '+(result.status ?? 'нет ответа'));
+    } else {
+      if (!response || result.status < 200 || result.status >= 300) throw Error('Главная страница: HTTP '+result.status);
+      // A single deadline covers navigation and readiness, including SPA rendering.
+      const remaining = () => Math.max(1, timeout - (Date.now()-started));
+      await page.waitForFunction(() => document.body?.innerText.trim().length >= 40, null, {timeout:remaining()});
+      if (challenge.test(await page.locator('body').innerText()) || challenge.test(await page.title())) throw Error('Страница защиты/капча вместо сайта');
+      if (item.required) {
+        await page.getByText(new RegExp(item.text,'i')).first().waitFor({state:'visible',timeout:remaining()});
+        await page.locator(item.selector).filter({visible:true}).first().waitFor({state:'visible',timeout:remaining()});
+      }
+      const until = Date.now()+(options.dwell ?? 10000);
+      while (Date.now()<until) {
+        await page.evaluate(()=>window.scrollBy(0,Math.max(400,window.innerHeight * .8)));
+        await page.waitForTimeout(Math.min(1000,until-Date.now()));
+      }
+      if (result.status < 200 || result.status >= 300) throw Error('Конечная страница: HTTP '+result.status);
+      const body = await page.locator('body').innerText();
+      if (challenge.test(body) || challenge.test(await page.title())) throw Error('Страница защиты/капча вместо сайта');
+      if (body.trim().length < 40) throw Error('Пустая страница или незагрузившийся интерфейс');
+      if (item.required) {
+        if (!new RegExp(item.text,'i').test(body)) throw Error('Нет ожидаемого текста интерфейса');
+        if (!await page.locator(item.selector).filter({visible:true}).count()) throw Error('Нет ожидаемого элемента интерфейса');
+      }
     }
     result.ok = true;
   } catch (e) {

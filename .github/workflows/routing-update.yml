@@ -6,11 +6,20 @@ on:
         description: ID запуска с сохранёнными результатами
         required: false
         type: string
+      report_only:
+        description: Построить общий отчёт из опубликованного IP.json без нового сканирования
+        type: boolean
+        default: false
+      full_refresh:
+        description: Перепроверить все сайты и ASN
+        type: boolean
+        default: false
   push:
     branches: [test]
     paths:
       - 'source/routing/sites.txt'
       - 'source/routing/ASN.txt'
+      - 'source/routing/exclude'
 permissions:
   contents: write
   actions: read
@@ -19,14 +28,17 @@ concurrency:
   cancel-in-progress: false
 jobs:
   update:
-    if: github.ref == 'refs/heads/test'
+    if: github.ref == 'refs/heads/test' && !inputs.report_only
     runs-on: [self-hosted, Linux, X64]
-    timeout-minutes: 120
+    timeout-minutes: ${{ inputs.full_refresh && 260 || 120 }}
+    outputs:
+      checkout_ref: ${{ steps.scan-ref.outputs.sha }}
     steps:
       - name: Verify runner
         run: |
           set -euo pipefail
           test "$RUNNER_NAME" = Admiralteskiy
+          df -h / /var "$GITHUB_WORKSPACE" "$RUNNER_TEMP" "$HOME"
           echo "XDG_CACHE_HOME=$HOME/.cache/m3t-routing" >> "$GITHUB_ENV"
           echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/m3t-routing/chromium" >> "$GITHUB_ENV"
           echo "ROUTING_EVIDENCE=$RUNNER_TEMP/routing-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
@@ -34,6 +46,10 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: test
+      - name: Record scan revision
+        id: scan-ref
+        shell: bash
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Find checkpoint from previous routing run
         if: inputs.resume_run_id != ''
         id: resume
@@ -96,20 +112,28 @@ jobs:
           python3 source/tests/test_global_routing.py
           python3 source/tests/test_json_routing.py
           python3 source/tests/test_asn_routes.py
+          python3 source/tests/test_exclusion_routing.py
           python3 source/tests/test_incremental_routing.py
           python3 source/tests/test_publish_routing.py
       - name: Scan sites and compact prefixes
         shell: bash
         env:
           RESUME_RUN_ID: ${{ inputs.resume_run_id }}
+          FULL_REFRESH: ${{ inputs.full_refresh }}
         run: |
           set -euo pipefail
           mkdir -p "$ROUTING_EVIDENCE"
           resume=()
           if [ -n "$RESUME_RUN_ID" ]; then resume=(--resume "$ROUTING_RESUME"); fi
-          timeout --verbose --kill-after=10s 105m python3 source/routing/update_routing.py --incremental --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
+          refresh=()
+          scan_timeout=105m
+          if [ "$FULL_REFRESH" = true ]; then
+            refresh=(--full-refresh)
+            scan_timeout=245m
+          fi
+          timeout --verbose --kill-after=10s "$scan_timeout" python3 source/routing/update_routing.py --incremental --exclude-asns --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" "${refresh[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
           if ! python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["complete"])' "$ROUTING_EVIDENCE/completeness.json"; then
-            echo '::warning::Неполный сбор: опубликованы доступные подсети; прежние записи сохранены. См. routing-evidence.'
+            echo '::warning::Неполный сбор: доступные подсети и обнаруженные домены подготовлены к публикации; прежние записи сохранены. См. routing-evidence.'
           fi
           {
             cat "$ROUTING_EVIDENCE/asn-report.md"
@@ -135,3 +159,63 @@ jobs:
         run: |
           set -euo pipefail
           python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --output "$ROUTING_EVIDENCE/IP.json" --domains "$ROUTING_EVIDENCE/domains.json" --sources "$ROUTING_EVIDENCE/sources.json"
+
+  curl-diagnostic:
+    needs: update
+    if: needs.update.result == 'success'
+    uses: ./.github/workflows/xray-routing-test.yml
+    with:
+      checkout_ref: ${{ needs.update.outputs.checkout_ref }}
+    permissions:
+      contents: read
+
+  routing-report:
+    needs: [update, curl-diagnostic]
+    if: >-
+      ${{ !cancelled() && github.ref == 'refs/heads/test' &&
+          (needs.update.result == 'success' || (inputs.report_only && needs.update.result == 'skipped')) }}
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: test
+      - name: Download DNS/BGP observations from this workflow
+        if: needs.update.result == 'success'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: routing-evidence-${{ github.run_id }}-*
+          path: ${{ runner.temp }}/routing-report-input-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Build report from published IP.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$RUNNER_NAME" = Admiralteskiy
+          export XDG_CACHE_HOME="$HOME/.cache/m3t-routing"
+          output="$RUNNER_TEMP/routing-report-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          mkdir -p "$output"
+          evidence=()
+          for directory in "$RUNNER_TEMP/routing-report-input-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/"*/; do
+            if [ -d "$directory" ]; then evidence+=(--evidence "$directory"); fi
+          done
+          python3 source/tests/test_routing_report.py
+          python3 source/routing/routing_report.py source/routing/IP.json "$output/asn-report.md" \
+            --verbose-output "$output/asn-report-verbose.md" --sources source/routing/sources.json \
+            --previous-provenance source/routing/dns-provenance.json \
+            --provenance-output "$output/dns-provenance.json" "${evidence[@]}"
+          cat "$output/asn-report.md" >> "$GITHUB_STEP_SUMMARY"
+          printf '\n[Подробный отчёт ASN с доменами](https://github.com/NNN706/M3T/blob/test/source/routing/asn-report-verbose.md)\n' >> "$GITHUB_STEP_SUMMARY"
+      - name: Save overall routing report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: overall-routing-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/routing-report-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 7
+      - name: Publish report on test
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$RUNNER_TEMP/routing-report-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" \
+            --report "$output/asn-report.md" --report-verbose "$output/asn-report-verbose.md" \
+            --provenance "$output/dns-provenance.json"

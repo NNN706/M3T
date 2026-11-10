@@ -1,42 +1,67 @@
-const {test}=require('node:test');
-const assert=require('node:assert/strict');
-const fs=require('node:fs');
-const os=require('node:os');
-const path=require('node:path');
-const {spawnSync}=require('node:child_process');
-test('remote Xray config validation failure preserves the working deployment',()=>{
-  const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'xray-deploy-'));
-  const bin=path.join(tmp,'bin'),home=path.join(tmp,'remote');fs.mkdirSync(bin);fs.mkdirSync(home);
-  fs.writeFileSync(path.join(home,'working-config'),'previous configuration');
-  fs.writeFileSync(path.join(bin,'ssh'),`#!/usr/bin/env python3
-import os,sys,subprocess
-args=sys.argv[1:]
-while args and args[0].startswith('-'):
-    args=args[2:]
-args=args[1:]
-if args and args[0]=='bash':
-    command=args
-else:
-    command=['bash','-c',args[0]]
-raise SystemExit(subprocess.call(command,cwd=os.environ['FAKE_REMOTE_HOME'],env={**os.environ,'HOME':os.environ['FAKE_REMOTE_HOME']}))
-`,{mode:0o755});
-  fs.writeFileSync(path.join(bin,'docker'),`#!/usr/bin/env bash
-printf '%s\\n' "$*" >> "$FAKE_REMOTE_HOME/docker-commands"
-if [[ $1 == pull ]]; then exit 0; fi
-if [[ $1 == run ]]; then echo 'Invalid Xray config fixture' >&2; exit 1; fi
-echo 'Unexpected mutation' >&2
-exit 99
-`,{mode:0o755});
+const {test} = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const {spawnSync} = require('node:child_process');
+
+for (const useSudo of [false, true]) {
+  test('invalid Xray config stops before starting a local container, sudo=' + useSudo, () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'xray-deploy-'));
+    const commandsFile = path.join(tmp, 'docker-commands');
+    fs.writeFileSync(path.join(tmp, 'docker'), `#!/usr/bin/env bash
+printf '%s\\n' "$*" >> "$DOCKER_TEST_COMMANDS"
+case "$1" in
+    info|pull) exit 0 ;;
+    run) echo 'Invalid Xray config fixture' >&2; exit 1 ;;
+    *) exit 99 ;;
+esac
+`, {mode: 0o755});
+    fs.writeFileSync(path.join(tmp, 'sudo'), `#!/usr/bin/env bash
+[[ "$1" == -n && "$2" == docker ]] || exit 98
+printf 'sudo\\n' >> "$DOCKER_TEST_COMMANDS"
+shift
+exec "$@"
+`, {mode: 0o755});
+    try {
+      const result = spawnSync('bash', ['deploy.sh'], {encoding: 'utf8', timeout: 15000, env: {
+        ...process.env, PATH: tmp + ':' + process.env.PATH,
+        DOCKER_TEST_COMMANDS: commandsFile,
+        XRAY_IMAGE: 'ghcr.io/xtls/xray-core:26.10.31@sha256:' + 'a'.repeat(64),
+        XRAY_DOCKER_SUDO: useSudo ? '1' : '0',
+        XRAY_EVIDENCE: path.join(tmp, 'evidence'),
+      }});
+      assert.equal(result.status, 1, result.stderr);
+      assert.match(result.stderr, /Invalid Xray config fixture/);
+      const calls = fs.readFileSync(commandsFile, 'utf8').trim().split('\n');
+      assert.equal(calls.filter(command => command === 'sudo').length, useSudo ? 3 : 0);
+      const commands = calls.filter(command => command !== 'sudo');
+      assert.equal(commands.length, 3);
+      assert.match(commands[2], /^run --rm --network none .* run -test -config /);
+    } finally {
+      fs.rmSync(tmp, {recursive: true, force: true});
+    }
+  });
+}
+
+test('negative probe requires the default block access log for the exact IP', () => {
+  const script = fs.readFileSync('deploy.sh', 'utf8');
+  const start = `python3 - "$evidence/preflight-xray.log" "$negative" <<'PY'`;
+  const probe = script.split(start + '\n')[1].split('\nPY\n')[0];
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'xray-preflight-'));
   try {
-    const result=spawnSync('bash',['deploy.sh'],{encoding:'utf8',env:{...process.env,PATH:bin+':'+process.env.PATH,
-      FAKE_REMOTE_HOME:home,XRAY_HOST:'test.example',XRAY_USER:'tester',XRAY_IMAGE:'ghcr.io/xtls/xray-core:26.1.1@sha256:'+'a'.repeat(64),
-      XRAY_SSH_KEY:'fixture-not-a-real-key',XRAY_KNOWN_HOSTS:'fixture',GITHUB_SHA:'b'.repeat(40),GITHUB_RUN_ID:'123',RUNNER_TEMP:tmp,
-      XRAY_EVIDENCE:path.join(tmp,'evidence')},timeout:15000});
-    assert.equal(result.status,1,result.stderr);
-    assert.match(result.stderr,/Invalid Xray config fixture/);
-    const commands=fs.readFileSync(path.join(home,'docker-commands'),'utf8');
-    assert.match(commands,/run --rm --network none/);
-    assert(!commands.includes('compose'));
-    assert.equal(fs.readFileSync(path.join(home,'working-config'),'utf8'),'previous configuration');
-  } finally {fs.rmSync(tmp,{recursive:true,force:true});}
+    const log = path.join(tmp, 'access.log');
+    for (const [line, status] of [
+      ['accepted tcp:1.1.1.1:443 [routing-test-socks >> block]', 0],
+      ['accepted tcp:1.1.1.1:443 [routing-test-socks -> block]', 1],
+      ['accepted tcp:1.1.1.1:443 [routing-test-socks >> direct]', 1],
+      ['accepted tcp:11.1.1.1:443 [routing-test-socks >> block]', 1],
+    ]) {
+      fs.writeFileSync(log, line);
+      const result = spawnSync('python3', ['-c', probe, log, '1.1.1.1'], {encoding: 'utf8'});
+      assert.equal(result.status, status, result.stderr);
+    }
+  } finally {
+    fs.rmSync(tmp, {recursive: true, force: true});
+  }
 });

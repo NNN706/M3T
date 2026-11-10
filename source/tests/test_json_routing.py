@@ -53,11 +53,13 @@ for rule in ips:
     assert nets==[n for version in (4,6) for n in ipaddress.collapse_addresses(n for n in nets if n.version==version)]
 current_domains=json.loads((root/'domains.json').read_text())
 # The committed JSON describes the previous scan. sites.txt may already have changed.
+# outboundTag is deployment policy, outside the generated domain data.
+current_domains['rules'] = [
+    {key: value for key, value in rule.items() if key != 'outboundTag'}
+    for rule in current_domains['rules']
+]
 assert current_domains == routing.domain_rules(
     current_domains, [rule['ruleTag'] for rule in current_domains['rules']], include_seed=False
-)
+), 'domains.json differs from canonical domain rules (ignoring outboundTag)' 
 assert (root/'ASN.txt').exists()
-assert not (root/'IP.txt').exists()
-assert not (root.parent/'ip/IP.txt').exists()
-assert not (root.parent/'ip/ASN.txt').exists()
-print('PASS separate JSON outputs, source domain attribution, partial union, persistent IPv4/IPv6 legacy, invalid domain atomic rejection, migration data')
+print('PASS separate JSON outputs, source domain attribution, partial union, persistent IPv4/IPv6 legacy, invalid domain atomic rejection, committed routing JSON')

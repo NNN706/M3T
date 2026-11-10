@@ -56,16 +56,17 @@ with tempfile.TemporaryDirectory() as directory:
     assert dns_call[dns_call.index('--') + 1:] == ['cdn.pending.example', 'child.old.example', 'pending.example', 'service.example']
     assert json.loads(args.domains_output.read_text()) == {'rules': [
         {'ruleTag': 'old.example', 'domain': ['domain:child.old.example', 'domain:old.example']},
-        {'ruleTag': 'pending.example', 'domain': ['domain:cdn.pending.example']},
+        {'ruleTag': 'pending.example', 'domain': ['domain:cdn.pending.example', 'domain:pending.example']},
         {'ruleTag': 'service.example', 'domain': ['domain:service.example']},
     ]}
     result = json.loads(args.output.read_text())
     assert {prefix for rule in result['rules'] for prefix in rule['ip']} == {
-        '192.0.2.0/24', '198.51.100.0/24',
+        '192.0.2.0/24', '198.51.100.0/24', '203.0.113.0/24',
     }
     report = json.loads((args.evidence / 'completeness.json').read_text())
     assert report['domains_without_complete_dns_bgp'] == ['pending.example']
     assert report['dns_skipped_existing'] == 1 and report['dns_requested'] == 4
+    assert json.loads(args.sources_output.read_text())['pending_dns'] == ['pending.example']
     args.resume = args.evidence
     args.evidence = tmp / 'resumed'
     checkout()
@@ -79,6 +80,23 @@ with tempfile.TemporaryDirectory() as directory:
         'cdn.pending.example', 'child.old.example', 'service.example', 'pending.example',
     }
 
+    resumed = args.evidence
+    args.evidence = tmp / 'extended'
+    checkout()
+    extra = {'site': 'extra.example', 'domains': ['extra.example'], 'errors': []}
+    with patch('update_routing.subprocess.run', side_effect=[
+        subprocess.CompletedProcess([], 0, json.dumps({'pages': [extra], 'complete': True})),
+        subprocess.CompletedProcess([], 0, json.dumps({'domains': [
+            dict(good, domain='extra.example'), dict(good, domain='pending.example'),
+        ]})),
+    ]) as run:
+        incremental_update(args, entries + [('extra.example', 'extra.example')], {'AS12345'},
+                           lambda *_: ([], [], ''))
+        browser_call, dns_call = [call.args[0] for call in run.call_args_list]
+        assert browser_call[browser_call.index('--') + 1:] == ['extra.example']
+        assert dns_call[dns_call.index('--') + 1:] == ['extra.example', 'pending.example']
+
+    args.evidence = resumed
     args.resume = args.evidence
     args.evidence = tmp / 'ready'
     checkout()
@@ -95,6 +113,26 @@ with tempfile.TemporaryDirectory() as directory:
     args.resume = None
     result = json.loads(args.output.read_text())
 
+    # The unfinished hostname remains eligible even after it appears in domains.json.
+    checkout()
+    write_json(args.domains_output, {'rules': [
+        {'ruleTag': 'old.example', 'domain': ['domain:old.example']},
+        {'ruleTag': 'pending.example', 'domain': ['domain:pending.example']},
+    ]})
+    write_json(args.sources_output, {'rules': [
+        {'ruleTag': 'old.example', 'ip': ['192.0.2.0/24']},
+    ], 'pending_dns': ['pending.example']})
+    with patch('update_routing.subprocess.run', side_effect=[
+        subprocess.CompletedProcess([], 0, json.dumps({'pages': [], 'complete': True})),
+        subprocess.CompletedProcess([], 1, ''),
+    ]) as run:
+        incremental_update(args, [('pending.example', 'pending.example'), ('dns-s', 'dns-s')],
+                           set(), lambda *_: ([], [], ''))
+        assert run.call_args.args[0][-1] == 'pending.example'
+        assert 'dns-s' not in run.call_args.args[0]
+    assert json.loads(args.sources_output.read_text())['pending_dns'] == ['pending.example']
+    result = json.loads(args.output.read_text())
+
     discovery.update(pages=[], complete=True)
     with patch('update_routing.subprocess.run', return_value=subprocess.CompletedProcess([], 0, json.dumps(discovery))) as run:
         incremental_update(args, [('old.example', 'old.example')], set(), lambda *_: ([], [], ''))
@@ -102,3 +140,56 @@ with tempfile.TemporaryDirectory() as directory:
     assert json.loads(args.output.read_text()) == result
 
 print('PASS incremental routing keeps old rules, skips exact names, resolves service hosts and retries unresolved names')
+
+with tempfile.TemporaryDirectory() as directory:
+    tmp = Path(directory)
+    args = argparse.Namespace(scanner=root / 'SubnetResolve.sh', verbose=False, allow_partial=True,
+                              full_refresh=True, domains_output=tmp / 'domains.json',
+                              sources_output=tmp / 'sources.json', output=tmp / 'IP.json',
+                              evidence=tmp / 'evidence')
+    sources = {'rules': [{'ruleTag': 'site.example', 'ip': ['192.0.2.0/24']},
+                         {'ruleTag': 'legacy', 'ip': ['198.51.100.0/24']}]}
+    domains = {'rules': [{'ruleTag': 'site.example',
+                          'domain': ['domain:old.site.example', 'domain:site.example']}]}
+    for success in (True, False):
+        write_json(args.sources_output, sources)
+        write_json(args.domains_output, domains)
+        scan = {'domains': [
+            {'domain': 'site.example', 'complete': success, 'results': [
+                {'prefix': '203.0.113.0/24', 'asn': 'AS123'}]},
+            {'domain': 'old.site.example', 'complete': False, 'results': []},
+        ]}
+        discovery = {'pages': [{'site': 'site.example', 'domains': [], 'errors': []}]}
+        with patch('update_routing.subprocess.run', side_effect=[
+            subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+            subprocess.CompletedProcess([], 3, json.dumps(scan)),
+        ]) as run:
+            incremental_update(args, [('site.example', 'https://site.example')], set(), lambda *_: ([], [], ''))
+            assert run.call_args.args[0][-2:] == ['old.site.example', 'site.example']
+        saved = json.loads(args.sources_output.read_text())
+        prefixes = {prefix for rule in saved['rules'] for prefix in rule['ip']}
+        assert {'198.51.100.0/24', '203.0.113.0/24'} <= prefixes
+        assert ('192.0.2.0/24' in prefixes) is not success
+        assert ('old.site.example' in args.domains_output.read_text()) is not success
+        status = json.loads((args.evidence / 'completeness.json').read_text())
+        assert status['mode'] == 'full-refresh' and status['complete'] is success
+print('PASS daily full refresh replaces generated rules only after complete active discovery and keeps legacy')
+
+with tempfile.TemporaryDirectory() as directory:
+    tmp = Path(directory)
+    args = argparse.Namespace(scanner=root / 'SubnetResolve.sh', verbose=False, allow_partial=True,
+                              full_refresh=True, domains_output=tmp / 'domains.json',
+                              sources_output=tmp / 'sources.json', output=tmp / 'IP.json',
+                              evidence=tmp / 'evidence')
+    write_json(args.sources_output, {'rules': [{'ruleTag': 'legacy', 'ip': ['198.51.100.0/24']}]})
+    discovery = {'pages': [{'site': 'site.example', 'domains': [], 'errors': []}]}
+    with patch('update_routing.time.monotonic', side_effect=[0, 1, 13801]), patch(
+        'update_routing.subprocess.run',
+        return_value=subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+    ) as run:
+        incremental_update(args, [('site.example', 'https://site.example')], set(), lambda *_: ([], [], ''))
+        assert run.call_count == 1
+    assert json.loads(args.output.read_text())['rules'] == [{'ruleTag': 'legacy', 'ip': ['198.51.100.0/24']}]
+    assert json.loads((args.evidence / 'completeness.json').read_text())['complete'] is False
+
+print('PASS expired shared scan budget preserves output and records incomplete refresh')

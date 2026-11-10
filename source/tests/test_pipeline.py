@@ -46,8 +46,8 @@ elif name=='nc':
   line=line.strip()
   if line=='end':break
   if line not in ('begin','verbose'):ips.append(line)
- phase='bgp-health' if ips==['1.1.1.1'] else 'bulk';log(phase,ips)
- if mode=='bgp-health' and phase=='bgp-health':print('invalid response');sys.exit(0)
+ phase='bgp-health' if ips in (['1.1.1.1'],['8.8.8.8']) else 'bulk';log(phase,ips)
+ if phase=='bgp-health' and (mode=='bgp-health' or (mode=='probe-fallback' and ips==['1.1.1.1'])):print('invalid response');sys.exit(0)
  for ip in ips:
   if mode=='bgp' and ip=='3.3.3.3':continue
   if ip=='195.242.82.12':
@@ -68,7 +68,7 @@ with tempfile.TemporaryDirectory(prefix='subnet-pipeline-') as directory:
   assert 'пригодный маршрут' not in result.stderr
   assert 'HTTPcurl' not in result.stderr and 'curl: (' not in result.stderr,result.stderr
   assert 'код выхода' not in result.stderr and 'код результата' not in result.stderr
-  assert '[Этап ' in result.stderr
+  assert '[Этап ' in result.stderr or 'Подготовка DNS/BGP' in result.stderr
   evidence.append({'mode':mode,'hosts':hosts,'status':result.returncode,'events':events,'stderr':result.stderr})
   return result,events,phases
  combinations=[['good1.example','good2.example'],['good1.example','bad1.example'],['bad1.example','good1.example'],['bad1.example','bad2.example']]
@@ -83,7 +83,7 @@ with tempfile.TemporaryDirectory(prefix='subnet-pipeline-') as directory:
    assert output['ip']==expected_ips,(mode,hosts,output)
    if web_failure:
     assert output['domain']==['domain:'+h for h in sorted(hosts)]
-    assert [d for phase,d in events if phase=='dns']==sorted(hosts)
+    assert sorted(d for phase,d in events if phase=='dns')==sorted(hosts)
     if mode=='cert':
      for host in bad:
       for attempt in (1,2):
@@ -96,9 +96,9 @@ with tempfile.TemporaryDirectory(prefix='subnet-pipeline-') as directory:
     for h in bad:assert events.count(['dns',h])==2 and ['result',h] not in events
    if mode=='result':
     for h in bad:assert events.count(['result',h])==2
-   if 'health' in phases:assert phases.index('health')<phases.index('dns')
+   if 'health' in phases:assert phases.index('health')<phases.index('bgp-health')<phases.index('dns')
    if 'bulk' in phases:
-    assert max(i for i,x in enumerate(phases) if x=='result')<phases.index('bgp-health')<phases.index('bulk')
+    assert phases.index('bgp-health')<max(i for i,x in enumerate(phases) if x=='result')<phases.index('bulk')
     assert phases.count('bulk')==(2 if mode=='bgp' and bad else 1)
     for phase,ips in events:
      if phase=='bulk':assert len(ips)==len(set(ips)) and ('3.3.3.3' in ips)==((mode=='bgp' or web_failure) and bool(bad))
@@ -114,11 +114,24 @@ with tempfile.TemporaryDirectory(prefix='subnet-pipeline-') as directory:
  for mode in ('health','bgp-health'):
   result,events,phases=run(mode,combinations[0])
   assert result.returncode==1 and not result.stdout,(mode,result.stderr)
-  assert phases.count(mode)==2
+  assert phases.count(mode)==(4 if mode=='bgp-health' else 2)
   if mode=='health':assert phases==['health','health'] and 'HTTP-ошибку' in result.stderr
-  else:assert 'bulk' not in phases
+  else:assert 'dns' not in phases and 'bulk' not in phases
   print('PASS shared service unavailable:',mode,flush=True)
  result,events,phases=run('retry',combinations[0]);assert result.returncode==0 and phases.count('health')==2,result.stderr
  print('PASS first attempt fails, second succeeds; duplicate IP sent once',flush=True)
+ result,events,phases=run('probe-fallback',combinations[0])
+ assert result.returncode==0 and ['bgp-health',['8.8.8.8']] in events and phases.index('bgp-health')<phases.index('dns')
+ result,events,phases=run('bgp',combinations[1])
+ import re
+ checkpoint=re.search(r'--resume-bgp (\S+) \(без списка доменов\)',result.stderr)[1]
+ saved=pathlib.Path(checkpoint)
+ assert saved.stat().st_mode & 0o777 == 0o600
+ result,events,phases=run('ok',['--resume-bgp',checkpoint])
+ assert result.returncode==0,result.stderr
+ assert 'dns' not in phases and 'browser' not in phases and 'health' not in phases
+ assert [payload for phase,payload in events if phase=='bulk']==[['3.3.3.3']]
+ assert json.loads(result.stdout)['ip']==['2.2.2.0/24','3.3.3.0/24']
+ print('PASS early BGP probe fallback and resume only missing IPs after incomplete WHOIS',flush=True)
  if os.environ.get('TEST_ARTIFACTS'):
   dest=pathlib.Path(os.environ['TEST_ARTIFACTS']);dest.mkdir(parents=True,exist_ok=True);(dest/'pipeline.json').write_text(json.dumps(evidence,ensure_ascii=False,indent=2))

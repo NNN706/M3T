@@ -36,6 +36,15 @@ with TemporaryDirectory() as directory, patch.dict(os.environ, {'XDG_CACHE_HOME'
             assert curl.call_count == 2
 
         target = Path(directory) / 'SubnetResolve/bgp-tools/table.jsonl'
+        table = asn_routes.BgpTable()
+        with patch.object(asn_routes, 'table_prefixes', wraps=asn_routes.table_prefixes) as parse:
+            assert table.prefixes({100}) == {100: {'192.0.2.0/24', '2001:db8::/32'}}
+            assert table.prefixes({200}) == {200: {'198.51.100.0/24'}}
+            assert parse.call_count == 1
+            target.write_text(TABLE.replace('198.51.100.0/24', '198.51.100.0/25'))
+            assert table.prefixes({200}) == {200: {'198.51.100.0/25'}}
+            assert parse.call_count == 2
+            target.write_text(TABLE)
         os.utime(target, (1, 1))
 
         def incomplete(command, **kwargs):

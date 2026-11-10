@@ -1,3 +1,10 @@
-https://bgp.he.net/AS57724#_prefixes
-https://bgp.he.net/AS8901#_prefixes
-https://bgp.he.net/AS8732#_prefixes
+AS47764
+AS8732
+AS8901
+AS57724
+AS210756
+AS8291
+AS34879
+AS51115
+AS15632
+AS44128

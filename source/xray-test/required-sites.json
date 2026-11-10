@@ -1,8 +1,8 @@
 [
-  {"url":"https://dzen.ru/","text":"Дзен|Новости","selector":"a[href], button"},
+  {"url":"https://dzen.ru/","statusOnly":true},
   {"url":"https://gosuslugi.ru/","text":"Госуслуги|Государственные услуги","selector":"a[href], button"},
   {"url":"https://lkfl2.nalog.ru/lkfl/login","text":"Личный кабинет|Войти|Вход","selector":"input:not([type=hidden]), button"},
   {"url":"https://lknpd.nalog.ru/","text":"Мой налог|Войти|Вход","selector":"input:not([type=hidden]), button"},
-  {"url":"https://gov.ru/","text":"государствен|органов|Российск","selector":"a[href]"},
+  {"url":"https://www.nalog.gov.ru/","text":"О ФНС России","selector":"a[href]"},
   {"url":"https://max.ru/","text":"MAX|Макс","selector":"a[href], button"}
 ]

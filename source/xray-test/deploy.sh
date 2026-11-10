@@ -1,88 +1,98 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# Run only on the trusted self-hosted runner, with GitHub Environment secrets.
-: "${XRAY_HOST:?Set XRAY_HOST}" "${XRAY_USER:?Set XRAY_USER}"
-: "${XRAY_IMAGE:?Set ghcr.io/xtls/xray-core:VERSION@sha256:DIGEST}"
-: "${XRAY_SSH_KEY:?Set SSH private key}" "${XRAY_KNOWN_HOSTS:?Set pinned known_hosts}"
-XRAY_SSH_PORT=${XRAY_SSH_PORT:-22}
-[[ $XRAY_HOST =~ ^[a-zA-Z0-9.-]+$ && $XRAY_USER =~ ^[a-zA-Z_][a-zA-Z0-9_-]*$ ]]
-[[ $XRAY_SSH_PORT =~ ^[0-9]+$ ]]
+
+: "${XRAY_IMAGE:?Set the pinned official Xray image in the workflow}"
 [[ $XRAY_IMAGE =~ ^ghcr\.io/xtls/xray-core:[a-zA-Z0-9_.-]+@sha256:[a-f0-9]{64}$ ]]
-[[ ${GITHUB_SHA:?} =~ ^[a-f0-9]{40}$ && ${GITHUB_RUN_ID:?} =~ ^[0-9]+$ ]]
 root=$(cd "$(dirname "$0")/../.." && pwd)
 evidence=${XRAY_EVIDENCE:-"${RUNNER_TEMP:?}/xray-evidence"}
 mkdir -p "$evidence"
-private=$(mktemp -d)
-chmod 700 "$private"
-printf '%s\n' "$XRAY_SSH_KEY" > "$private/key"
-printf '%s\n' "$XRAY_KNOWN_HOSTS" > "$private/known_hosts"
-chmod 600 "$private/key" "$private/known_hosts"
-unset XRAY_SSH_KEY XRAY_KNOWN_HOSTS
-opts=(-i "$private/key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$private/known_hosts" -o ConnectTimeout=15 -p "$XRAY_SSH_PORT")
-remote="$XRAY_USER@$XRAY_HOST"
-tunnel_pid=''
-activated=0
+container_state_dir=$(mktemp -d "$evidence/container.XXXXXX")
+cidfile="$container_state_dir/id"
+docker_command=(docker)
+if [[ ${XRAY_DOCKER_SUDO:-0} == 1 ]]; then
+  docker_command=(sudo -n docker)
+fi
+run_docker() { "${docker_command[@]}" "$@"; }
 cleanup() {
-  status=$?
-  if [[ $activated == 1 ]]; then
-    ssh "${opts[@]}" "$remote" 'docker logs --timestamps m3t-xray-routing-test' > "$evidence/xray.log" 2>&1 || true
-    ssh "${opts[@]}" "$remote" 'docker inspect --format "{{json .State}}" m3t-xray-routing-test' > "$evidence/container-state.json" 2>/dev/null || true
+  local status=$? container
+  if [ -s "$cidfile" ]; then
+    container=$(cat "$cidfile")
+    if [[ $container =~ ^[a-f0-9]{64}$ ]]; then
+      run_docker logs --timestamps "$container" > "$evidence/xray.log" 2>&1 || true
+      run_docker inspect --format '{{json .State}}' "$container" > "$evidence/container-state.json" 2>/dev/null || true
+      run_docker rm -f "$container" >/dev/null || true
+      rm -f "$cidfile"
+    fi
   fi
-  [[ -z $tunnel_pid ]] || { kill "$tunnel_pid" 2>/dev/null || true; wait "$tunnel_pid" 2>/dev/null || true; }
-  rm -rf "$private"
+  rmdir "$container_state_dir" 2>/dev/null || true
   exit "$status"
 }
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM HUP
+
+if ! run_docker info --format 'Docker {{.ServerVersion}}, data root {{.DockerRootDir}}'; then
+  printf 'Docker недоступен через %s. Проверьте доступ к daemon на Admiralteskiy.\n' "${docker_command[*]}" >&2
+  exit 1
+fi
 node "$root/source/xray-test/prepare.cjs" "$root/Templates/Routing-(RU-Direct)/routing-ru.json" "$evidence"
-release="m3t-xray-routing-test/releases/$GITHUB_SHA-$GITHUB_RUN_ID"
-ssh "${opts[@]}" "$remote" "mkdir -p '$release'"
-ssh "${opts[@]}" "$remote" "cat > '$release/config.json'" < "$evidence/config.json"
-# Validation precedes any change to the existing managed container.
-ssh "${opts[@]}" "$remote" bash -s -- "$XRAY_IMAGE" "$release" "$GITHUB_SHA" <<'REMOTE'
-set -euo pipefail
-image=$1
-release="$HOME/$2"
-sha=$3
-chmod 644 "$release/config.json"
-docker pull "$image"
-docker run --rm --network none -v "$release/config.json:/etc/xray/config.json:ro" "$image" run -test -config /etc/xray/config.json
-if docker inspect m3t-xray-routing-test >/dev/null 2>&1; then
-  [[ $(docker inspect --format '{{index .Config.Labels "com.docker.compose.project"}}' m3t-xray-routing-test) == m3t-xray-routing-test ]] || { echo 'Container name is owned by another project' >&2; exit 1; }
+chmod 644 "$evidence/config.json"
+config_mount="$evidence/config.json:/etc/xray/config.json:ro"
+config_sha=$(git -C "$root" rev-parse HEAD 2>/dev/null || printf local)
+run_docker pull "$XRAY_IMAGE"
+run_docker run --rm --network none -v "$config_mount" "$XRAY_IMAGE" run -test -config /etc/xray/config.json
+
+container=$(run_docker run --detach --cidfile "$cidfile" --publish 127.0.0.1::10808   --label "m3t.sha=$config_sha" --label "m3t.run=${GITHUB_RUN_ID:-local}"   --log-driver json-file --log-opt max-size=20m --log-opt max-file=3   -v "$config_mount" "$XRAY_IMAGE" run -config /etc/xray/config.json)
+binding=$(run_docker port "$container" 10808/tcp)
+if ! [[ $binding =~ ^127\.0\.0\.1:[0-9]+$ ]]; then
+  echo "Неожиданная привязка SOCKS: $binding" >&2
+  exit 1
 fi
-cat > "$release/compose.json" <<JSON
-{"services":{"xray":{"image":"$image","container_name":"m3t-xray-routing-test","restart":"unless-stopped","command":["run","-config","/etc/xray/config.json"],"ports":["127.0.0.1:10808:10808"],"volumes":["$release/config.json:/etc/xray/config.json:ro"],"labels":{"m3t.sha":"$sha"},"logging":{"driver":"json-file","options":{"max-size":"20m","max-file":"3"}}}}}
-JSON
-docker compose -p m3t-xray-routing-test -f "$release/compose.json" up -d
-# No CPU quota or memory limit. Leave the candidate running after test failures.
-sleep 2
-[[ $(docker inspect --format '{{.State.Running}}' m3t-xray-routing-test) == true ]]
-REMOTE
-activated=1
-# Ask SSH to allocate a free local forwarding port, avoiding collisions on the runner.
-# A short-lived bound socket selects a port; ExitOnForwardFailure catches any race.
-port=$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()')
-ssh "${opts[@]}" -o ExitOnForwardFailure=yes -o ServerAliveInterval=15 -o ServerAliveCountMax=3 -N -L "127.0.0.1:$port:127.0.0.1:10808" "$remote" &
-tunnel_pid=$!
-for attempt in {1..30}; do
-  kill -0 "$tunnel_pid" 2>/dev/null || { echo 'SSH tunnel stopped' >&2; exit 1; }
-  if python3 -c 'import socket,sys; s=socket.create_connection(("127.0.0.1",int(sys.argv[1])),.2); s.close()' "$port" 2>/dev/null; then break; fi
-  sleep 1
-done
+port=${binding##*:}
+python3 - "$port" <<'PY'
+import socket
+import sys
+import time
+
+for _ in range(30):
+    try:
+        with socket.create_connection(("127.0.0.1", int(sys.argv[1])), 0.5) as conn:
+            conn.settimeout(0.5)
+            conn.sendall(b"\x05\x01\x00")
+            if conn.recv(2) == b"\x05\x00":
+                break
+    except OSError:
+        pass
+    time.sleep(0.5)
+else:
+    raise SystemExit("Xray не ответил на SOCKS5 handshake")
+PY
+
 negative=$(cat "$evidence/negative-ip")
-probe_started=$(ssh "${opts[@]}" "$remote" "date -u +%FT%TZ")
-# Failed networking alone is not proof of block: require Xray's routing decision.
-if curl -fsS --socks5-hostname "127.0.0.1:$port" --connect-timeout 5 --max-time 10 "https://$negative/" > /dev/null 2> "$evidence/negative-curl.log"; then
-  echo 'Default block preflight unexpectedly succeeded' >&2; exit 1
+if curl -fsS --noproxy '' --socks5-hostname "$binding" --connect-timeout 5 --max-time 10 "https://$negative/"     > /dev/null 2> "$evidence/negative-curl.log"; then
+  echo 'Контрольное соединение неожиданно прошло через default block' >&2
+  exit 1
 fi
-ssh "${opts[@]}" "$remote" "docker logs --since '$probe_started' m3t-xray-routing-test 2>&1" > "$evidence/preflight-xray.log"
+run_docker logs "$container" > "$evidence/preflight-xray.log" 2>&1
 python3 - "$evidence/preflight-xray.log" "$negative" <<'PY'
 import sys
-lines=open(sys.argv[1]).read().splitlines()
-if not any(sys.argv[2]+':443' in line and 'routing-test-socks -> block' in line for line in lines):
-    raise SystemExit('Не подтверждён default block в журнале Xray; браузерный тест не запускается')
+# Xray writes >> for a default outbound and -> for an explicit routing rule.
+expected = f'accepted tcp:{sys.argv[2]}:443 [routing-test-socks >> block]'
+with open(sys.argv[1]) as log:
+    if not any(expected in line for line in log):
+        raise SystemExit(f'Не подтверждён default block в журнале Xray. Ожидалась запись: {expected}')
 PY
-printf 'Container: m3t-xray-routing-test\nImage: %s\nSHA: %s\nStarted: %s\n' "$XRAY_IMAGE" "$GITHUB_SHA" "$(date -u +%FT%TZ)" > "$evidence/deployment.txt"
+printf 'Container: %s\nImage: %s\nSHA: %s\nStarted: %s\n'   "$container" "$XRAY_IMAGE" "$config_sha" "$(date -u +%FT%TZ)" > "$evidence/deployment.txt"
 cat "$evidence/deployment.txt" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
-node "$root/source/xray-test/browse.cjs" "$root/source/routing/sites.txt" "$root/source/xray-test/required-sites.json" "$evidence" "socks5://127.0.0.1:$port"
+curl_status=0
+if [ -f "$evidence/curl-direct.json" ]; then
+  python3 "$root/source/xray-test/curl_diagnostics.py" "$root/source/xray-test/required-sites.json" \
+    "$evidence" --proxy "$binding" || curl_status=$?
+  if [ -f "$evidence/curl-comparison.md" ]; then
+    cat "$evidence/curl-comparison.md" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
+  fi
+fi
+browser_status=0
+node "$root/source/xray-test/browse.cjs" "$root/source/routing/sites.txt" "$root/source/xray-test/required-sites.json" "$evidence" "socks5://$binding" || browser_status=$?
+if [ "$browser_status" -ne 0 ]; then exit "$browser_status"; fi
+exit "$curl_status"

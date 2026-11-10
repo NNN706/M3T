@@ -8,6 +8,11 @@ on:
       - 'source/xray-test/**'
       - '.github/workflows/xray-routing-test.yml'
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      checkout_ref:
+        type: string
+        required: true
 permissions:
   contents: read
 concurrency:
@@ -16,11 +21,12 @@ concurrency:
 jobs:
   validate:
     runs-on: [self-hosted, Linux, X64]
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+          ref: ${{ inputs.checkout_ref || github.sha }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
@@ -32,19 +38,22 @@ jobs:
         run: |
           set -euo pipefail
           test "$RUNNER_NAME" = Admiralteskiy
+          df -h / /var "$GITHUB_WORKSPACE" "$RUNNER_TEMP"
           npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install --only-shell chromium
           bash -n deploy.sh
           npm test
+          python3 test/curl_diagnostics.py
   deploy-and-browse:
     needs: validate
     if: github.ref == 'refs/heads/test'
     runs-on: [self-hosted, Linux, X64]
-    environment: xray-routing-test
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+          ref: ${{ inputs.checkout_ref || github.sha }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
@@ -55,34 +64,35 @@ jobs:
         run: |
           set -euo pipefail
           test "$RUNNER_NAME" = Admiralteskiy
+          df -h / /var "$GITHUB_WORKSPACE" "$RUNNER_TEMP"
           npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install --only-shell chromium
-      - name: Check deployment settings
-        id: settings
+      - name: Probe mandatory sites directly with curl
         shell: bash
         env:
-          XRAY_HOST: ${{ vars.XRAY_HOST }}
+          XRAY_EVIDENCE: ${{ runner.temp }}/xray-evidence-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
-          if [ -z "$XRAY_HOST" ]; then
-            echo 'enabled=false' >> "$GITHUB_OUTPUT"
-            echo '::notice::Live deployment skipped: configure the xray-routing-test Environment first.'
-            echo '### Live Xray deployment skipped: XRAY_HOST is not configured in xray-routing-test.' >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo 'enabled=true' >> "$GITHUB_OUTPUT"
-          fi
-      - name: Validate, deploy and browse through SSH tunnel
-        if: steps.settings.outputs.enabled == 'true'
+          set -euo pipefail
+          mkdir -p "$XRAY_EVIDENCE"
+          python3 source/xray-test/curl_diagnostics.py source/xray-test/required-sites.json "$XRAY_EVIDENCE"
+      - name: Run Xray and verify routing through local SOCKS
+        id: xray-check
         shell: bash
         env:
-          XRAY_HOST: ${{ vars.XRAY_HOST }}
-          XRAY_USER: ${{ vars.XRAY_USER }}
-          XRAY_SSH_PORT: ${{ vars.XRAY_SSH_PORT }}
-          XRAY_IMAGE: ${{ vars.XRAY_IMAGE }}
-          XRAY_SSH_KEY: ${{ secrets.XRAY_SSH_KEY }}
-          XRAY_KNOWN_HOSTS: ${{ secrets.XRAY_KNOWN_HOSTS }}
+          XRAY_DOCKER_SUDO: '1'
+          XRAY_IMAGE: ghcr.io/xtls/xray-core:26.10.31@sha256:ceabeac03a89d991d2a247361825c1d1d2e9c91cd5dc010f298c7dc0c2f325c9
           XRAY_EVIDENCE: ${{ runner.temp }}/xray-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/xray-test-browsers
         run: bash source/xray-test/deploy.sh
+      - name: Retry failed sites directly with curl
+        if: ${{ failure() && steps.xray-check.outcome == 'failure' }}
+        shell: bash
+        env:
+          XRAY_EVIDENCE: ${{ runner.temp }}/xray-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          python3 source/xray-test/curl_diagnostics.py source/xray-test/required-sites.json \
+            "$XRAY_EVIDENCE" --after-failure | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Save diagnostic artifacts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

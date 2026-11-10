@@ -5,9 +5,14 @@ import shutil
 import subprocess
 import tempfile
 
-INPUTS = ['source/routing/sites.txt', 'source/routing/ASN.txt', 'source/routing/asn_routes.py', 'source/SubnetResolve.sh',
+LISTS = ['source/routing/sites.txt', 'source/routing/ASN.txt']
+INPUTS = ['source/routing/exclusion_policy.py', 'source/routing/exclude', 'source/routing/asn_routes.py', 'source/SubnetResolve.sh',
           'source/routing/update_routing.py', 'source/routing/domains.json', 'source/routing/sources.json', 'source/routing/IP.json']
 OUTPUT = 'source/routing/IP.json'
+REPORT = 'source/routing/asn-report.md'
+REPORT_VERBOSE = 'source/routing/asn-report-verbose.md'
+PROVENANCE = 'source/routing/dns-provenance.json'
+REPORT_INPUTS = [OUTPUT, 'source/routing/sources.json', REPORT, REPORT_VERBOSE, PROVENANCE, 'source/routing/routing_report.py', 'source/routing/asn_routes.py']
 
 def git(repo, *args, check=True):
     return subprocess.run(['git', '-C', str(repo), *args], text=True,
@@ -21,11 +26,20 @@ def publish(repo, output, base, branch='test', domains=None, sources=None):
         payloads['source/routing/domains.json'] = domains.read_bytes()
     if sources is not None:
         payloads['source/routing/sources.json'] = sources.read_bytes()
+    publish_payloads(repo, base, payloads, INPUTS, 'Update service routing prefixes')
+
+
+def publish_payloads(repo, base, payloads, inputs, message):
     for attempt in range(3):
         git(repo, 'fetch', 'origin', 'refs/heads/test')
         head = git(repo, 'rev-parse', 'FETCH_HEAD').stdout.strip()
-        if git(repo, 'diff', '--quiet', base, head, '--', *INPUTS, check=False).returncode:
-            raise RuntimeError('Routing inputs or previous IP.json changed during scan; result retained in artifacts. Run update again.')
+        guarded = git(repo, 'diff', '--name-only', base, head, '--', *inputs).stdout.splitlines()
+        if guarded:
+            raise RuntimeError('Routing code or published JSON changed during scan: '
+                               + ', '.join(guarded) + '. Results retained in artifacts.')
+        changed_lists = git(repo, 'diff', '--name-only', base, head, '--', *LISTS).stdout.splitlines()
+        if changed_lists:
+            print('Publishing collected data without changing newer lists: ' + ', '.join(changed_lists))
         with tempfile.TemporaryDirectory(prefix='routing-publish-') as directory:
             worktree = Path(directory) / 'checkout'
             git(repo, 'worktree', 'add', '--detach', str(worktree), head)
@@ -36,14 +50,14 @@ def publish(repo, output, base, branch='test', domains=None, sources=None):
                     target.write_bytes(payload)
                 git(worktree, 'add', '--', *payloads)
                 if git(worktree, 'diff', '--cached', '--quiet', check=False).returncode == 0:
-                    print('IP.json unchanged; no commit needed.')
+                    print('Files unchanged; no commit needed: ' + ', '.join(payloads))
                     return
                 git(worktree, '-c', 'user.name=github-actions[bot]',
                     '-c', 'user.email=41898282+github-actions[bot]@users.noreply.github.com',
-                    'commit', '-m', 'Update service routing prefixes')
+                    'commit', '-m', message)
                 pushed = git(worktree, 'push', 'origin', 'HEAD:refs/heads/test', check=False)
                 if pushed.returncode == 0:
-                    print('Published source/routing/IP.json to test.')
+                    print('Published to test: ' + ', '.join(payloads))
                     return
                 # Retry only when the remote branch advanced; authentication and policy errors remain failures.
                 git(repo, 'fetch', 'origin', 'refs/heads/test')
@@ -58,12 +72,28 @@ def publish(repo, output, base, branch='test', domains=None, sources=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', type=Path, default=Path.cwd())
-    parser.add_argument('--output', type=Path, required=True)
+    operation = parser.add_mutually_exclusive_group(required=True)
+    operation.add_argument('--output', type=Path)
+    operation.add_argument('--report', type=Path)
+    parser.add_argument('--report-verbose', type=Path)
+    parser.add_argument('--provenance', type=Path)
     parser.add_argument('--sources', type=Path)
     parser.add_argument('--domains', type=Path)
     parser.add_argument('--base', required=True)
     args = parser.parse_args()
-    publish(args.repo.resolve(), args.output.resolve(), args.base, domains=args.domains.resolve() if args.domains else None, sources=args.sources.resolve() if args.sources else None)
+    if bool(args.report_verbose) != bool(args.provenance) or (args.report_verbose and not args.report):
+        parser.error('--report-verbose and --provenance require --report and must be supplied together')
+    if args.report:
+        if args.sources or args.domains:
+            parser.error('--sources and --domains require --output')
+        payloads = {REPORT: args.report.read_bytes()}
+        if args.report_verbose:
+            payloads[REPORT_VERBOSE] = args.report_verbose.read_bytes()
+            payloads[PROVENANCE] = args.provenance.read_bytes()
+        publish_payloads(args.repo.resolve(), args.base, payloads,
+                         REPORT_INPUTS, 'Update overall routing ASN report')
+    else:
+        publish(args.repo.resolve(), args.output, args.base, domains=args.domains, sources=args.sources)
 
 if __name__ == '__main__':
     main()
