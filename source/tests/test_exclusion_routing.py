@@ -94,6 +94,7 @@ with tempfile.TemporaryDirectory() as directory:
     write_json(args.domains_output, {'rules': [
         {'ruleTag': 'other.example', 'domain': ['domain:ipv6.other.example', 'domain:other.example']},
     ]})
+    baseline = {path: path.read_bytes() for path in (args.sources_output, args.domains_output)}
     discovery = {'pages': [
         {'site': 'cloud.example', 'domains': ['mixed.example'], 'errors': []}
     ]}
@@ -118,6 +119,40 @@ with tempfile.TemporaryDirectory() as directory:
     }
     stats = json.loads((args.evidence / 'completeness.json').read_text())
     assert stats['complete'] and stats['excluded_ipv4_skipped_before_whois'] == 3, stats
+
+    published = {path: path.read_bytes() for path in (*baseline, args.output)}
+    args.resume = args.evidence
+    args.evidence = tmp / 'replayed'
+    for path, content in baseline.items():
+        path.write_bytes(content)
+    args.output.unlink()
+
+    def unexpected_collect(*_):
+        raise AssertionError('Repeated ASN collection')
+
+    explicit = {'AS13335', 'AS54113', 'AS8075'}
+    with patch('update_routing.subprocess.run') as run, patch('exclusion_policy.lookup_addresses') as dns:
+        incremental_update(args, entries, explicit, unexpected_collect, policy)
+        run.assert_not_called()
+        dns.assert_not_called()
+    assert all(path.read_bytes() == payload for path, payload in published.items())
+    evidence_file = 'scanner-output-1.json'
+    assert (args.evidence / evidence_file).read_bytes() == (args.resume / evidence_file).read_bytes()
+
+    # IPv4 is unchanged, but IPv6 changed. The prepared rules must be rebuilt.
+    for path, content in baseline.items():
+        path.write_bytes(content)
+    args.output.unlink()
+    args.evidence = tmp / 'changed-policy'
+    changed = ExclusionPolicy(origins, ['192.0.2.128/25', '203.0.113.0/24', '2001:db8::/47'])
+    with patch('update_routing.subprocess.run') as run, patch('exclusion_policy.lookup_addresses', return_value=set()):
+        incremental_update(args, entries, explicit, lambda *_: ([], [], ''), changed)
+        run.assert_not_called()
+    assert all(':' not in prefix for rule in json.loads(args.output.read_text())['rules'] for prefix in rule['ip'])
+    for path, payload in published.items():
+        path.write_bytes(payload)
+    args.resume = None
+    args.evidence = tmp / 'incremental'
 
     with patch('exclusion_policy.lookup_addresses', return_value=set()), patch(
         'update_routing.subprocess.run', return_value=subprocess.CompletedProcess([], 0, json.dumps(discovery))

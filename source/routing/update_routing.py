@@ -1,5 +1,6 @@
 """Scan services and atomically write deduplicated Xray rule fragments (Python stdlib)."""
 import argparse
+from bisect import bisect_right
 from collections import Counter
 from contextlib import ExitStack
 from hashlib import sha256
@@ -7,6 +8,7 @@ import ipaddress
 import json
 import os
 import re
+from shutil import copyfile
 from pathlib import Path
 import subprocess
 import tempfile
@@ -89,9 +91,19 @@ def global_rules(data):
             tagged.append((rule['ruleTag'], ipaddress.ip_network(value, strict=True)))
     collapsed = [n for version in (4,6) for n in ipaddress.collapse_addresses(n for _,n in tagged if n.version==version)]
     groups = {}
-    for network in collapsed:
-        tag = min(tag for tag,original in tagged if original.version==network.version and original.overlaps(network))
-        groups.setdefault(tag, []).append(str(network))
+    for version in (4, 6):
+        networks = [network for network in collapsed if network.version == version]
+        starts = [int(network.network_address) for network in networks]
+        owners = {}
+        for tag, original in tagged:
+            if original.version != version:
+                continue
+            index = bisect_right(starts, int(original.network_address)) - 1
+            if index < 0 or not original.subnet_of(networks[index]):
+                raise ValueError('Prefix is outside collapsed coverage')
+            owners[index] = min(owners.get(index, tag), tag)
+        for index, network in enumerate(networks):
+            groups.setdefault(owners[index], []).append(str(network))
     result = {'rules':[{'ruleTag':tag, 'ip':groups[tag]} for tag in sorted(groups)]}
     # Independent integer interval check, not another call to collapse_addresses.
     def coverage(networks):
@@ -112,7 +124,6 @@ def global_rules(data):
 
 
 def domain_rules(data, expected, *, include_seed=True):
-    import re
     rules = validate_rule_tags(data, expected, 'Правила доменов')
     result = []
     for rule in rules:
@@ -166,8 +177,13 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         manifest['full_refresh'] = True
     if ipv4_index is not None:
         manifest['ipv4_exclusions'] = sha256(json.dumps(ipv4_index, sort_keys=True).encode()).hexdigest()
+    if exclusion is not None:
+        policy = [sorted(exclusion.asns), [str(network) for family in (4, 6)
+                                          for network in exclusion.ranges[family]]]
+        manifest['exclusion_policy'] = sha256(json.dumps(policy).encode()).hexdigest()
     implementation = routing_fingerprint({
         'generator': Path(__file__), 'asn_routes': Path(__file__).with_name('asn_routes.py'),
+        'exclusion_policy': Path(__file__).with_name('exclusion_policy.py'),
     })
     saved = None
     if resume:
@@ -182,10 +198,11 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
             raise RuntimeError(f'Контрольная точка несовместима. Изменились: {detail}.')
     if args.evidence:
         write_json(args.evidence / 'checkpoint.json', manifest)
-    if exclusion is None and resume and saved == manifest and (resume / 'prepared.json').is_file():
+    if resume and saved == manifest and (resume / 'prepared.json').is_file():
         prepared = json.loads((resume / 'prepared.json').read_text())
         files = [*outputs, 'asn-report.md', 'completeness.json']
-        saved_files = {name: resume / name for name in files}
+        evidence_files = prepared_evidence(resume)
+        saved_files = {name: resume / name for name in files} | evidence_files
         if prepared.get('implementation') == implementation:
             if prepared.get('files') != routing_fingerprint(saved_files) or not all(p.is_file() for p in saved_files.values()):
                 raise RuntimeError('Контрольная точка публикации повреждена: файлы не совпадают с контрольными суммами.')
@@ -194,9 +211,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
                                                     'asns_without_prefixes', 'asn_export_error')):
                 for name, path in outputs.items():
                     write_json(path, json.loads(saved_files[name].read_text()))
-                for name in ('asn-report.md', 'completeness.json', 'discovery.json', 'dns-checkpoint.json'):
-                    if (resume / name).is_file():
-                        (args.evidence / name).write_bytes((resume / name).read_bytes())
+                for name in ('asn-report.md', 'completeness.json', *evidence_files):
+                    copyfile(saved_files[name], args.evidence / name)
                 save_prepared(args.evidence, outputs, implementation)
                 print('Восстановлены готовые файлы маршрутизации. Продолжаем с публикации.', flush=True)
                 return
@@ -261,7 +277,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
     pending = sorted(discovered | known) if full_refresh else sorted(
         host for host in discovered if host in retry_names or host not in known | previous_excluded
     )
-    print(f'DNS Check-Host: на проверку {len(pending)}, пропущено известных {len(discovered - set(pending))}.', flush=True)
+    skipped_existing = len(discovered - set(pending))
+    print(f'DNS Check-Host: на проверку {len(pending)}, пропущено известных {skipped_existing}.', flush=True)
     observations = []
     responses = {}
     if args.evidence:
@@ -387,7 +404,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         (args.evidence / 'asn-report.md').write_text(report)
         write_json(args.evidence / 'completeness.json', {
             'complete': complete, 'mode': 'full-refresh' if full_refresh else 'incremental', 'invalid_sites': invalid, 'dns_requested': len(pending),
-            'dns_skipped_existing': len(discovered) - len(pending),
+            'dns_skipped_existing': skipped_existing,
             'domains_without_complete_dns_bgp': unresolved,
             'domains_without_any_prefix': sorted(set(pending) - resolved.keys()),
             'excluded_ipv4_skipped_before_whois': len(excluded_ips),
@@ -407,17 +424,23 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         save_prepared(args.evidence, outputs, implementation)
 
 
+def prepared_evidence(directory):
+    paths = [directory / 'discovery.json', directory / 'dns-checkpoint.json',
+             *sorted(directory.glob('scanner-output-*.json'))]
+    return {path.name: path for path in paths if path.is_file()}
+
+
 def save_prepared(evidence, outputs, implementation):
     files = {name: evidence / name for name in (*outputs, 'asn-report.md', 'completeness.json')}
     for name, source in outputs.items():
         write_json(files[name], json.loads(source.read_text()))
     write_json(evidence / 'prepared.json', {
-        'files': routing_fingerprint(files), 'implementation': implementation,
+        'files': routing_fingerprint(files | prepared_evidence(evidence)), 'implementation': implementation,
     })
 
 
 def main():
-    from asn_routes import asn, collect
+    from asn_routes import BgpTable, asn, collect
     parser = argparse.ArgumentParser(description=__doc__)
     root = Path(__file__).resolve().parent
     parser.add_argument('--sites', type=Path, default=root / 'sites.txt')
@@ -461,14 +484,16 @@ def main():
         parser.error('--exclude-asns requires --incremental')
     if args.incremental:
         policy = None
+        table = BgpTable() if args.exclude_asns else None
         if args.exclude_asns:
             from exclusion_policy import ExclusionPolicy
             try:
-                policy = ExclusionPolicy.load()
+                policy = ExclusionPolicy.load(table=table)
             except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
                 parser.exit(1, f'Исключения ASN: не удалось загрузить ASN и префиксы. '
                                f'Сбор и публикация не запущены. {error}\n')
-        incremental_update(args, entries, explicit, collect, policy)
+        incremental_update(args, entries, explicit,
+                           lambda explicit, observed: collect(explicit, observed, table=table), policy)
         return
     with tempfile.TemporaryDirectory(prefix='routing-bgp-') as directory:
         metadata = Path(directory) / 'observations.json'

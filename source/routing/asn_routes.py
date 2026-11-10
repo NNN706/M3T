@@ -2,6 +2,7 @@
 from collections import defaultdict
 import csv
 import fcntl
+from hashlib import sha256
 import ipaddress
 import json
 import os
@@ -76,6 +77,28 @@ def table_prefixes(path, origins):
     return selected
 
 
+class BgpTable:
+    """Share one validated parse within a scan without extending export freshness."""
+
+    def __init__(self):
+        self.digest = None
+        self.snapshot = {}
+
+    def prefixes(self, origins):
+        def read(path):
+            digest = sha256()
+            with path.open('rb') as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+                    digest.update(chunk)
+            fingerprint = digest.digest()
+            if fingerprint != self.digest:
+                self.snapshot = table_prefixes(path, range(1, 2**32))
+                self.digest = fingerprint
+            return {origin: self.snapshot[origin] for origin in origins if origin in self.snapshot}
+
+        return cached_export('table.jsonl', 7200, read)
+
+
 def asn_names(path, origins):
     with path.open(encoding='utf-8', newline='') as stream:
         rows = csv.DictReader(stream)
@@ -84,7 +107,7 @@ def asn_names(path, origins):
         return {row['asn']: row['name'] for row in rows if row['asn'] in origins and row['name']}
 
 
-def collect(explicit, observations):
+def collect(explicit, observations, *, table=None):
     observed = {}
     names = {}
     for row in observations:
@@ -96,7 +119,8 @@ def collect(explicit, observations):
     origins = sorted(set(explicit) | observed.keys(), key=lambda value: int(value[2:]))
     if origins:
         ids = {int(origin[2:]) for origin in origins}
-        snapshot = cached_export('table.jsonl', 7200, lambda path: table_prefixes(path, ids))
+        snapshot = (table.prefixes(ids) if table is not None else
+                    cached_export('table.jsonl', 7200, lambda path: table_prefixes(path, ids)))
         unnamed = set(origins) - names.keys()
         if unnamed:
             try:

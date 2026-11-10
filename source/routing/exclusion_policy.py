@@ -41,11 +41,12 @@ class ExclusionPolicy:
         self.ends = {v: [int(n.broadcast_address) for n in self.ranges[v]] for v in (4, 6)}
 
     @classmethod
-    def load(cls, path=EXCLUDE_FILE):
+    def load(cls, path=EXCLUDE_FILE, *, table=None):
         origins = read_excluded_asns(path)
         if not origins:
             return cls(set(), set())
-        snapshot = cached_export('table.jsonl', 7200, lambda path: table_prefixes(path, origins))
+        snapshot = (table.prefixes(origins) if table is not None else
+                    cached_export('table.jsonl', 7200, lambda path: table_prefixes(path, origins)))
         return cls(origins, set().union(*snapshot.values()))
 
     def _overlaps(self, network):

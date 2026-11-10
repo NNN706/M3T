@@ -646,11 +646,14 @@ async function main() {
   const seeds = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
   const workers = Math.min(10, seeds.length);
   let next = 0, completed = 0;
+  let lastProgress;
   function publishProgress(i, origin, detail) {
     const status = workers > 1
       ? `обработано сайтов: ${completed}/${seeds.length}; найдено доменов: ${domains.size}`
       : `${i+1}/${seeds.length}: ${origin}; ${detail}`;
+    if (status === lastProgress) return;
     fs.writeFileSync(progressPath, status);
+    lastProgress = status;
   }
   async function capture(i) {
     const seed = new URL(seeds[i]);

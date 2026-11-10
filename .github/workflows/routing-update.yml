@@ -31,6 +31,8 @@ jobs:
     if: github.ref == 'refs/heads/test' && !inputs.report_only
     runs-on: [self-hosted, Linux, X64]
     timeout-minutes: ${{ inputs.full_refresh && 260 || 120 }}
+    outputs:
+      checkout_ref: ${{ steps.scan-ref.outputs.sha }}
     steps:
       - name: Verify runner
         run: |
@@ -44,6 +46,10 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: test
+      - name: Record scan revision
+        id: scan-ref
+        shell: bash
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Find checkpoint from previous routing run
         if: inputs.resume_run_id != ''
         id: resume
@@ -154,8 +160,17 @@ jobs:
           set -euo pipefail
           python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --output "$ROUTING_EVIDENCE/IP.json" --domains "$ROUTING_EVIDENCE/domains.json" --sources "$ROUTING_EVIDENCE/sources.json"
 
-  routing-report:
+  curl-diagnostic:
     needs: update
+    if: needs.update.result == 'success'
+    uses: ./.github/workflows/xray-routing-test.yml
+    with:
+      checkout_ref: ${{ needs.update.outputs.checkout_ref }}
+    permissions:
+      contents: read
+
+  routing-report:
+    needs: [update, curl-diagnostic]
     if: >-
       ${{ !cancelled() && github.ref == 'refs/heads/test' &&
           (needs.update.result == 'success' || (inputs.report_only && needs.update.result == 'skipped')) }}

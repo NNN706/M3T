@@ -52,7 +52,19 @@ with tempfile.TemporaryDirectory(prefix='subnet-bgp-') as directory:
  else:
   f=bin/'nc';f.write_text(mock);f.chmod(0o755)
   f=bin/'sleep';f.write_text('#!/bin/bash\nif [ "$1" = 0.1 ]; then exec /bin/sleep 0.03; fi\nprintf "%s\\n" "$1" >> "$SLEEPS"\n');f.chmod(0o755)
-  clock=root/'clock.sh';clock.write_text('sleep() { if [ "$1" = 0.1 ]; then SECONDS=$((SECONDS + 1)); /bin/sleep 0.03; else printf "%s\\n" "$1" >> "$SLEEPS"; fi; }\n')
+  clock=root/'clock.sh'
+  clock.write_text(r'''sleep() {
+    if [ "$1" = 0.1 ]; then
+      SECONDS=$((SECONDS + 1))
+      /bin/sleep 0.03
+    else
+      printf '%s\n' "$1" >> "$SLEEPS"
+      # Keep the scanner in backoff until the test sends SIGINT. An
+      # instantaneous mock sleep races the next WHOIS cycle instead.
+      if [[ "$MODE" == blocked || "$MODE" == forever ]]; then /bin/sleep 60; fi
+    fi
+  }
+  ''')
   for mode in ('ok','recover','partial','long','refused','missing','na','prefix','asn','forever'):
    trace.write_text('');sleeps.write_text('');env={**os.environ,'PATH':str(bin)+':'+os.environ['PATH'],'TRACE':str(trace),'SLEEPS':str(sleeps),'MODE':mode,'BASH_ENV':str(clock)}
    proc=subprocess.Popen(['bash','-c',code,'test',str(root)],env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)

@@ -38,10 +38,11 @@ fi
 node "$root/source/xray-test/prepare.cjs" "$root/Templates/Routing-(RU-Direct)/routing-ru.json" "$evidence"
 chmod 644 "$evidence/config.json"
 config_mount="$evidence/config.json:/etc/xray/config.json:ro"
+config_sha=$(git -C "$root" rev-parse HEAD 2>/dev/null || printf local)
 run_docker pull "$XRAY_IMAGE"
 run_docker run --rm --network none -v "$config_mount" "$XRAY_IMAGE" run -test -config /etc/xray/config.json
 
-container=$(run_docker run --detach --cidfile "$cidfile" --publish 127.0.0.1::10808   --label "m3t.sha=${GITHUB_SHA:-local}" --label "m3t.run=${GITHUB_RUN_ID:-local}"   --log-driver json-file --log-opt max-size=20m --log-opt max-file=3   -v "$config_mount" "$XRAY_IMAGE" run -config /etc/xray/config.json)
+container=$(run_docker run --detach --cidfile "$cidfile" --publish 127.0.0.1::10808   --label "m3t.sha=$config_sha" --label "m3t.run=${GITHUB_RUN_ID:-local}"   --log-driver json-file --log-opt max-size=20m --log-opt max-file=3   -v "$config_mount" "$XRAY_IMAGE" run -config /etc/xray/config.json)
 binding=$(run_docker port "$container" 10808/tcp)
 if ! [[ $binding =~ ^127\.0\.0\.1:[0-9]+$ ]]; then
   echo "Неожиданная привязка SOCKS: $binding" >&2
@@ -81,6 +82,17 @@ with open(sys.argv[1]) as log:
     if not any(expected in line for line in log):
         raise SystemExit(f'Не подтверждён default block в журнале Xray. Ожидалась запись: {expected}')
 PY
-printf 'Container: %s\nImage: %s\nSHA: %s\nStarted: %s\n'   "$container" "$XRAY_IMAGE" "${GITHUB_SHA:-local}" "$(date -u +%FT%TZ)" > "$evidence/deployment.txt"
+printf 'Container: %s\nImage: %s\nSHA: %s\nStarted: %s\n'   "$container" "$XRAY_IMAGE" "$config_sha" "$(date -u +%FT%TZ)" > "$evidence/deployment.txt"
 cat "$evidence/deployment.txt" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
-node "$root/source/xray-test/browse.cjs" "$root/source/routing/sites.txt" "$root/source/xray-test/required-sites.json" "$evidence" "socks5://$binding"
+curl_status=0
+if [ -f "$evidence/curl-direct.json" ]; then
+  python3 "$root/source/xray-test/curl_diagnostics.py" "$root/source/xray-test/required-sites.json" \
+    "$evidence" --proxy "$binding" || curl_status=$?
+  if [ -f "$evidence/curl-comparison.md" ]; then
+    cat "$evidence/curl-comparison.md" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
+  fi
+fi
+browser_status=0
+node "$root/source/xray-test/browse.cjs" "$root/source/routing/sites.txt" "$root/source/xray-test/required-sites.json" "$evidence" "socks5://$binding" || browser_status=$?
+if [ "$browser_status" -ne 0 ]; then exit "$browser_status"; fi
+exit "$curl_status"

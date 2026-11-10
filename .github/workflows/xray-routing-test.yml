@@ -8,6 +8,11 @@ on:
       - 'source/xray-test/**'
       - '.github/workflows/xray-routing-test.yml'
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      checkout_ref:
+        type: string
+        required: true
 permissions:
   contents: read
 concurrency:
@@ -21,6 +26,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+          ref: ${{ inputs.checkout_ref || github.sha }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
@@ -37,6 +43,7 @@ jobs:
           npx playwright install --only-shell chromium
           bash -n deploy.sh
           npm test
+          python3 test/curl_diagnostics.py
   deploy-and-browse:
     needs: validate
     if: github.ref == 'refs/heads/test'
@@ -46,6 +53,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+          ref: ${{ inputs.checkout_ref || github.sha }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
@@ -59,6 +67,14 @@ jobs:
           df -h / /var "$GITHUB_WORKSPACE" "$RUNNER_TEMP"
           npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install --only-shell chromium
+      - name: Probe mandatory sites directly with curl
+        shell: bash
+        env:
+          XRAY_EVIDENCE: ${{ runner.temp }}/xray-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$XRAY_EVIDENCE"
+          python3 source/xray-test/curl_diagnostics.py source/xray-test/required-sites.json "$XRAY_EVIDENCE"
       - name: Run Xray and verify routing through local SOCKS
         shell: bash
         env:
