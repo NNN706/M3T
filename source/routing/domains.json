@@ -55,7 +55,9 @@
       "ruleTag": "cloud.ru",
       "domain": [
         "domain:2002--slt.stbid.ru",
+        "domain:20b6425d-3a25-4a96-94c3-d99808c1e115.dsp.mts.ru",
         "domain:3182419811793495384628.cm.a.mts.ru",
+        "domain:9360834981794299986160.cm.a.mts.ru",
         "domain:a.ussp.io",
         "domain:a.utraff.com",
         "domain:a.videohead.tech",
@@ -83,6 +85,7 @@
         "domain:crm.allbdata.ru",
         "domain:crm.deepcall.ru",
         "domain:crm.info-it-data.ru",
+        "domain:crm.megabigteh.ru",
         "domain:crm.viva-lead.ru",
         "domain:dm-eu.hybrid.ai",
         "domain:dm.hybrid.ai",
@@ -107,6 +110,7 @@
         "domain:mc.yandex.ru",
         "domain:mdd.yandex.net",
         "domain:otclick-adv.ru",
+        "domain:pixel.konnektu.ru",
         "domain:pool.liftdsp.com",
         "domain:privacy-cs.mail.ru",
         "domain:prodmp.ru",
@@ -373,6 +377,7 @@
     {
       "ruleTag": "mws.ru",
       "domain": [
+        "domain:1686587501794300151369.cm.a.mts.ru",
         "domain:5817185321794261790587.cm.a.mts.ru",
         "domain:5819685921794266382441.cm.a.mts.ru",
         "domain:5882964711793495484340.cm.a.mts.ru",
@@ -438,7 +443,9 @@
       "ruleTag": "reg.ru",
       "domain": [
         "domain:api.flocktory.com",
+        "domain:api.wavesend.ru",
         "domain:avatars.mds.yandex.net",
+        "domain:cdn.wavesend.ru",
         "domain:event-logger-bff.svc.reg.ru",
         "domain:external.login.reg.ru",
         "domain:header-bff.svc.reg.ru",
@@ -563,6 +570,7 @@
     {
       "ruleTag": "spb.mts.ru",
       "domain": [
+        "domain:2399342921794300238215.cm.a.mts.ru",
         "domain:2934199061794266471230.cm.a.mts.ru",
         "domain:4394285141794261891524.cm.a.mts.ru",
         "domain:bs.serving-sys.ru",
@@ -591,6 +599,7 @@
       "domain": [
         "domain:2260358961794266483993.cm.a.mts.ru",
         "domain:2w.ru",
+        "domain:4830143981794300251190.cm.a.mts.ru",
         "domain:9501822521794261904662.cm.a.mts.ru",
         "domain:api-common.tbank-online.com",
         "domain:api-common.tinkoff.ru",
