@@ -141,6 +141,9 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
     """Workflow mode. Append verified discoveries to the published baseline."""
     resume = getattr(args, 'resume', None)
     full_refresh = getattr(args, 'full_refresh', False)
+    # Share the scan budget with Chromium and reserve time for ASN export and
+    # writing partial results before the workflow's hard timeout.
+    deadline = time.monotonic() + (13800 if full_refresh else 5400)
     outputs = {'IP.json': args.output, 'domains.json': args.domains_output, 'sources.json': args.sources_output}
     invalid = sorted(host for host, _ in entries if len(host) > 253 or '.' not in host
                      or not all(re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?', label)
@@ -234,7 +237,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         try:
             browser = subprocess.run(['bash', '-c', browser_phase, str(args.scanner), '-parse', '-s',
                                       *flags, '--', *[url for _, url in browser_entries]],
-                                     stdout=subprocess.PIPE, text=True, timeout=6600, check=True)
+                                     stdout=subprocess.PIPE, text=True,
+                                     timeout=max(0.1, min(6600, deadline - time.monotonic())), check=True)
             discovery['pages'].extend(json.loads(browser.stdout)['pages'])
         except (subprocess.SubprocessError, ValueError) as error:
             print(f'Chromium: сбор страниц не завершён ({error.__class__.__name__}). Исходные домены сохранены.', file=sys.stderr)
@@ -274,7 +278,6 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         responses.update({host: row for host, row in saved_dns.items() if host in pending})
         print(f'DNS/BGP: восстановлено доменов {len(responses)}.', flush=True)
     remaining = [host for host in pending if host not in responses]
-    deadline = time.monotonic() + (14400 if full_refresh else 6600)
     if args.evidence:
         write_json(args.evidence / 'dns-checkpoint.json', responses)
     for start in range(0, len(remaining), 32):
