@@ -2,7 +2,7 @@
 
 Workflow **Xray RU Direct deployment and browser test** работает в `test` при изменениях шаблона, списка сайтов или тестового сценария. Доступен ручной запуск. `main` не меняется.
 
-- Конфиг берётся из `Templates/Routing-(RU-Direct)/routing-ru.json`, включая DNS и порядок правил. Генерируемые `source/routing/IP.json` и `domains.json` этим сценарием не подключаются.
+- Конфиг берётся из `Templates/Routing-(RU-Direct)/routing-ru.json`, включая DNS и порядок правил. Update предварительно встраивает IP.json в этот файл и записывает domains.json в комментариях; Xray проверяет опубликованный коммит.
 - Тестовый конфиг сохраняет `direct`, заменяет `proxy` на `block` и использует `block` по умолчанию. Внутренние DNS-запросы направляются через `direct` отдельным правилом по `inboundTag`.
 - Xray и Chromium запускаются на Admiralteskiy. Временный контейнер публикует SOCKS5 на свободном порту loopback. QUIC отключён; прямого обхода прокси нет.
 - Очередь: `source/routing/sites.txt` и обязательные URL из `required-sites.json`, без повторов. До 10 сайтов одновременно, один проход, до 60 секунд на открытие интерфейса, затем 10 секунд JavaScript/прокрутки. Никакой авторизации.

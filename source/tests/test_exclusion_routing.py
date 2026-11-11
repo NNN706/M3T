@@ -203,4 +203,13 @@ with tempfile.TemporaryDirectory() as directory:
     ]), patch('exclusion_policy.lookup_addresses', return_value=set()):
         incremental_update(args, entries, set(), lambda *_: ([], [], ''), policy)
     assert json.loads(args.output.read_bytes()) == manual
+    manual['rules'].insert(0, {'ruleTag': 'legacy', 'ip': ['52.48.0.0/14'],
+                               'respect_exclusions': True})
+    write_json(args.manual_rules, manual)
+    with patch('update_routing.subprocess.run', side_effect=[
+        subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+        subprocess.CompletedProcess([], 0, json.dumps(response)),
+    ]), patch('exclusion_policy.lookup_addresses', return_value=set()):
+        incremental_update(args, entries, set(), lambda *_: ([], [], ''), policy)
+    assert json.loads(args.output.read_bytes())['rules'] == manual['rules'][1:]
 print('PASS Amazon manual /24 rules survive full and partial refresh and can be removed')

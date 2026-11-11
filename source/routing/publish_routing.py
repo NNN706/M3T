@@ -1,14 +1,16 @@
 """Publish routing output on the latest test branch without overwriting newer inputs."""
 import argparse
+import os
 from pathlib import Path
 import shutil
 import subprocess
 import tempfile
 
 LISTS = ['source/routing/sites.txt', 'source/routing/ASN.txt']
-INPUTS = ['source/routing/manual.json', 'source/routing/exclusion_policy.py', 'source/routing/exclude', 'source/routing/asn_routes.py', 'source/SubnetResolve.sh',
+INPUTS = ['source/routing/build_routing.cjs', 'source/routing/manual.json', 'source/routing/exclusion_policy.py', 'source/routing/exclude', 'source/routing/asn_routes.py', 'source/SubnetResolve.sh',
           'source/routing/update_routing.py', 'source/routing/domains.json', 'source/routing/sources.json', 'source/routing/IP.json']
 OUTPUT = 'source/routing/IP.json'
+TEMPLATE = 'Templates/Routing-(RU-Direct)/routing-ru.json'
 REPORT = 'source/routing/asn-report.md'
 REPORT_VERBOSE = 'source/routing/asn-report-verbose.md'
 PROVENANCE = 'source/routing/dns-provenance.json'
@@ -18,7 +20,7 @@ def git(repo, *args, check=True):
     return subprocess.run(['git', '-C', str(repo), *args], text=True,
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=check)
 
-def publish(repo, output, base, branch='test', domains=None, sources=None):
+def publish(repo, output, base, branch='test', domains=None, sources=None, *, build_routing=False):
     if branch != 'test':
         raise ValueError('Only test publication is enabled')
     payloads = {OUTPUT:output.read_bytes()}
@@ -26,10 +28,13 @@ def publish(repo, output, base, branch='test', domains=None, sources=None):
         payloads['source/routing/domains.json'] = domains.read_bytes()
     if sources is not None:
         payloads['source/routing/sources.json'] = sources.read_bytes()
-    publish_payloads(repo, base, payloads, INPUTS, 'Update service routing prefixes')
+    if build_routing and domains is None:
+        raise ValueError('Сборка routing-ru.json требует domains.json')
+    return publish_payloads(repo, base, payloads, INPUTS, 'Update service routing prefixes',
+                            build_routing=build_routing)
 
 
-def publish_payloads(repo, base, payloads, inputs, message):
+def publish_payloads(repo, base, payloads, inputs, message, *, build_routing=False):
     for attempt in range(3):
         git(repo, 'fetch', 'origin', 'refs/heads/test')
         head = git(repo, 'rev-parse', 'FETCH_HEAD').stdout.strip()
@@ -48,17 +53,25 @@ def publish_payloads(repo, base, payloads, inputs, message):
                     target = worktree / path
                     target.parent.mkdir(parents=True, exist_ok=True)
                     target.write_bytes(payload)
-                git(worktree, 'add', '--', *payloads)
+                staged = list(payloads)
+                if build_routing:
+                    subprocess.run([
+                        'node', str(Path(__file__).with_name('build_routing.cjs')),
+                        str(worktree / TEMPLATE), str(worktree / OUTPUT),
+                        str(worktree / 'source/routing/domains.json'),
+                    ], check=True)
+                    staged.append(TEMPLATE)
+                git(worktree, 'add', '--', *staged)
                 if git(worktree, 'diff', '--cached', '--quiet', check=False).returncode == 0:
                     print('Files unchanged; no commit needed: ' + ', '.join(payloads))
-                    return
+                    return head
                 git(worktree, '-c', 'user.name=github-actions[bot]',
                     '-c', 'user.email=41898282+github-actions[bot]@users.noreply.github.com',
                     'commit', '-m', message)
                 pushed = git(worktree, 'push', 'origin', 'HEAD:refs/heads/test', check=False)
                 if pushed.returncode == 0:
                     print('Published to test: ' + ', '.join(payloads))
-                    return
+                    return git(worktree, 'rev-parse', 'HEAD').stdout.strip()
                 # Retry only when the remote branch advanced; authentication and policy errors remain failures.
                 git(repo, 'fetch', 'origin', 'refs/heads/test')
                 newest = git(repo, 'rev-parse', 'FETCH_HEAD').stdout.strip()
@@ -80,20 +93,27 @@ def main():
     parser.add_argument('--sources', type=Path)
     parser.add_argument('--domains', type=Path)
     parser.add_argument('--base', required=True)
+    parser.add_argument('--build-routing', action='store_true')
     args = parser.parse_args()
     if bool(args.report_verbose) != bool(args.provenance) or (args.report_verbose and not args.report):
         parser.error('--report-verbose and --provenance require --report and must be supplied together')
     if args.report:
+        if args.build_routing:
+            parser.error('--build-routing requires --output')
         if args.sources or args.domains:
             parser.error('--sources and --domains require --output')
         payloads = {REPORT: args.report.read_bytes()}
         if args.report_verbose:
             payloads[REPORT_VERBOSE] = args.report_verbose.read_bytes()
             payloads[PROVENANCE] = args.provenance.read_bytes()
-        publish_payloads(args.repo.resolve(), args.base, payloads,
+        published = publish_payloads(args.repo.resolve(), args.base, payloads,
                          REPORT_INPUTS, 'Update overall routing ASN report')
     else:
-        publish(args.repo.resolve(), args.output, args.base, domains=args.domains, sources=args.sources)
+        published = publish(args.repo.resolve(), args.output, args.base, domains=args.domains,
+                            sources=args.sources, build_routing=args.build_routing)
+    if os.environ.get('GITHUB_OUTPUT'):
+        with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+            output.write(f'published_sha={published}\n')
 
 if __name__ == '__main__':
     main()

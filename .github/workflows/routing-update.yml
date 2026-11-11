@@ -33,7 +33,7 @@ jobs:
     runs-on: [self-hosted, Linux, X64]
     timeout-minutes: ${{ inputs.full_refresh && 260 || 120 }}
     outputs:
-      checkout_ref: ${{ steps.scan-ref.outputs.sha }}
+      checkout_ref: ${{ steps.publish.outputs.published_sha }}
     steps:
       - name: Verify runner
         run: |
@@ -47,10 +47,6 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: test
-      - name: Record scan revision
-        id: scan-ref
-        shell: bash
-        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Find checkpoint from previous routing run
         if: inputs.resume_run_id != ''
         id: resume
@@ -94,6 +90,9 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
+      - name: Prepare routing assembler
+        shell: bash
+        run: npm ci --prefix source/xray-test --ignore-scripts --no-audit --no-fund
       - name: Prepare Chromium without interactive sudo
         shell: bash
         run: |
@@ -116,6 +115,7 @@ jobs:
           python3 source/tests/test_exclusion_routing.py
           python3 source/tests/test_incremental_routing.py
           python3 source/tests/test_publish_routing.py
+          node --test source/xray-test/test/routing.test.cjs
       - name: Scan sites and compact prefixes
         shell: bash
         env:
@@ -155,11 +155,12 @@ jobs:
           name: routing-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ env.ROUTING_EVIDENCE }}
           retention-days: 7
-      - name: Publish IP.json on current test
+      - name: Publish routing files on current test
+        id: publish
         shell: bash
         run: |
           set -euo pipefail
-          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --output "$ROUTING_EVIDENCE/IP.json" --domains "$ROUTING_EVIDENCE/domains.json" --sources "$ROUTING_EVIDENCE/sources.json"
+          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --output "$ROUTING_EVIDENCE/IP.json" --domains "$ROUTING_EVIDENCE/domains.json" --sources "$ROUTING_EVIDENCE/sources.json" --build-routing
 
   curl-diagnostic:
     needs: update

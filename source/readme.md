@@ -68,3 +68,12 @@ IP.json теперь объединяется глобально между вс
 Ручные разрешения задаются в source/routing/manual.json в формате rules с
 ruleTag и ip. Update применяет их после исключений ASN и сохраняет при полном
 пересборе. Эти правила имеют приоритет над списком exclude.
+
+Legacy хранится в source/routing/manual.json с respect_exclusions: true.
+Такой список применяется с учётом exclude. Ручные разрешения без этого флага
+имеют приоритет над исключениями ASN.
+
+Update публикует IP.json, domains.json, sources.json и собранный
+Templates/Routing-(RU-Direct)/routing-ru.json одним коммитом. IP-правила
+активны с outboundTag direct, доменные правила с тем же outboundTag записаны
+в комментариях. Следующий Xray-job проверяет SHA опубликованной конфигурации.

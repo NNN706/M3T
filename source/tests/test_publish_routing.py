@@ -1,5 +1,6 @@
 """Real local Git remote verifies publication when test advances during a scan."""
 import importlib.util
+import json
 from pathlib import Path
 import subprocess
 import tempfile
@@ -93,6 +94,26 @@ with tempfile.TemporaryDirectory() as directory:
     git(other, 'fetch', 'origin', 'test')
     assert git(other, 'diff-tree', '--no-commit-id', '--name-only', '-r', report_commit) == module.REPORT
     assert git(other, 'show', f'{report_commit}:{module.REPORT}') == '# Current report'
+    git(other, 'reset', '--hard', report_commit)
+    template = other / module.TEMPLATE
+    template.parent.mkdir(parents=True, exist_ok=True)
+    template.write_text('{"routing":{"rules":[{"protocol":["bittorrent"],"outboundTag":"direct"}]}}')
+    git(other, 'add', '.')
+    git(other, 'commit', '-m', 'Add routing template')
+    git(other, 'push')
+    assembled_base = git(other, 'rev-parse', 'HEAD')
+    domain_payload.write_text('{"rules":[{"ruleTag":"result","domain":["domain:result.example"]}]}')
+    published = module.publish(repo, payload, assembled_base, domains=domain_payload,
+                               sources=sources_payload, build_routing=True)
+    assert published == git(other, 'ls-remote', 'origin', 'refs/heads/test').split()[0]
+    git(other, 'fetch', 'origin', 'test')
+    assembled = git(other, 'show', published + ':' + module.TEMPLATE)
+    assert '"192.0.2.0/24"' in assembled and '"domain:result.example"' in assembled
+    assert '"outboundTag": "direct"' in assembled
+    changed_files = set(git(other, 'diff-tree', '--no-commit-id', '--name-only', '-r', published).splitlines())
+    assert module.TEMPLATE in changed_files and 'source/routing/domains.json' in changed_files
+    assert module.publish(repo, payload, published, domains=domain_payload,
+                          sources=sources_payload, build_routing=True) == published
     try:module.publish(repo,payload,changed,branch='main')
     except ValueError:pass
     else:raise AssertionError('main publication enabled')

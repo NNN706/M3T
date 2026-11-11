@@ -6,6 +6,7 @@ on:
       - 'source/SubnetResolve.sh'
       - 'source/tests/**'
       - 'source/routing/update_routing.py'
+      - 'source/routing/build_routing.cjs'
       - 'source/routing/asn_routes.py'
       - 'source/routing/exclusion_policy.py'
       - 'source/routing/exclude'
@@ -36,6 +37,9 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
+      - name: Prepare routing assembler
+        shell: bash
+        run: npm ci --prefix source/xray-test --ignore-scripts --no-audit --no-fund
       - name: Prepare local test dependencies
         id: dependencies
         shell: bash

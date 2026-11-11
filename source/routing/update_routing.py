@@ -177,7 +177,17 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     manual = {'rules': []}
     if manual_path is not None and manual_path.is_file():
         manual = json.loads(manual_path.read_bytes())
+        policies = {rule['ruleTag']: rule.get('respect_exclusions', False) for rule in manual['rules']}
+        if any(type(value) is not bool for value in policies.values()):
+            raise ValueError('manual.json: respect_exclusions должен быть true или false')
         manual = compact_rules(manual, [rule['ruleTag'] for rule in manual['rules']], dual_stack=True)
+        if exclusion:
+            restricted = exclusion.filter_ip_rules({'rules': [
+                rule for rule in manual['rules'] if policies[rule['ruleTag']]
+            ]})['rules']
+            manual['rules'] = sorted(restricted + [
+                rule for rule in manual['rules'] if not policies[rule['ruleTag']]
+            ], key=lambda rule: rule['ruleTag'])
     ipv4_index = exclusion.ipv4_index() if exclusion else None
     manifest = {
         'version': 1,
