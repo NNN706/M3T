@@ -82,6 +82,7 @@
         "domain:ads.betweendigital.com",
         "domain:ads.gpm-ssp.ru",
         "domain:ads.tds.bid",
+        "domain:am8.bigdata-it.ru",
         "domain:am9.bigdata-it.ru",
         "domain:an.yandex.ru",
         "domain:api.cloud.ru",
@@ -106,6 +107,7 @@
         "domain:crm.sertmarket.shop",
         "domain:crm.viva-lead.ru",
         "domain:d26e0371-4904-4dbb-8810-bdc36887f93f.dsp.mts.ru",
+        "domain:dis.criteo.com",
         "domain:dm-eu.hybrid.ai",
         "domain:dm.hybrid.ai",
         "domain:dmg.digitaltarget.ru",
@@ -271,6 +273,12 @@
       ]
     },
     {
+      "ruleTag": "finance.ozon.ru",
+      "domain": [
+        "domain:finance.ozon.ru"
+      ]
+    },
+    {
       "ruleTag": "fornex.com",
       "domain": [
         "domain:ru.fornex.com"
@@ -353,6 +361,7 @@
         "domain:531311.ms.dzen.ru",
         "domain:531511.ms.dzen.ru",
         "domain:551121.ms.dzen.ru",
+        "domain:551511.ms.dzen.ru",
         "domain:account.mail.ru",
         "domain:ad.mail.ru",
         "domain:an.mail.ru",
@@ -398,9 +407,11 @@
         "domain:vd476.okcdn.ru",
         "domain:vd483.okcdn.ru",
         "domain:vd519.okcdn.ru",
+        "domain:vd524.okcdn.ru",
         "domain:vd613.okcdn.ru",
         "domain:vd623.okcdn.ru",
         "domain:vd643.okcdn.ru",
+        "domain:vd645.okcdn.ru",
         "domain:vd680.okcdn.ru",
         "domain:vd737.okcdn.ru",
         "domain:vkvideo.ru",
@@ -455,6 +466,7 @@
       "ruleTag": "mws.ru",
       "domain": [
         "domain:1686587501794300151369.cm.a.mts.ru",
+        "domain:2359741341794393788476.cm.a.mts.ru",
         "domain:3565207081794340010766.cm.a.mts.ru",
         "domain:4135084311794335388817.cm.a.mts.ru",
         "domain:4636494031794306066312.cm.a.mts.ru",
@@ -528,6 +540,12 @@
       "ruleTag": "online.vtb.ru",
       "domain": [
         "domain:online.vtb.ru"
+      ]
+    },
+    {
+      "ruleTag": "ozon.ru",
+      "domain": [
+        "domain:ozon.ru"
       ]
     },
     {
@@ -669,6 +687,7 @@
         "domain:2507129031794377425246.cm.a.mts.ru",
         "domain:2934199061794266471230.cm.a.mts.ru",
         "domain:4394285141794261891524.cm.a.mts.ru",
+        "domain:4975811741794393809345.cm.a.mts.ru",
         "domain:5409217191794335397399.cm.a.mts.ru",
         "domain:6340847681794390093975.cm.a.mts.ru",
         "domain:7302874391794306076193.cm.a.mts.ru",
