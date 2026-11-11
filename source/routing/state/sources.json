@@ -520,6 +520,13 @@
       ]
     },
     {
+      "ruleTag": "cdek.ru",
+      "ip": [
+        "91.206.127.0/24",
+        "155.212.234.0/24"
+      ]
+    },
+    {
       "ruleTag": "cdnvideo.com",
       "ip": [
         "37.48.64.0/18",
@@ -2196,8 +2203,10 @@
     "531511.ms.dzen.ru",
     "551121.ms.dzen.ru",
     "551511.ms.dzen.ru",
+    "a.quora.com",
     "ad.doubleclick.net",
     "ads.vk.com",
+    "alb.reddit.com",
     "api.vkvideo.ru",
     "avatars.mds.yandex.net",
     "cloud.vk.com",
@@ -2217,8 +2226,10 @@
     "le.tbank.ru",
     "login.vk.com",
     "ozon.ru",
+    "pixel-config.reddit.com",
     "pixel.ipinfo.io",
     "platform.twitter.com",
+    "q.quora.com",
     "securepubads.g.doubleclick.net",
     "smi2.ru",
     "st.vkvideo.ru",
@@ -2230,7 +2241,8 @@
     "tms.dmp.wi-fi.ru",
     "v6.ipinfo.io",
     "vk.com",
-    "vkvideo.ru"
+    "vkvideo.ru",
+    "www.googleadservices.com"
   ],
   "excluded_asns": [
     "AS10124",
@@ -2440,15 +2452,20 @@
     "AS9059"
   ],
   "excluded_domains": [
+    "a.quora.com",
     "accounts.google.com",
     "ad.doubleclick.net",
+    "alb.reddit.com",
     "analytics.google.com",
     "api.iconify.design",
     "api.simplesvg.com",
     "api.unisvg.com",
     "apis.google.com",
     "assets.capterra.com",
+    "bat.bing.com",
     "bzrcdn.openai.com",
+    "c.bing.com",
+    "c.clarity.ms",
     "cdn.jsdelivr.net",
     "cllctr.roistat.com",
     "code.jquery.com",
@@ -2456,23 +2473,38 @@
     "d-ipv6.mmapiws.com",
     "device.maxmind.com",
     "e.clarity.ms",
+    "f.clarity.ms",
     "fonts.googleapis.com",
     "fonts.gstatic.com",
     "fornex.com",
     "googleads.g.doubleclick.net",
+    "id.adx.bid",
     "ifconfig.me",
     "ipinfo.io",
+    "js.hs-analytics.net",
+    "js.hs-banner.com",
+    "js.hs-scripts.com",
+    "js.hsadspixel.net",
+    "js.hscollectedforms.net",
+    "js.hubspot.com",
+    "my.g2.com",
+    "pixel-config.reddit.com",
     "pixel.ipinfo.io",
     "platform.twitter.com",
     "px.ads.linkedin.com",
+    "q.quora.com",
+    "r.clarity.ms",
     "reviews-badge.capterra.com",
     "scripts.clarity.ms",
     "securepubads.g.doubleclick.net",
     "ssl.gstatic.com",
+    "ssp-statistics.dsp.nt.technology",
     "static.2ip.io",
+    "static.ads-twitter.com",
     "stats.g.doubleclick.net",
     "statuspal.io",
     "stpd.cloud",
+    "tracking.g2crowd.com",
     "v.ipinfo.io",
     "v6.ipinfo.io",
     "website-cdn.assets.ipinfo.io",
@@ -2481,7 +2513,10 @@
     "www.google-analytics.com",
     "www.google.com",
     "www.google.ru",
+    "www.googleadservices.com",
     "www.googletagmanager.com",
-    "www.gstatic.com"
+    "www.gstatic.com",
+    "www.redditstatic.com",
+    "x.bidswitch.net"
   ]
 }

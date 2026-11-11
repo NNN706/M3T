@@ -1323,6 +1323,14 @@
       //   "outboundTag": "direct"
       // },
       // {
+      //   "ruleTag": "cdek.ru",
+      //   "domain": [
+      //     "domain:cdek.ru",
+      //     "domain:servicepipe.tech"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
       //   "ruleTag": "cdnvideo.com",
       //   "domain": [
       //     "domain:api.sypexgeo.net",
@@ -1373,6 +1381,7 @@
       //     "domain:const.uno",
       //     "domain:creatives.al-adtech.com",
       //     "domain:crm.allbdata.ru",
+      //     "domain:crm.board-traff.ru",
       //     "domain:crm.deepcall.ru",
       //     "domain:crm.direct-client.ru",
       //     "domain:crm.info-it-data.ru",
@@ -1694,6 +1703,7 @@
       //     "domain:sun9-38.vkuserphoto.ru",
       //     "domain:sun9-39.vkuserphoto.ru",
       //     "domain:sun9-40.vkuserphoto.ru",
+      //     "domain:sun9-47.userapi.com",
       //     "domain:sun9-47.vkuserphoto.ru",
       //     "domain:sun9-48.vkuserphoto.ru",
       //     "domain:sun9-49.vkuserphoto.ru",
@@ -1716,6 +1726,7 @@
       //     "domain:vd519.okcdn.ru",
       //     "domain:vd524.okcdn.ru",
       //     "domain:vd534.okcdn.ru",
+      //     "domain:vd537.okcdn.ru",
       //     "domain:vd613.okcdn.ru",
       //     "domain:vd623.okcdn.ru",
       //     "domain:vd635.okcdn.ru",
@@ -1799,6 +1810,7 @@
       // {
       //   "ruleTag": "mws.ru",
       //   "domain": [
+      //     "domain:1325848681794439906951.cm.a.mts.ru",
       //     "domain:1686587501794300151369.cm.a.mts.ru",
       //     "domain:1cd5c3c7d5a445d59c7f73b38cf6da12.ops.beeline.ru",
       //     "domain:2359741341794393788476.cm.a.mts.ru",
@@ -1832,6 +1844,7 @@
       //     "domain:cmr.bidderstack.com",
       //     "domain:content.adriver.ru",
       //     "domain:cr-frontend.weborama-tech.ru",
+      //     "domain:e9252003-b88e-47a5-961a-d5d01a13046a.dsp.mts.ru",
       //     "domain:ev.adriver.ru",
       //     "domain:match.new-programmatic.com",
       //     "domain:mc.yandex.ru",
@@ -2067,6 +2080,7 @@
       //     "domain:2507129031794377425246.cm.a.mts.ru",
       //     "domain:2569500681794402591460.cm.a.mts.ru",
       //     "domain:2934199061794266471230.cm.a.mts.ru",
+      //     "domain:2994809501794439922000.cm.a.mts.ru",
       //     "domain:4394285141794261891524.cm.a.mts.ru",
       //     "domain:4975811741794393809345.cm.a.mts.ru",
       //     "domain:5409217191794335397399.cm.a.mts.ru",
