@@ -53,3 +53,5 @@ ifconfig.me
 vk.ru
 ok.ru
 mail.ru
+finance.ozon.ru
+ozon.ru
