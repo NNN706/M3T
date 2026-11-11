@@ -59,3 +59,4 @@ tls1.iitrust.ru
 memstech.ru
 mobile.vkusvill.ru
 vkusvill.ru
+cdek.ru
