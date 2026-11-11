@@ -22,7 +22,7 @@
       "captcha-api.yandex.ru": "87.250.250.121",
       "yastatic.net": "37.9.64.225",
       "mdd.yandex.net": "93.158.134.140",
-      "api.ipify.org":[
+      "api.ipify.org": [
         "172.67.74.152",
         "104.26.13.205",
         "104.26.12.205"
@@ -86,6 +86,44 @@
         "type": "field",
         "protocol": [
           "bittorrent"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "domain:asusrouter.com",
+          "domain:instant.arubanetworks.com",
+          "domain:miwifi.com",
+          "domain:oasisauth.h3c.com",
+          "domain:router.asus.com",
+          "domain:routerlogin.com",
+          "domain:setmeup.arubanetworks.com",
+          "domain:tplogin.cn",
+          "domain:www.asusrouter.com",
+          "domain:www.miwifi.com",
+          "domain:www.routerlogin.com",
+          "domain:hiwifi.com",
+          "domain:internal",
+          "domain:invalid",
+          "domain:lan",
+          "domain:leike.cc",
+          "domain:local",
+          "domain:localdomain",
+          "domain:localhost",
+          "domain:localhost.ptlogin2.qq.com",
+          "domain:localhost.sec.qq.com",
+          "domain:my.router",
+          "domain:peiluyou.com",
+          "domain:phicomm.me",
+          "domain:plex.direct",
+          "domain:router.ctc",
+          "domain:tendawifi.com",
+          "domain:test.steampowered.com",
+          "domain:tplinkwifi.net",
+          "domain:ts.net",
+          "domain:zte.home",
+          "domain:wi-fi.ru"
         ],
         "outboundTag": "direct"
       },
@@ -1227,7 +1265,7 @@
       //     "domain:get-v6.2ip.io",
       //     "domain:luxcdn.com",
       //     "domain:s.luxcdn.com",
-      //     "full:2ip.io"
+      //     "domain:2ip.io"
       //   ],
       //   "outboundTag": "direct"
       // },
