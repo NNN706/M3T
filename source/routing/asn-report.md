@@ -1,10 +1,10 @@
 # Общее покрытие ASN правилами маршрутизации
 
-Опубликовано **732** уникальных подсетей (IPv4: **690**, IPv6: **42**). С ними пересекаются анонсы **648** ASN.
+Опубликовано **710** уникальных подсетей (IPv4: **668**, IPv6: **42**). С ними пересекаются анонсы **646** ASN.
 
 Источник правил — [IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/IP.json). Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).
 
-SHA-256 файла IP.json: `cc76ee65569ea489be7f8a01dc573ca1b10bc520335041536ebfa51e2846b39a`.
+SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59caba974c0ec920`.
 
 «Затронуто» — анонсы ASN, которые хотя бы частично пересекаются с правилами. «Всего» — все анонсы этого ASN в снимке. Один префикс может учитываться у нескольких ASN, если они его анонсируют.
 
@@ -70,7 +70,6 @@ SHA-256 файла IP.json: `cc76ee65569ea489be7f8a01dc573ca1b10bc520335041536eb
 | AS8901 | GKU "Mosgortelecom" | 34 / 34 |
 | AS8966 | Etisalat (E&) | 6 / 54 |
 | AS8985 | Join-stock company "Internet Exchange"MSK-IX" | 8 / 21 |
-| AS8987 | Amazon Gov Cloud | 1 / 258 |
 | AS9049 | JSC "ER-Telecom Holding" | 1 / 43 |
 | AS9050 | Orange Romania S.A. | 1 / 80 |
 | AS9068 | JSC Comcor | 1 / 1 |
@@ -101,7 +100,6 @@ SHA-256 файла IP.json: `cc76ee65569ea489be7f8a01dc573ca1b10bc520335041536eb
 | AS13174 | MTS PJSC | 3 / 12 |
 | AS13238 | YANDEX LLC | 47 / 47 |
 | AS14522 | Satnet | 1 / 361 |
-| AS14618 | Amazon.com, Inc. | 5 / 2219 |
 | AS15632 | JSC "Alfa-Bank" | 14 / 14 |
 | AS15754 | OOO Taxtelecom | 1 / 1 |
 | AS15802 | Emirates Integrated Telecommunications Company PJSC | 3 / 359 |
@@ -111,7 +109,7 @@ SHA-256 файла IP.json: `cc76ee65569ea489be7f8a01dc573ca1b10bc520335041536eb
 | AS16276 | OVH SAS | 2 / 751 |
 | AS16321 | Petersburg Internet Network ltd. | 1 / 8 |
 | AS16345 | PJSC "Vimpelcom" | 21 / 198 |
-| AS16509 | Amazon.com, Inc. | 3140 / 23435 |
+| AS16509 | Amazon.com, Inc. | 3 / 23435 |
 | AS16625 | Akamai Technologies, Inc. | 1618 / 1802 |
 | AS17639 | Converge ICT Solutions Inc. | 5 / 630 |
 | AS18209 | Atria Convergence Technologies Ltd., | 1 / 172 |

@@ -143,6 +143,17 @@ def domain_rules(data, expected, *, include_seed=True):
     return {'rules':result}
 
 
+def apply_manual_rules(sources, manual):
+    groups = {rule['ruleTag']: set(rule['ip']) for rule in sources['rules']}
+    for rule in manual['rules']:
+        groups.setdefault(rule['ruleTag'], set()).update(rule['ip'])
+    result = {**sources, 'rules': [{'ruleTag': tag, 'ip': sorted(values)}
+                                  for tag, values in sorted(groups.items())]}
+    if manual['rules']:
+        result['manual_rules'] = manual['rules']
+    return result
+
+
 def routing_fingerprint(paths):
     return {name: sha256(path.read_bytes()).hexdigest() if path.exists() else None
             for name, path in paths.items()}
@@ -162,6 +173,11 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     for host in invalid:
         print(f'Некорректное DNS-имя в sites.txt: {host!r}. Остальные записи будут обработаны.', file=sys.stderr)
     entries = [(host, url) for host, url in entries if host not in invalid]
+    manual_path = getattr(args, 'manual_rules', None)
+    manual = {'rules': []}
+    if manual_path is not None and manual_path.is_file():
+        manual = json.loads(manual_path.read_bytes())
+        manual = compact_rules(manual, [rule['ruleTag'] for rule in manual['rules']], dual_stack=True)
     ipv4_index = exclusion.ipv4_index() if exclusion else None
     manifest = {
         'version': 1,
@@ -173,6 +189,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
         'sites': [list(entry) for entry in entries],
         'asns': sorted(explicit),
     }
+    if manual_path is not None:
+        manifest['inputs']['manual_rules'] = routing_fingerprint({'manual': manual_path})['manual']
     if full_refresh:
         manifest['full_refresh'] = True
     if ipv4_index is not None:
@@ -224,6 +242,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     previous_domains = domain_rules(previous_domains, previous_tags, include_seed=False)
     domain_groups = {r['ruleTag']: set(r['domain']) for r in previous_domains['rules']}
     source_groups = {r['ruleTag']: set(r['ip']) for r in previous_sources['rules']}
+    for rule in previous_sources.get('manual_rules', []):
+        source_groups.get(rule['ruleTag'], set()).difference_update(rule['ip'])
     known = {matcher.split(':', 1)[1] for group in domain_groups.values() for matcher in group}
     retry_names = set(previous_sources.get('pending_dns', []))
     excluded_asns = exclusion.asns if exclusion else set()
@@ -423,7 +443,11 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     if exclusion:
         sources = exclusion.filter_ip_rules(sources)
         domains = exclusion.filter_domain_rules(domains, excluded_domains)
+    sources = apply_manual_rules(sources, manual)
+    metadata = sources.get('manual_rules')
     sources = compact_rules(sources, [rule['ruleTag'] for rule in sources['rules']], dual_stack=True)
+    if metadata:
+        sources['manual_rules'] = metadata
     sources['pending_dns'] = sorted((retry_names - set(pending)) | set(unresolved))
     if exclusion:
         sources['excluded_asns'] = sorted(excluded_asns)
@@ -493,6 +517,7 @@ def main():
         parser.error('--full-refresh requires --incremental')
     if args.resume and (not args.incremental or not args.evidence):
         parser.error('--resume requires --incremental and --evidence')
+    args.manual_rules = args.sites.with_name('manual.json')
     entries = services(args.sites, asn)
     explicit = {tag for tag, _ in entries if asn(tag)}
     entries = [(tag, value) for tag, value in entries if not asn(tag)]

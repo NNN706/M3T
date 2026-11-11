@@ -164,3 +164,43 @@ with tempfile.TemporaryDirectory() as directory:
     assert json.loads(args.domains_output.read_text()) == domains
 
 print('PASS Cloudflare/Fastly early IPv4 filtering, mixed IPs, domain exclusions, resume and IPv6 subtraction')
+
+# Manual rules override the denied ASN only at the explicitly configured CIDRs.
+with tempfile.TemporaryDirectory() as directory:
+    tmp = Path(directory)
+    args = argparse.Namespace(
+        scanner=scanner, verbose=False, allow_partial=True, resume=None,
+        domains_output=tmp / 'domains.json', sources_output=tmp / 'sources.json',
+        output=tmp / 'IP.json', evidence=tmp / 'evidence', manual_rules=tmp / 'manual.json',
+    )
+    manual = {'rules': [{'ruleTag': 'manual.example', 'ip': ['52.208.237.0/24', '54.154.123.0/24']}]}
+    write_json(args.manual_rules, manual)
+    policy = ExclusionPolicy({16509}, ['52.48.0.0/14', '52.208.0.0/13', '54.154.0.0/15', '63.32.0.0/14'])
+    write_json(args.sources_output, {'rules': [{'ruleTag': 'legacy', 'ip': [
+        '52.48.0.0/14', '52.208.0.0/13', '54.154.0.0/15', '63.32.0.0/14',
+    ]}]})
+    write_json(args.domains_output, {'rules': []})
+    entries = [('manual.example', 'manual.example')]
+    discovery = {'pages': [{'site': 'manual.example', 'domains': [], 'errors': []}]}
+    response = {'domain': 'manual.example', 'complete': True, 'results': [],
+                'excluded_ips': ['52.208.237.126', '54.154.123.78'], 'errors': []}
+    for full_refresh, partial in ((False, False), (True, False), (True, True)):
+        args.full_refresh = full_refresh
+        discovery['pages'][0]['errors'] = ['Fixture browser failure'] if partial else []
+        with patch('update_routing.subprocess.run', side_effect=[
+            subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+            subprocess.CompletedProcess([], 0, json.dumps(response)),
+        ]), patch('exclusion_policy.lookup_addresses', return_value=set()):
+            incremental_update(args, entries, set(), lambda *_: ([], [], ''), policy)
+        assert json.loads(args.output.read_bytes()) == manual
+        assert json.loads(args.sources_output.read_bytes())['manual_rules'] == manual['rules']
+    manual['rules'][0]['ip'].remove('54.154.123.0/24')
+    write_json(args.manual_rules, manual)
+    args.full_refresh = False
+    with patch('update_routing.subprocess.run', side_effect=[
+        subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+        subprocess.CompletedProcess([], 0, json.dumps(response)),
+    ]), patch('exclusion_policy.lookup_addresses', return_value=set()):
+        incremental_update(args, entries, set(), lambda *_: ([], [], ''), policy)
+    assert json.loads(args.output.read_bytes()) == manual
+print('PASS Amazon manual /24 rules survive full and partial refresh and can be removed')

@@ -127,7 +127,14 @@ def write_verbose(output, report, rows, names, prefixes, provenance, explicit_pr
                 explicit = sorted({tag for tag, original in explicit_prefixes
                                    if original.version == network.version and original.overlaps(network)
                                    and any(prefix.overlaps(original) for prefix in published)})
-                hosts = ['Ручной импорт' if tag == 'legacy' else f'Входной ASN `{tag}`' for tag in explicit]
+                hosts = []
+                for tag in explicit:
+                    if tag == 'legacy':
+                        hosts.append('Ручной импорт')
+                    elif re.fullmatch(r'AS[0-9]+', tag):
+                        hosts.append(f'Входной ASN `{tag}`')
+                    else:
+                        hosts.append(f'Ручное разрешение `{tag}`')
             published_text = ', '.join(f'`{prefix}`' for prefix in published)
             text.append(f'| `{network}` | {published_text} | {", ".join(hosts) or "Нет наблюдений"} |')
         text.append('')
@@ -181,10 +188,13 @@ def build_report(path, *, verbose_output=None, provenance=None, sources=None):
     if verbose_output is not None:
         explicit_prefixes = []
         if sources is not None:
-            for rule in json.loads(sources.read_bytes())['rules']:
+            source_data = json.loads(sources.read_bytes())
+            for rule in source_data['rules']:
                 tag = rule['ruleTag']
                 if tag == 'legacy' or re.fullmatch(r'AS[0-9]+', tag):
                     explicit_prefixes.extend((tag, ipaddress.ip_network(prefix)) for prefix in rule['ip'])
+            explicit_prefixes.extend((rule['ruleTag'], ipaddress.ip_network(prefix))
+                                     for rule in source_data.get('manual_rules', []) for prefix in rule['ip'])
         write_verbose(verbose_output, report, rows, names, prefixes, provenance or {}, explicit_prefixes)
     return '\n'.join(report) + '\n'
 

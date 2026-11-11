@@ -20,6 +20,7 @@ on:
       - 'source/routing/sites.txt'
       - 'source/routing/ASN.txt'
       - 'source/routing/exclude'
+      - 'source/routing/manual.json'
 permissions:
   contents: write
   actions: read

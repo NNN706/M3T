@@ -1,0 +1,11 @@
+{
+  "rules": [
+    {
+      "ruleTag": "ssp-statistics.dsp.nt.technology",
+      "ip": [
+        "52.208.237.0/24",
+        "54.154.123.0/24"
+      ]
+    }
+  ]
+}

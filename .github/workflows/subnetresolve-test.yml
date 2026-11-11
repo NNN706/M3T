@@ -9,6 +9,7 @@ on:
       - 'source/routing/asn_routes.py'
       - 'source/routing/exclusion_policy.py'
       - 'source/routing/exclude'
+      - 'source/routing/manual.json'
       - 'source/routing/publish_routing.py'
       - '.github/workflows/subnetresolve-test.yml'
   workflow_dispatch:

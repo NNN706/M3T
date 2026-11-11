@@ -148,7 +148,6 @@
         "domain:smi2.ru",
         "domain:sp.linkssp.ru",
         "domain:ssp-rtb.sape.ru",
-        "domain:ssp-statistics.dsp.nt.technology",
         "domain:ssp.adriver.ru",
         "domain:ssp.al-adtech.com",
         "domain:ssp.bidster.net",
@@ -325,7 +324,6 @@
     {
       "ruleTag": "ipinfo.io",
       "domain": [
-        "domain:assets.capterra.com",
         "domain:connect.facebook.net",
         "domain:p.typekit.net",
         "domain:use.typekit.net"
