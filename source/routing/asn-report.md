@@ -1,18 +1,18 @@
 # Общее покрытие ASN правилами маршрутизации
 
-Опубликовано **710** уникальных подсетей (IPv4: **668**, IPv6: **42**). С ними пересекаются анонсы **646** ASN.
+Опубликовано **710** уникальных подсетей (IPv4: **668**, IPv6: **42**). С ними пересекаются анонсы **645** ASN.
 
 Источник правил — [IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/IP.json). Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).
 
-SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59caba974c0ec920`.
+SHA-256 файла IP.json: `a928b361c3332d8dfddfa558b54b99205d47791a11ca374d11602967b39fd9f4`.
 
 «Затронуто» — анонсы ASN, которые хотя бы частично пересекаются с правилами. «Всего» — все анонсы этого ASN в снимке. Один префикс может учитываться у нескольких ASN, если они его анонсируют.
 
 | ASN | Название | Затронуто / всего |
 | --- | --- | ---: |
 | AS174 | Cogent Communications, LLC | 1 / 4191 |
-| AS577 | Bell Canada | 1 / 16452 |
-| AS714 | Apple Inc. | 5 / 2032 |
+| AS577 | Bell Canada | 1 / 16453 |
+| AS714 | Apple Inc. | 5 / 2034 |
 | AS852 | TELUS Communications Inc. | 2 / 714 |
 | AS1299 | Arelion (fka. Telia Carrier) | 4 / 123 |
 | AS1680 | Cellcom Fixed Line Communication L.P | 1 / 79 |
@@ -27,7 +27,7 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS3320 | Deutsche Telekom AG | 1 / 974 |
 | AS3786 | LG DACOM Corporation | 4 / 955 |
 | AS4657 | StarHub Ltd | 1 / 226 |
-| AS4761 | PT Indosat Tbk | 7 / 1036 |
+| AS4761 | PT Indosat Tbk | 7 / 1041 |
 | AS4771 | Spark New Zealand Trading Ltd. | 2 / 475 |
 | AS4775 | Globe Telecoms | 11 / 985 |
 | AS4787 | PT Cyberindo Aditama | 7 / 458 |
@@ -47,8 +47,8 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS7470 | TRUE INTERNET Co.,Ltd. | 7 / 828 |
 | AS7545 | TPG Telecom Limited | 9 / 5052 |
 | AS7552 | Viettel Group | 4 / 8146 |
-| AS7713 | PT Telkom Indonesia Tbk | 40 / 3928 |
-| AS7979 | Servers.com, Inc. | 10 / 1929 |
+| AS7713 | PT Telkom Indonesia Tbk | 40 / 3922 |
+| AS7979 | Servers.com, Inc. | 10 / 1930 |
 | AS8193 | "Uzbektelekom" Joint Stock Company | 1 / 105 |
 | AS8291 | The Federal Guard Service of the Russian Federation | 15 / 15 |
 | AS8342 | JSC RTComm.RU | 4 / 100 |
@@ -59,7 +59,7 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS8595 | OOO WestCall Ltd. | 3 / 55 |
 | AS8641 | LLC "Nauka-Svyaz" | 1 / 62 |
 | AS8697 | Jordan Telecommunications PSC | 1 / 85 |
-| AS8708 | DIGI ROMANIA S.A. | 1 / 146 |
+| AS8708 | DIGI ROMANIA S.A. | 1 / 147 |
 | AS8717 | A1 Bulgaria EAD | 2 / 111 |
 | AS8732 | JSC Comcor | 20 / 20 |
 | AS8742 | LTD Santekhkomplekt | 1 / 2 |
@@ -70,7 +70,7 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS8901 | GKU "Mosgortelecom" | 34 / 34 |
 | AS8966 | Etisalat (E&) | 6 / 54 |
 | AS8985 | Join-stock company "Internet Exchange"MSK-IX" | 8 / 21 |
-| AS9049 | JSC "ER-Telecom Holding" | 1 / 43 |
+| AS9049 | JSC "ER-Telecom Holding" | 1 / 44 |
 | AS9050 | Orange Romania S.A. | 1 / 80 |
 | AS9068 | JSC Comcor | 1 / 1 |
 | AS9121 | Turk Telekom | 108 / 1354 |
@@ -78,7 +78,6 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS9198 | JSC Kazakhtelecom | 23 / 1111 |
 | AS9269 | Hong Kong Broadband Network Ltd. | 1 / 214 |
 | AS9299 | PLDT (Philippine Long Distance Telephone Company) | 8 / 538 |
-| AS9329 | Sri Lanka Telecom Internet | 1 / 181 |
 | AS9354 | Community Network Center Inc. | 1 / 38 |
 | AS9443 | Vocus Retail | 2 / 50 |
 | AS9498 | Bharti Airtel Ltd. | 60 / 5288 |
@@ -88,7 +87,7 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS9924 | Taiwan Fixed Network, Telco and Network Service Provider. | 4 / 673 |
 | AS12222 | Akamai Technologies, Inc. | 16 / 147 |
 | AS12252 | America Movil Peru S.A.C. | 7 / 1809 |
-| AS12389 | PJSC Rostelecom | 120 / 3555 |
+| AS12389 | PJSC Rostelecom | 120 / 3553 |
 | AS12400 | Partner Communications Ltd. | 18 / 326 |
 | AS12555 | Data-center IMAQLIQ Ltd. | 1 / 28 |
 | AS12616 | Citytelecom LLC | 2 / 20 |
@@ -102,18 +101,18 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS14522 | Satnet | 1 / 361 |
 | AS15632 | JSC "Alfa-Bank" | 14 / 14 |
 | AS15754 | OOO Taxtelecom | 1 / 1 |
-| AS15802 | Emirates Integrated Telecommunications Company PJSC | 3 / 359 |
+| AS15802 | Emirates Integrated Telecommunications Company PJSC | 3 / 360 |
 | AS15924 | Vodafone Turkey | 1 / 392 |
 | AS15943 | wilhelm.tel GmbH | 1 / 67 |
 | AS16249 | Open Joint Stock Company HLEBPROM | 1 / 1 |
 | AS16276 | OVH SAS | 2 / 751 |
 | AS16321 | Petersburg Internet Network ltd. | 1 / 8 |
 | AS16345 | PJSC "Vimpelcom" | 21 / 198 |
-| AS16509 | Amazon.com, Inc. | 3 / 23435 |
+| AS16509 | Amazon.com, Inc. | 3 / 23432 |
 | AS16625 | Akamai Technologies, Inc. | 1618 / 1802 |
 | AS17639 | Converge ICT Solutions Inc. | 5 / 630 |
 | AS18209 | Atria Convergence Technologies Ltd., | 1 / 172 |
-| AS18403 | FPT Telecom Company | 807 / 8450 |
+| AS18403 | FPT Telecom Company | 810 / 8467 |
 | AS18680 | Akamai Technologies, Inc. | 1 / 1 |
 | AS20454 | SECURED SERVERS LLC | 2 / 162 |
 | AS20485 | JSC TransTeleCom | 1 / 87 |
@@ -121,7 +120,7 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS20764 | CJSC RASCOM | 1 / 9 |
 | AS20821 | Limited Liability Company "Business information technology" | 1 / 2 |
 | AS20848 | ROSBUSINESSCONSULTING JSC | 4 / 14 |
-| AS20940 | Akamai International B.V. | 3578 / 4681 |
+| AS20940 | Akamai International B.V. | 3578 / 4680 |
 | AS21051 | ASTRUM LLC | 4 / 6 |
 | AS21299 | Kar-Tel LLC | 28 / 768 |
 | AS21342 | Akamai International B.V. | 66 / 171 |
@@ -140,7 +139,7 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS24873 | PJSC Rostelecom | 3 / 3 |
 | AS24916 | Orbital Net Ltd | 1 / 26 |
 | AS24940 | Hetzner Online GmbH | 4 / 101 |
-| AS25019 | Saudi Telecom Company JSC | 8 / 3455 |
+| AS25019 | Saudi Telecom Company JSC | 8 / 3454 |
 | AS25106 | Mobile TeleSystems JLLC | 1 / 231 |
 | AS25159 | PJSC MegaFon | 2 / 88 |
 | AS25292 | Federal State Unitary Enterprise "The Russian Television and Radio Broadcasting Company" | 7 / 7 |
@@ -195,7 +194,7 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS35994 | Akamai Technologies, Inc. | 269 / 408 |
 | AS36057 | Webair Internet Development Company Inc. | 8 / 13 |
 | AS37457 | Telkom SA Ltd. | 1 / 519 |
-| AS37963 | Hangzhou Alibaba Advertising Co.,Ltd. | 3 / 972 |
+| AS37963 | Hangzhou Alibaba Advertising Co.,Ltd. | 3 / 968 |
 | AS38040 | TOT Public Company Limited | 7 / 33 |
 | AS38266 | Vodafone Idea (Vodafone India) | 1 / 2156 |
 | AS38928 | JSC GLONASS | 2 / 4 |
@@ -378,7 +377,7 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS57352 | Rossiya Segodnya | 1 / 1 |
 | AS57363 | CDNvideo LLC | 52 / 75 |
 | AS57452 | Summit Systems Ltd. | 4 / 4 |
-| AS57494 | Adman LLC | 1 / 105 |
+| AS57494 | Adman LLC | 1 / 113 |
 | AS57503 | OOO Taxtelecom | 3 / 5 |
 | AS57512 | OOO "Sportmaster" | 1 / 5 |
 | AS57529 | JSC GTNT | 4 / 10 |
@@ -464,12 +463,12 @@ SHA-256 файла IP.json: `d420b3b64ceb1b4451219f1c4c7fd6547d03d78b9eb0909d59c
 | AS198068 | CLOUD.DOG OU | 9 / 107 |
 | AS198226 | JSC "Publishing House "Komsomolskaya Pravda" | 1 / 1 |
 | AS198576 | Bulgarin National Radio | 1 / 2 |
-| AS198610 | Beget LLC | 58 / 436 |
+| AS198610 | Beget LLC | 60 / 444 |
 | AS198770 | Virtual infrastructures Ltd. | 5 / 24 |
 | AS198947 | RETN Saint Petersburg | 3 / 3 |
 | AS199089 | Joint Stock Company "INVESTTORGBANK" | 1 / 1 |
 | AS199458 | LLC Rusbuilding | 1 / 8 |
-| AS199524 | Gcore S.A. | 141 / 579 |
+| AS199524 | Gcore S.A. | 141 / 582 |
 | AS199530 | Telecompany Viza-2 Ltd. | 1 / 1 |
 | AS199546 | Moscomnet LLC | 1 / 7 |
 | AS199599 | Telecom-Birzha, LLC | 1 / 41 |
