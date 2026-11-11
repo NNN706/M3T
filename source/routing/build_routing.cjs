@@ -31,26 +31,25 @@ function build(template, ips, domains) {
   const values = nodes.map(node => jsonc.getNodeValue(node));
   const managed = values.map(rule => rule.outboundTag === 'direct' && Array.isArray(rule.ip)
     && Object.keys(rule).every(key => ['type', 'ruleTag', 'ip', 'outboundTag'].includes(key)));
-  const marker = template.indexOf('// BEGIN GENERATED DIRECT RULES', array.offset);
   let insertion = managed.indexOf(true);
   if (insertion < 0) {
-    insertion = marker >= 0 && marker < array.offset + array.length
-      ? nodes.filter(node => node.offset < marker).length : nodes.length;
+    // Keep generated rules before an existing catch-all routing rule.
+    insertion = values.findIndex(rule => !rule.ip && !rule.domain && !rule.protocol
+      && (rule.port || Object.keys(rule).every(key => ['outboundTag', 'ruleTag', 'type'].includes(key))));
+    if (insertion < 0) insertion = nodes.length;
   }
   const ipRules = fragments(ips, 'ip');
   const domainRules = fragments(domains, 'domain');
   const render = value => JSON.stringify(value, null, 2).split('\n').map(line => '      ' + line).join('\n');
   const active = ipRules.map(render);
   const commented = domainRules.map(render).join(',\n').split('\n').map(line => '      // ' + line.slice(6));
-  const generated = ['      // BEGIN GENERATED DIRECT RULES', active.join(',\n')].join('\n');
-  const domainBlock = [
-    '      // Domain rules are disabled.',
-    ...commented,
-    '      // END GENERATED DIRECT RULES',
-  ].join('\n');
+  const generated = active.join(',\n');
+  const domainBlock = domainRules.length ? commented.join('\n') : '';
   const pieces = [];
   for (let index = 0; index <= nodes.length; index++) {
-    if (index === insertion) pieces.push({text: generated, tail: domainBlock, active: active.length > 0});
+    if (index === insertion) {
+      if (generated || domainBlock) pieces.push({text: generated, tail: domainBlock, active: active.length > 0});
+    }
     if (index < nodes.length && !managed[index]) {
       pieces.push({text: '      ' + template.slice(nodes[index].offset, nodes[index].offset + nodes[index].length), active: true});
     }

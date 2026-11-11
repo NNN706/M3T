@@ -63,6 +63,6 @@ test('real repository template embeds exactly the published IP fragments', () =>
   const config = jsonc.parse(result);
   assert.deepEqual(config.routing.rules.filter(rule => rule.outboundTag === 'direct' && rule.ip),
     ip.rules.filter(rule => rule.ip.length).map(rule => ({ruleTag: rule.ruleTag, ip: rule.ip, outboundTag: 'direct'})));
-  assert.equal(result.split('BEGIN GENERATED DIRECT RULES').length, 2);
+  assert.doesNotMatch(result, /GENERATED DIRECT RULES|Domain rules are disabled/);
   assert.equal(result, build(result, ip, domain));
 });
