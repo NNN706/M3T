@@ -3,7 +3,7 @@ const test = require('node:test');
 const fs = require('node:fs');
 const path = require('node:path');
 const jsonc = require('jsonc-parser');
-const {build} = require('../../routing/build_routing.cjs');
+const {build} = require('../../../routing/scripts/build_routing.cjs');
 
 const ips = {rules: [{ruleTag: 'new.example', ip: ['192.0.2.0/24']}]};
 const domains = {rules: [{ruleTag: 'new.example', domain: ['domain:new.example']}]};
@@ -55,10 +55,10 @@ test('assembler rejects invalid source and template before producing a config', 
 });
 
 test('real repository template embeds exactly the published IP fragments', () => {
-  const root = path.resolve(__dirname, '../../..');
+  const root = path.resolve(__dirname, '../../../..');
   const original = fs.readFileSync(path.join(root, 'Templates/Routing-(RU-Direct)/routing-ru.json'), 'utf8');
-  const ip = JSON.parse(fs.readFileSync(path.join(root, 'source/routing/IP.json')));
-  const domain = JSON.parse(fs.readFileSync(path.join(root, 'source/routing/domains.json')));
+  const ip = JSON.parse(fs.readFileSync(path.join(root, 'source/routing/generated/IP.json')));
+  const domain = JSON.parse(fs.readFileSync(path.join(root, 'source/routing/generated/domains.json')));
   const result = build(original, ip, domain);
   const config = jsonc.parse(result);
   assert.deepEqual(config.routing.rules.filter(rule => rule.outboundTag === 'direct' && rule.ip),

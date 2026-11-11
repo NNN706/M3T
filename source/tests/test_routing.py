@@ -11,7 +11,7 @@ root = Path(__file__).resolve().parent
 source = root.parent / 'SubnetResolve.sh'
 if not source.exists():
     source = root / 'SubnetResolve.sh'
-generator = root.parent / 'routing' / 'update_routing.py'
+generator = root.parent / 'routing/scripts' / 'update_routing.py'
 if not generator.exists():
     generator = root / 'update_routing.py'
 spec = importlib.util.spec_from_file_location('routing', generator)

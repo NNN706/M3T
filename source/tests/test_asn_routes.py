@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 from unittest.mock import patch
 from types import SimpleNamespace
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'routing'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'routing/scripts'))
 import asn_routes
 
 TABLE = (

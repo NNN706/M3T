@@ -112,7 +112,7 @@ print('PASS full -parse -4s: one JSON, unique domain: entries, one unique IP sen
 # intermediate redirect host appears only in Location, never in page resources.
 sites=root/'sites.txt'
 sites.write_text(seed+'\n')
-generator=pathlib.Path(__file__).resolve().parents[1]/'routing/update_routing.py'
+generator=pathlib.Path(__file__).resolve().parents[1]/'routing/scripts/update_routing.py'
 fixture_scanner=root/'routing-scanner.sh'
 fixture_scanner.write_text('#!/bin/bash\nunset SUBNET_BGP_OBSERVATIONS\nexec bash '
                            +__import__('shlex').quote(str(script))+' "$@"\n')

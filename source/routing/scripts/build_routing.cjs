@@ -1,5 +1,5 @@
 const fs = require('node:fs');
-const jsonc = require('../xray-test/node_modules/jsonc-parser');
+const jsonc = require('../../tests/xray/node_modules/jsonc-parser');
 
 function parseTemplate(text) {
   const errors = [];

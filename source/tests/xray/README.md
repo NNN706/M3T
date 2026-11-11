@@ -15,7 +15,7 @@ Workflow **Xray RU Direct deployment and browser test** работает в `tes
 
 ## Обязательные сайты
 
-Редактируйте **`source/xray-test/required-sites.json`**:
+Редактируйте **`source/tests/xray/required-sites.json`**:
 
 ```json
 {"url":"https://example.ru/login","text":"Войти|Личный кабинет","selector":"input:not([type=hidden]), button"}
@@ -27,7 +27,7 @@ Workflow **Xray RU Direct deployment and browser test** работает в `tes
 
 Artifacts содержат `sites.json`, таблицу, снимки неоткрывшихся страниц, конфиг и логи Xray. SHA, digest, имя контейнера и время позволяют сопоставить запуск с Grafana. Измеряется весь Xray с DNS/соединениями, а не отдельно память matcher. Бюджеты RAM/CPU не определяют статус CI.
 
-Локальная проверка: `cd source/xray-test && npm ci && npx playwright install --only-shell chromium && npm test`. На Linux системные зависимости Chromium должны быть установлены администратором раннера заранее; workflow не вызывает интерактивный sudo.
+Локальная проверка: `cd source/tests/xray && npm ci && npx playwright install --only-shell chromium && npm test`. На Linux системные зависимости Chromium должны быть установлены администратором раннера заранее; workflow не вызывает интерактивный sudo.
 
 В Update service routing prefixes после публикации запускается тот же Xray workflow.
 На одном Admiralteskiy выполняются два curl-запроса к каждому URL из общей

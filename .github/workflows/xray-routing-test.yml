@@ -5,7 +5,7 @@ on:
     paths:
       - 'Templates/Routing-(RU-Direct)/routing-ru.json'
       - 'source/routing/sites.txt'
-      - 'source/xray-test/**'
+      - 'source/tests/xray/**'
       - '.github/workflows/xray-routing-test.yml'
   workflow_dispatch:
   workflow_call:
@@ -32,7 +32,7 @@ jobs:
           node-version: '22'
       - name: Prepare and test browser harness
         shell: bash
-        working-directory: source/xray-test
+        working-directory: source/tests/xray
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/xray-test-browsers
         run: |
@@ -58,7 +58,7 @@ jobs:
         with:
           node-version: '22'
       - name: Prepare browser
-        working-directory: source/xray-test
+        working-directory: source/tests/xray
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/xray-test-browsers
         run: |
@@ -74,9 +74,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$XRAY_EVIDENCE"
-          node source/xray-test/browse.cjs source/routing/sites.txt source/xray-test/required-sites.json \
+          node source/tests/xray/browse.cjs source/routing/sites.txt source/tests/xray/required-sites.json \
             --queue > "$XRAY_EVIDENCE/curl-queue.json"
-          python3 source/xray-test/curl_diagnostics.py "$XRAY_EVIDENCE/curl-queue.json" "$XRAY_EVIDENCE"
+          python3 source/tests/xray/curl_diagnostics.py "$XRAY_EVIDENCE/curl-queue.json" "$XRAY_EVIDENCE"
       - name: Run Xray and verify routing through local SOCKS
         shell: bash
         env:
@@ -84,7 +84,7 @@ jobs:
           XRAY_IMAGE: ghcr.io/xtls/xray-core:26.10.31@sha256:ceabeac03a89d991d2a247361825c1d1d2e9c91cd5dc010f298c7dc0c2f325c9
           XRAY_EVIDENCE: ${{ runner.temp }}/xray-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/xray-test-browsers
-        run: bash source/xray-test/deploy.sh
+        run: bash source/tests/xray/deploy.sh
       - name: Save diagnostic artifacts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

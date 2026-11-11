@@ -10,7 +10,7 @@ import tempfile
 from unittest.mock import patch
 
 root = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(root / 'routing'))
+sys.path.insert(0, str(root / 'routing/scripts'))
 from exclusion_policy import ExclusionPolicy, read_excluded_asns
 from update_routing import incremental_update, write_json
 
@@ -115,7 +115,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert sources['excluded_domains'] == ['cloud.example', 'ipv6.other.example', 'mixed.example']
     assert {r['ruleTag']:r['ip'] for r in sources['rules']} == {
         'cloud.example': ['192.0.2.0/25', '198.51.100.0/24'],
-        'legacy': ['192.0.2.0/25', '2001:db8::/48'],
+        'legacy': ['2001:db8::/48'],
     }
     stats = json.loads((args.evidence / 'completeness.json').read_text())
     assert stats['complete'] and stats['excluded_ipv4_skipped_before_whois'] == 3, stats
@@ -212,4 +212,37 @@ with tempfile.TemporaryDirectory() as directory:
     ]), patch('exclusion_policy.lookup_addresses', return_value=set()):
         incremental_update(args, entries, set(), lambda *_: ([], [], ''), policy)
     assert json.loads(args.output.read_bytes())['rules'] == manual['rules'][1:]
+    manual['rules'] = manual['rules'][1:]
+    write_json(args.manual_rules, manual)
+    args.manual_ips = tmp / 'ip.txt'
+    args.manual_ips.write_text('# Imported CIDRs\n192.0.2.0/25\n192.0.2.128/25 # sibling\n52.48.0.0/14\n')
+    def run_manual_ips():
+        with patch('update_routing.subprocess.run', side_effect=[
+            subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+            subprocess.CompletedProcess([], 0, json.dumps(response)),
+        ]), patch('exclusion_policy.lookup_addresses', return_value=set()):
+            incremental_update(args, entries, set(), lambda *_: ([], [], ''), policy)
+    run_manual_ips()
+    assert json.loads(args.output.read_bytes())['rules'] == [
+        {'ruleTag': 'legacy', 'ip': ['192.0.2.0/24']}, *manual['rules']]
+    args.manual_ips.write_text('')
+    run_manual_ips()
+    assert json.loads(args.output.read_bytes()) == manual
+    previous = args.output.read_bytes()
+    args.manual_ips.write_text('192.0.2.1/24')
+    try:
+        run_manual_ips()
+    except ValueError as error:
+        assert 'ip.txt, строка 1' in str(error)
+    else:
+        raise AssertionError('Invalid manual CIDR accepted')
+    assert args.output.read_bytes() == previous
+    args.manual_ips.write_text('')
+    args.manual_rules = tmp / 'manual.txt'
+    args.manual_rules.write_text('#### manual.example\n52.208.237.0/24\n')
+    run_manual_ips()
+    assert json.loads(args.output.read_bytes()) == manual
+    assert '#### Локальные подсети' in args.manual_ips.read_text()
+    assert '#### Остальные подсети' in args.manual_ips.read_text()
+print('PASS manual CIDR file: comments, exact collapse, exclusions, removal and invalid input preserves output')
 print('PASS Amazon manual /24 rules survive full and partial refresh and can be removed')

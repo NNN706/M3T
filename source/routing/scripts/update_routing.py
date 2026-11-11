@@ -81,8 +81,44 @@ def compact_rules(data, expected, dual_stack=False):
     return {'rules': result}
 
 
+def redistribute_legacy(data):
+    """Move only whole legacy CIDRs fully covered by named service observations."""
+    named = [ipaddress.ip_network(value) for rule in data['rules'] if rule['ruleTag'] != 'legacy'
+             for value in rule['ip']]
+    cuts = {v: list(ipaddress.collapse_addresses(n for n in named if n.version == v)) for v in (4, 6)}
+    rules = []
+    for rule in data['rules']:
+        if rule['ruleTag'] != 'legacy':
+            rules.append(rule)
+            continue
+        networks = [ipaddress.ip_network(value) for value in rule['ip']]
+        remaining = [network for network in networks
+                     if not any(network.subnet_of(cut) for cut in cuts[network.version])]
+        if remaining:
+            rules.append({'ruleTag': 'legacy', 'ip': [str(n) for n in sorted(set(remaining),
+                          key=lambda n: (n.version, int(n.network_address), n.prefixlen))]})
+    return {**data, 'rules': sorted(rules, key=lambda rule: rule['ruleTag'])}
+
+
+def format_manual_ips(prefixes):
+    local_blocks = [ipaddress.ip_network(value) for value in (
+        '0.0.0.0/8', '10.0.0.0/8', '100.64.0.0/10', '127.0.0.0/8', '169.254.0.0/16',
+        '172.16.0.0/12', '192.0.0.0/24', '192.168.0.0/16', '198.18.0.0/15',
+        '224.0.0.0/4', '240.0.0.0/4', '::/128', '::1/128', 'fc00::/7', 'fe80::/10', 'ff00::/8')]
+    groups = {True: [], False: []}
+    networks = [ipaddress.ip_network(value) for value in prefixes]
+    for network in sorted(set(networks), key=lambda n: (n.version, int(n.network_address), n.prefixlen)):
+        local = any(network.version == block.version and network.subnet_of(block) for block in local_blocks)
+        groups[local].append(str(network))
+    return ('# Ручные подсети direct; ASN-исключения применяются автоматически.\n'
+            '# Целиком найденные у сервисов блоки переносятся из этого списка в их ruleTag.\n\n'
+            '#### Локальные подсети\n' + '\n'.join(groups[True]) + '\n\n'
+            '#### Остальные подсети\n' + '\n'.join(groups[False]) + '\n')
+
+
 def global_rules(data):
-    """Exact union across tags; assign each CIDR once to the first contributing tag."""
+    """Exact union across tags; prefer a named service over legacy for storage."""
+    data = redistribute_legacy(data)
     tagged = []
     for rule in data['rules']:
         if set(rule) != {'ruleTag', 'ip'}:
@@ -101,7 +137,7 @@ def global_rules(data):
             index = bisect_right(starts, int(original.network_address)) - 1
             if index < 0 or not original.subnet_of(networks[index]):
                 raise ValueError('Prefix is outside collapsed coverage')
-            owners[index] = min(owners.get(index, tag), tag)
+            owners[index] = min(owners.get(index, tag), tag, key=lambda owner: (owner == 'legacy', owner))
         for index, network in enumerate(networks):
             groups.setdefault(owners[index], []).append(str(network))
     result = {'rules':[{'ruleTag':tag, 'ip':groups[tag]} for tag in sorted(groups)]}
@@ -174,26 +210,66 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
         print(f'Некорректное DNS-имя в sites.txt: {host!r}. Остальные записи будут обработаны.', file=sys.stderr)
     entries = [(host, url) for host, url in entries if host not in invalid]
     manual_path = getattr(args, 'manual_rules', None)
+    manual_ips = getattr(args, 'manual_ips', None)
+    raw_manual_ips = []
+    if manual_ips is not None:
+        outputs['ip.txt'] = manual_ips
     manual = {'rules': []}
     if manual_path is not None and manual_path.is_file():
-        manual = json.loads(manual_path.read_bytes())
-        policies = {rule['ruleTag']: rule.get('respect_exclusions', False) for rule in manual['rules']}
-        if any(type(value) is not bool for value in policies.values()):
-            raise ValueError('manual.json: respect_exclusions должен быть true или false')
-        manual = compact_rules(manual, [rule['ruleTag'] for rule in manual['rules']], dual_stack=True)
-        if exclusion:
-            restricted = exclusion.filter_ip_rules({'rules': [
-                rule for rule in manual['rules'] if policies[rule['ruleTag']]
-            ]})['rules']
-            manual['rules'] = sorted(restricted + [
-                rule for rule in manual['rules'] if not policies[rule['ruleTag']]
-            ], key=lambda rule: rule['ruleTag'])
+        if manual_path.suffix == '.json':
+            manual = json.loads(manual_path.read_bytes())
+        else:
+            tag = None
+            groups = {}
+            for line_number, line in enumerate(manual_path.read_text().splitlines(), 1):
+                if line.startswith('#### '):
+                    tag = line[5:].strip()
+                    if not tag or tag == 'legacy' or tag in groups:
+                        raise ValueError(f'{manual_path.name}, строка {line_number}: некорректная группа {tag!r}')
+                    groups[tag] = []
+                else:
+                    value = line.split('#', 1)[0].strip()
+                    if not value:
+                        continue
+                    if tag is None:
+                        raise ValueError(f'{manual_path.name}, строка {line_number}: перед подсетями нужен заголовок #### ruleTag')
+                    try:
+                        groups[tag].append(str(ipaddress.ip_network(value, strict=True)))
+                    except ValueError as error:
+                        raise ValueError(f'{manual_path.name}, строка {line_number}: некорректная подсеть {value!r}') from error
+            manual = {'rules': [{'ruleTag': tag, 'ip': values} for tag, values in sorted(groups.items())]}
+    if manual_ips is not None and manual_ips.is_file():
+        prefixes = []
+        for line_number, line in enumerate(manual_ips.read_text().splitlines(), 1):
+            value = line.split('#', 1)[0].strip()
+            if not value:
+                continue
+            try:
+                prefixes.append(str(ipaddress.ip_network(value, strict=True)))
+            except ValueError as error:
+                raise ValueError(f'ip.txt, строка {line_number}: некорректная подсеть {value!r}') from error
+        if any(rule['ruleTag'] == 'legacy' for rule in manual['rules']):
+            raise ValueError('Группа legacy задаётся только в ip.txt, удалите её из config/manual.txt')
+        raw_manual_ips = prefixes
+        manual['rules'].append({'ruleTag': 'legacy', 'ip': prefixes, 'respect_exclusions': True})
+    manual['rules'].sort(key=lambda rule: rule['ruleTag'])
+    policies = {rule['ruleTag']: rule.get('respect_exclusions', False) for rule in manual['rules']}
+    if any(type(value) is not bool for value in policies.values()):
+        raise ValueError('manual.json: respect_exclusions должен быть true или false')
+    manual = compact_rules(manual, [rule['ruleTag'] for rule in manual['rules']], dual_stack=True)
+    if exclusion:
+        restricted = exclusion.filter_ip_rules({'rules': [
+            rule for rule in manual['rules'] if policies[rule['ruleTag']]
+        ]})['rules']
+        manual['rules'] = sorted(restricted + [
+            rule for rule in manual['rules'] if not policies[rule['ruleTag']]
+        ], key=lambda rule: rule['ruleTag'])
     ipv4_index = exclusion.ipv4_index() if exclusion else None
     manifest = {
         'version': 1,
         'inputs': routing_fingerprint({
             **outputs, 'scanner': args.scanner,
-            **({'sites': args.sites, 'asn_file': args.asn_file or args.sites.with_name('ASN.txt')}
+            **({'sites': args.sites, 'asn_file': args.asn_file or args.sites.with_name('asn.txt')}
                if hasattr(args, 'sites') else {}),
         }),
         'sites': [list(entry) for entry in entries],
@@ -201,6 +277,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     }
     if manual_path is not None:
         manifest['inputs']['manual_rules'] = routing_fingerprint({'manual': manual_path})['manual']
+    if manual_ips is not None:
+        manifest['inputs']['manual_ips'] = routing_fingerprint({'manual': manual_ips})['manual']
     if full_refresh:
         manifest['full_refresh'] = True
     if ipv4_index is not None:
@@ -228,7 +306,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
         write_json(args.evidence / 'checkpoint.json', manifest)
     if resume and saved == manifest and (resume / 'prepared.json').is_file():
         prepared = json.loads((resume / 'prepared.json').read_text())
-        files = [*outputs, 'asn-report.md', 'completeness.json']
+        files = [*outputs, 'scan-summary.md', 'completeness.json']
         evidence_files = prepared_evidence(resume)
         saved_files = {name: resume / name for name in files} | evidence_files
         if prepared.get('implementation') == implementation:
@@ -238,8 +316,9 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
             if not any(status.get(key) for key in ('domains_without_complete_dns_bgp',
                                                     'asns_without_prefixes', 'asn_export_error')):
                 for name, path in outputs.items():
-                    write_json(path, json.loads(saved_files[name].read_text()))
-                for name in ('asn-report.md', 'completeness.json', *evidence_files):
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    copyfile(saved_files[name], path)
+                for name in ('scan-summary.md', 'completeness.json', *evidence_files):
                     copyfile(saved_files[name], args.evidence / name)
                 save_prepared(args.evidence, outputs, implementation)
                 print('Восстановлены готовые файлы маршрутизации. Продолжаем с публикации.', flush=True)
@@ -453,18 +532,20 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     if exclusion:
         sources = exclusion.filter_ip_rules(sources)
         domains = exclusion.filter_domain_rules(domains, excluded_domains)
-    sources = apply_manual_rules(sources, manual)
+    sources = redistribute_legacy(apply_manual_rules(sources, manual))
     metadata = sources.get('manual_rules')
     sources = compact_rules(sources, [rule['ruleTag'] for rule in sources['rules']], dual_stack=True)
     if metadata:
-        sources['manual_rules'] = metadata
+        legacy = next((rule['ip'] for rule in sources['rules'] if rule['ruleTag'] == 'legacy'), [])
+        sources['manual_rules'] = [({**rule, 'ip': legacy} if rule['ruleTag'] == 'legacy' else rule)
+                                   for rule in metadata if rule['ruleTag'] != 'legacy' or legacy]
     sources['pending_dns'] = sorted((retry_names - set(pending)) | set(unresolved))
     if exclusion:
         sources['excluded_asns'] = sorted(excluded_asns)
         sources['excluded_domains'] = sorted(excluded_domains)
     result = global_rules(sources)
     if args.evidence:
-        (args.evidence / 'asn-report.md').write_text(report)
+        (args.evidence / 'scan-summary.md').write_text(report)
         write_json(args.evidence / 'completeness.json', {
             'complete': complete, 'mode': 'full-refresh' if full_refresh else 'incremental', 'invalid_sites': invalid, 'dns_requested': len(pending),
             'dns_skipped_existing': skipped_existing,
@@ -484,6 +565,16 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     write_json(args.output, result)
     write_json(args.domains_output, domains)
     write_json(args.sources_output, sources)
+    if manual_ips is not None:
+        remaining = redistribute_legacy({'rules': [
+            *[rule for rule in sources['rules'] if rule['ruleTag'] != 'legacy'],
+            {'ruleTag': 'legacy', 'ip': raw_manual_ips},
+        ]})
+        legacy = next((rule['ip'] for rule in remaining['rules'] if rule['ruleTag'] == 'legacy'), [])
+        manual_ips.parent.mkdir(parents=True, exist_ok=True)
+        temporary = manual_ips.with_name(manual_ips.name + '.tmp')
+        temporary.write_text(format_manual_ips(legacy))
+        temporary.replace(manual_ips)
 
     if args.evidence:
         save_prepared(args.evidence, outputs, implementation)
@@ -496,9 +587,9 @@ def prepared_evidence(directory):
 
 
 def save_prepared(evidence, outputs, implementation):
-    files = {name: evidence / name for name in (*outputs, 'asn-report.md', 'completeness.json')}
+    files = {name: evidence / name for name in (*outputs, 'scan-summary.md', 'completeness.json')}
     for name, source in outputs.items():
-        write_json(files[name], json.loads(source.read_text()))
+        copyfile(source, files[name])
     write_json(evidence / 'prepared.json', {
         'files': routing_fingerprint(files | prepared_evidence(evidence)), 'implementation': implementation,
     })
@@ -507,15 +598,15 @@ def save_prepared(evidence, outputs, implementation):
 def main():
     from asn_routes import BgpTable, asn, collect
     parser = argparse.ArgumentParser(description=__doc__)
-    root = Path(__file__).resolve().parent
+    root = Path(__file__).resolve().parent.parent
     parser.add_argument('--sites', type=Path, default=root / 'sites.txt')
     parser.add_argument('--asn-file', type=Path)
-    parser.add_argument('--output', type=Path, default=root / 'IP.json')
+    parser.add_argument('--output', type=Path, default=root / 'generated/IP.json')
     parser.add_argument('--sources-output', type=Path, help='Original per-service prefixes before global grouping')
     parser.add_argument('--domains-output', type=Path, help='Defaults to domains.json beside IP.json')
     parser.add_argument('--resume', type=Path, help='Resume incremental routing from an evidence directory')
     parser.add_argument('--exclude-asns', '--exclude-cloudflare', action='store_true',
-                        help='Exclude ASNs listed in source/routing/exclude from direct rules')
+                        help='Exclude ASNs listed in source/routing/exclude.txt from direct rules')
     parser.add_argument('--incremental', action='store_true', help='Resolve only names absent from published domain rules')
     parser.add_argument('--full-refresh', action='store_true', help='Rescan all domains and replace generated rules after a complete scan')
     parser.add_argument('--allow-partial', action='store_true', help='Keep available prefixes and union previous entries on incomplete scans')
@@ -527,11 +618,12 @@ def main():
         parser.error('--full-refresh requires --incremental')
     if args.resume and (not args.incremental or not args.evidence):
         parser.error('--resume requires --incremental and --evidence')
-    args.manual_rules = args.sites.with_name('manual.json')
+    args.manual_rules = args.sites.parent / 'config/manual.txt'
+    args.manual_ips = args.sites.with_name('ip.txt')
     entries = services(args.sites, asn)
     explicit = {tag for tag, _ in entries if asn(tag)}
     entries = [(tag, value) for tag, value in entries if not asn(tag)]
-    asn_file = args.asn_file or args.sites.with_name('ASN.txt')
+    asn_file = args.asn_file or args.sites.with_name('asn.txt')
     if asn_file.exists() or args.asn_file:
         for tag, value in services(asn_file, asn):
             origin = asn(tag)
@@ -543,7 +635,8 @@ def main():
     if not entries and not explicit:
         raise ValueError('No domains or ASNs configured')
     if args.sources_output is None:
-        args.sources_output = args.output.with_name('sources.json')
+        args.sources_output = (root / 'state/sources.json' if args.output == root / 'generated/IP.json'
+                               else args.output.with_name('sources.json'))
     if args.domains_output is None:
         args.domains_output = args.output.with_name('domains.json')
     if args.exclude_asns and not args.incremental:
@@ -582,7 +675,7 @@ def main():
     as_rules, as_missing, report = collect(explicit, observations)
     print(report, flush=True)
     if args.evidence:
-        (args.evidence / 'asn-report.md').write_text(report)
+        (args.evidence / 'scan-summary.md').write_text(report)
     partial = scan.returncode == 3 or bool(as_missing)
     if partial and not args.allow_partial:
         raise RuntimeError('Scan incomplete or failed; existing routing files retained.')
