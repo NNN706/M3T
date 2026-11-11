@@ -55,3 +55,4 @@ ok.ru
 mail.ru
 finance.ozon.ru
 ozon.ru
+tls1.iitrust.ru
