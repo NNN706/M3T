@@ -14,7 +14,7 @@ Usage: SubnetResolve.sh [-parse] [-rules] [-v] [-4] [-s] [domain-or-URL ...]
   -s  Never ask to save and never save resolved.json.
   -h  Show help.
 Default: DNS A records; group by (ASN, prefix), ask to save (default no).
-Set SUBNET_DNS_CONCURRENCY to 1–10 to limit simultaneous Check-Host DNS checks (default 10).
+Set SUBNET_DNS_CONCURRENCY to 1–15 to limit simultaneous Check-Host DNS checks (default 15).
 JSON goes to stdout; prompts, diagnostics and report URL go to stderr.
 Failures are explained on stderr; incomplete results return a non-zero exit status for automation.
 HELP
@@ -188,10 +188,10 @@ ncpid=''
 http_pid=''
 parse_pid=''
 dns_pids=()
-dns_concurrency=${SUBNET_DNS_CONCURRENCY:-10}
-if ! [[ "$dns_concurrency" =~ ^([1-9]|10)$ ]]; then
+dns_concurrency=${SUBNET_DNS_CONCURRENCY:-15}
+if ! [[ "$dns_concurrency" =~ ^([1-9]|1[0-5])$ ]]; then
   rm -rf "$batch"
-  die 'SUBNET_DNS_CONCURRENCY должен быть от 1 до 10.'
+  die 'SUBNET_DNS_CONCURRENCY должен быть от 1 до 15.'
 fi
 mkdir "$batch/check-host-cooldown"
 started=$SECONDS
@@ -644,7 +644,7 @@ async function main() {
   browser = await chromium.launch({headless: true});
   if (process.env.SUBNET_PROBE === '1') { await browser.close(); return; }
   const seeds = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
-  const workers = Math.min(10, seeds.length);
+  const workers = Math.min(20, seeds.length);
   let next = 0, completed = 0;
   let lastProgress;
   function publishProgress(i, origin, detail) {

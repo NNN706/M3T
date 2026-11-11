@@ -86,11 +86,8 @@ printf 'Container: %s\nImage: %s\nSHA: %s\nStarted: %s\n'   "$container" "$XRAY_
 cat "$evidence/deployment.txt" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
 curl_status=0
 if [ -f "$evidence/curl-direct.json" ]; then
-  python3 "$root/source/xray-test/curl_diagnostics.py" "$root/source/xray-test/required-sites.json" \
+  python3 "$root/source/xray-test/curl_diagnostics.py" "$evidence/curl-queue.json" \
     "$evidence" --proxy "$binding" || curl_status=$?
-  if [ -f "$evidence/curl-comparison.md" ]; then
-    cat "$evidence/curl-comparison.md" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
-  fi
 fi
 browser_status=0
 node "$root/source/xray-test/browse.cjs" "$root/source/routing/sites.txt" "$root/source/xray-test/required-sites.json" "$evidence" "socks5://$binding" || browser_status=$?

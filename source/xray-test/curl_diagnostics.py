@@ -33,7 +33,9 @@ def successful(attempts):
 
 def describe(attempts):
     return ' / '.join(
-        f"curl {row['exit']}" if row['exit'] else f"HTTP {row['http']}"
+        ({51: 'Ошибка проверки TLS-сертификата', 60: 'Ошибка проверки TLS-сертификата',
+          77: 'Ошибка чтения локального хранилища TLS-сертификатов'}.get(row['exit'], f"curl {row['exit']}")
+         if row['exit'] else f"HTTP {row['http']}")
         for row in attempts
     )
 
@@ -45,67 +47,33 @@ def compare(direct, proxied):
         (False, True): 'Доступен только через Xray',
         (False, False): 'Ошибка на обоих путях',
     }
-    lines = ['## Сравнение curl на одном раннере', '',
-             '| Сайт | Напрямую | Через Xray | Итог |',
-             '| --- | --- | --- | --- |']
-    regressions = False
-    for url, plain in direct.items():
-        socks = proxied[url]
-        outcome = successful(plain), successful(socks)
-        regressions |= outcome == (True, False)
-        lines.append(f"| {url.replace('|', '%7C')} | {describe(plain)} | {describe(socks)} | {labels[outcome]} |")
-    return '\n'.join(lines) + '\n', regressions
-
-
-def failed_urls(evidence):
-    urls = {}
-    browser_path = evidence / 'sites.json'
-    if browser_path.is_file():
-        for row in json.loads(browser_path.read_bytes())['results']:
-            if row['required'] and not row['ok']:
-                urls[row['url']] = None
-    proxy_path = evidence / 'curl-xray.json'
-    if proxy_path.is_file():
-        for url, attempts in json.loads(proxy_path.read_bytes()).items():
-            if not successful(attempts):
-                urls[url] = None
-    return list(urls)
+    return [
+        {'url': url, 'direct': describe(plain), 'proxy': describe(proxied[url]),
+         'outcome': labels[successful(plain), successful(proxied[url])],
+         'regression': successful(plain) and not successful(proxied[url])}
+        for url, plain in direct.items()
+    ]
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('required_sites', type=Path)
+    parser.add_argument('queue', type=Path)
     parser.add_argument('evidence', type=Path)
-    mode = parser.add_mutually_exclusive_group()
-    mode.add_argument('--proxy')
-    mode.add_argument('--after-failure', action='store_true')
+    parser.add_argument('--proxy')
     args = parser.parse_args()
-    if args.after_failure:
-        urls = failed_urls(args.evidence)
-        if not urls:
-            print('Нет результатов с ошибкой конкретного сайта для повторного curl.')
-            return 0
-    else:
-        urls = list(dict.fromkeys(row['url'] for row in json.loads(args.required_sites.read_bytes())))
+    profiles = json.loads(args.queue.read_bytes())
+    urls = [row['url'] for row in profiles]
     direct_file = args.evidence / 'curl-direct.json'
-    with ThreadPoolExecutor(max_workers=6) as pool:
+    with ThreadPoolExecutor(max_workers=15) as pool:
         results = dict(zip(urls, pool.map(lambda url: probe(url, args.proxy), urls)))
-    if args.after_failure:
-        (args.evidence / 'curl-direct-after-failure.json').write_text(json.dumps(results, indent=2) + '\n')
-        print('\n## Прямой curl после сбоя Xray-проверки\n')
-        print('| Сайт | Две попытки без прокси |\n| --- | --- |')
-        for url, attempts in results.items():
-            print(f"| {url.replace('|', '%7C')} | {describe(attempts)} |")
-        return 0
     if args.proxy is None:
         direct_file.write_text(json.dumps(results, indent=2) + '\n')
         return 0
     (args.evidence / 'curl-xray.json').write_text(json.dumps(results, indent=2) + '\n')
-    direct = json.loads(direct_file.read_bytes())
-    report, regressions = compare(direct, results)
-    (args.evidence / 'curl-comparison.md').write_text(report)
-    print(report, end='')
-    return int(regressions)
+    comparison = compare(json.loads(direct_file.read_bytes()), results)
+    (args.evidence / 'curl-comparison.json').write_text(json.dumps(comparison, indent=2) + '\n')
+    required = {row['url'] for row in profiles if row['required']}
+    return int(any(row['regression'] and row['url'] in required for row in comparison))
 
 
 if __name__ == '__main__':

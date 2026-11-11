@@ -11,7 +11,7 @@ helper=source.split("<<'SUBNET_PARSE_JS'\n",1)[1].split('\nSUBNET_PARSE_JS',1)[0
 (root/'extracted-parse.cjs').write_text(helper)
 cache=pathlib.Path(os.environ.get('XDG_CACHE_HOME',str(pathlib.Path.home()/'.cache')))
 runtime=os.environ.get('SUBNET_PLAYWRIGHT',str(cache/'SubnetResolve/playwright-1.64.1/node_modules/playwright'))
-expected_concurrency = 10
+expected_concurrency = 20
 parallel_starts = []
 parallel_lock = threading.Lock()
 first_wave = threading.Event()
@@ -60,8 +60,8 @@ d=json.loads((root/'parse-discovery.json').read_text());expected={'site.localhos
 assert set(d['domains'])==expected,d
 assert d['complete'] and not p.stdout and 'Редирект: site.localhost → redirect.localhost' in p.stderr
 print('PASS real Chromium: JS, delayed fetch, dedup, iframe, WebSocket, scroll, URL path/case preserved',flush=True)
-# Ten pages must reach the server before it releases the first response.
-# The eleventh must wait for a slot to finish collecting requests.
+# Twenty pages must reach the server before it releases the first response.
+# The twenty-first must wait for a slot to finish collecting requests.
 parallel_seeds = [f'http://site{i}.localhost:{server.server_port}/Parallel/{i}' for i in range(expected_concurrency + 1)]
 (root/'parse-seeds.json').write_text(json.dumps(parallel_seeds))
 p = subprocess.run(
@@ -81,7 +81,7 @@ for i, page in enumerate(parallel['pages']):
  assert bool(page['errors']) == (i == 1), page
 assert 'отказал' in parallel['pages'][1]['errors'][0], parallel
 assert set(parallel['domains']) == {host for page in parallel['pages'] for host in page['domains']}
-print('PASS real Chromium: ten concurrent sites, eleventh waits, isolated domains and failure, stable output order', flush=True)
+print('PASS real Chromium: twenty concurrent sites, twenty-first waits, isolated domains and failure, stable output order', flush=True)
 # Same browser through the full Bash entrypoint, with DNS/BGP mock executables.
 bin=root/'parse-bin';bin.mkdir(exist_ok=True)
 real_curl=shutil.which('curl')

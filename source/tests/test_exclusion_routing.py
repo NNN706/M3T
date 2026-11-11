@@ -119,6 +119,8 @@ with tempfile.TemporaryDirectory() as directory:
     }
     stats = json.loads((args.evidence / 'completeness.json').read_text())
     assert stats['complete'] and stats['excluded_ipv4_skipped_before_whois'] == 3, stats
+    assert stats['domains_excluded_by_asn_without_prefix'] == ['cloud.example'], stats
+    assert stats['domains_without_any_prefix'] == [], stats
 
     published = {path: path.read_bytes() for path in (*baseline, args.output)}
     args.resume = args.evidence

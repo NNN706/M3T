@@ -148,7 +148,7 @@ def routing_fingerprint(paths):
             for name, path in paths.items()}
 
 
-def incremental_update(args, entries, explicit, collect, exclusion=None):
+def incremental_update(args, entries, explicit, collect, exclusion=None, *, table=None):
     """Workflow mode. Append verified discoveries to the published baseline."""
     resume = getattr(args, 'resume', None)
     full_refresh = getattr(args, 'full_refresh', False)
@@ -340,8 +340,18 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
     explicit = set(explicit) - excluded_asns
     resolved = {}
     excluded_ips = set()
+    eligible = {host: [route for route in row['results'] if route.get('asn') not in excluded_asns]
+                for host, row in responses.items()}
+    if table is not None:
+        from asn_routes import broadest_routes
+        try:
+            selected = iter(broadest_routes([route for routes in eligible.values() for route in routes], table))
+            eligible = {host: [next(selected) for _ in routes] for host, routes in eligible.items()}
+        except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
+            print(f'BGP.tools: не удалось сверить перекрывающиеся анонсы: {error}. '
+                  'Сохраняем префиксы из WHOIS.', file=sys.stderr)
     for host, row in responses.items():
-        routes = [route for route in row['results'] if route.get('asn') not in excluded_asns]
+        routes = eligible[host]
         if routes:
             resolved[host] = {str(ipaddress.ip_network(route['prefix'])) for route in routes}
             observations.extend(routes)
@@ -352,6 +362,25 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
         print(f'Исключения ASN: исключено доменов — {len(excluded_domains & (known | discovered))}; '
               f'пропущено уникальных IPv4 перед WHOIS — {len(excluded_ips)}.', flush=True)
     unresolved = [host for host in pending if host not in responses or responses[host]['complete'] is not True]
+    no_prefix = set(pending) - resolved.keys()
+    excluded_without_prefix = no_prefix & excluded_domains
+    incomplete_details = {}
+    for host in unresolved:
+        if host not in responses:
+            incomplete_details[host] = {'reason': 'scan_not_completed'}
+            continue
+        row = responses[host]
+        errors = [error for error in row.get('errors', []) if not error.get('check_host')]
+        failed_ips = [ipaddress.ip_address(error['ip']) for error in errors if error.get('ip')]
+        if failed_ips and len(failed_ips) == len(errors) and all(not ip.is_global for ip in failed_ips):
+            reason = 'non_public_ipv4'
+        elif failed_ips:
+            reason = 'bgp_incomplete'
+        elif errors:
+            reason = 'check_host_api_error'
+        else:
+            reason = 'no_ipv4_from_check_host'
+        incomplete_details[host] = {'reason': reason, 'errors': errors}
     if unresolved:
         print('DNS/BGP без полного результата. Домены остаются на повтор: ' + ', '.join(unresolved), file=sys.stderr)
     if args.evidence:
@@ -406,7 +435,9 @@ def incremental_update(args, entries, explicit, collect, exclusion=None):
             'complete': complete, 'mode': 'full-refresh' if full_refresh else 'incremental', 'invalid_sites': invalid, 'dns_requested': len(pending),
             'dns_skipped_existing': skipped_existing,
             'domains_without_complete_dns_bgp': unresolved,
-            'domains_without_any_prefix': sorted(set(pending) - resolved.keys()),
+            'domains_without_any_prefix': sorted(no_prefix - excluded_without_prefix),
+            'domains_excluded_by_asn_without_prefix': sorted(excluded_without_prefix),
+            'incomplete_dns_bgp_details': {host: incomplete_details[host] for host in unresolved},
             'excluded_ipv4_skipped_before_whois': len(excluded_ips),
             'excluded_domains': sorted(excluded_domains & (known | discovered)),
             'asns_without_prefixes': as_missing,
@@ -484,7 +515,7 @@ def main():
         parser.error('--exclude-asns requires --incremental')
     if args.incremental:
         policy = None
-        table = BgpTable() if args.exclude_asns else None
+        table = BgpTable()
         if args.exclude_asns:
             from exclusion_policy import ExclusionPolicy
             try:
@@ -493,7 +524,7 @@ def main():
                 parser.exit(1, f'Исключения ASN: не удалось загрузить ASN и префиксы. '
                                f'Сбор и публикация не запущены. {error}\n')
         incremental_update(args, entries, explicit,
-                           lambda explicit, observed: collect(explicit, observed, table=table), policy)
+                           lambda explicit, observed: collect(explicit, observed, table=table), policy, table=table)
         return
     with tempfile.TemporaryDirectory(prefix='routing-bgp-') as directory:
         metadata = Path(directory) / 'observations.json'

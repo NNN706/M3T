@@ -5,6 +5,7 @@ from subprocess import CompletedProcess
 import sys
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'routing'))
 import asn_routes
@@ -61,3 +62,23 @@ with TemporaryDirectory() as directory, patch.dict(os.environ, {'XDG_CACHE_HOME'
         assert target.read_text() == TABLE
 
 print('PASS BGP.tools dual-stack export, report-only domain coverage, cache reuse and incomplete download rejection')
+
+
+def sample_prefixes(origins):
+    assert origins == {15169, 64500}
+    return {
+        15169: {'142.250.120.0/24', '142.250.0.0/15', '142.252.0.0/15'},
+        64500: {'142.0.0.0/8', '2001:db8::/32'},
+    }
+
+
+routes = [
+    {'asn': 'AS15169', 'prefix': '142.250.120.0/24', 'ips': ['142.250.120.154']},
+    {'asn': 'AS64500', 'prefix': '2001:db8:1::/48', 'ips': ['2001:db8:1::2']},
+    {'asn': 'AS15169', 'prefix': '142.254.0.0/16', 'ips': ['142.254.0.1']},
+]
+effective = asn_routes.broadest_routes(routes, SimpleNamespace(prefixes=sample_prefixes))
+assert [row['prefix'] for row in effective] == ['142.250.0.0/15', '2001:db8::/32', '142.254.0.0/16']
+assert [row['ips'] for row in effective] == [row['ips'] for row in routes]
+assert routes[0]['prefix'] == '142.250.120.0/24'
+print('PASS broadest enclosing announcement of the same ASN; original evidence preserved')

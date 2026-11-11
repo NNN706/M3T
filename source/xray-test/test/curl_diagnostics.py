@@ -1,8 +1,6 @@
 import importlib.util
-import io
 import json
 import sys
-from contextlib import redirect_stdout
 from tempfile import TemporaryDirectory
 from pathlib import Path
 import subprocess
@@ -20,12 +18,12 @@ def probe(http, status=0):
 urls = ['https://both.example', 'https://blocked.example', 'https://proxy.example', 'https://offline.example']
 direct = dict(zip(urls, [probe(200), probe(200), probe(403), probe(0, 28)]))
 proxied = dict(zip(urls, [probe(200), probe(403), probe(204), probe(0, 28)]))
-report, failed = diagnostics.compare(direct, proxied)
-assert failed
-assert [line.split(' | ')[-1][:-2] for line in report.splitlines()[-4:]] == [
+report = diagnostics.compare(direct, proxied)
+assert [row['outcome'] for row in report] == [
     'Оба пути доступны', 'Ошибка только через Xray', 'Доступен только через Xray', 'Ошибка на обоих путях',
 ]
-assert not diagnostics.compare({urls[3]: direct[urls[3]]}, {urls[3]: proxied[urls[3]]})[1]
+assert [row['url'] for row in report if row['regression']] == [urls[1]]
+assert 'TLS-сертификата' in diagnostics.describe(probe(0, 60))
 
 response = subprocess.CompletedProcess([], 0, '200\t127.0.0.1\t0\t0\t0\t0\t0\t0', '')
 with patch.object(diagnostics.subprocess, 'run', return_value=response) as curl:
@@ -41,20 +39,21 @@ print('PASS direct and SOCKS curl use comparable settings and report all four ou
 
 with TemporaryDirectory() as directory:
     evidence = Path(directory)
-    assert diagnostics.failed_urls(evidence) == []
-    (evidence / 'sites.json').write_text(json.dumps({'results': [
-        {'url': urls[0], 'required': True, 'ok': True},
-        {'url': urls[1], 'required': True, 'ok': False},
-        {'url': urls[2], 'required': False, 'ok': False},
-    ]}))
-    (evidence / 'curl-xray.json').write_text(json.dumps(proxied))
-    (evidence / 'curl-direct.json').write_text(json.dumps(direct))
-    output = io.StringIO()
-    with patch.object(sys, 'argv', ['curl_diagnostics.py', 'unused.json', directory, '--after-failure']), \
-            patch.object(diagnostics, 'probe', return_value=probe(200)) as call, redirect_stdout(output):
+    queue = evidence / 'queue.json'
+    queue.write_text(json.dumps([{'url': url, 'required': url == urls[0]} for url in urls]))
+    with patch.object(sys, 'argv', ['curl_diagnostics.py', str(queue), directory]), \
+            patch.object(diagnostics, 'probe', side_effect=lambda url, _: direct[url]) as call:
         assert diagnostics.main() == 0
-    assert {item.args for item in call.call_args_list} == {(urls[1], None), (urls[3], None)}
-    assert list(json.loads((evidence / 'curl-direct-after-failure.json').read_text())) == [urls[1], urls[3]]
-    assert 'HTTP 200' in output.getvalue()
-    assert json.loads((evidence / 'curl-direct.json').read_text()) == direct
-print('PASS post-failure curl retries only failed URLs without proxy and preserves baseline')
+        assert {item.args for item in call.call_args_list} == {(url, None) for url in urls}
+    proxy = '127.0.0.1:1080'
+    with patch.object(sys, 'argv', ['curl_diagnostics.py', str(queue), directory, '--proxy', proxy]), \
+            patch.object(diagnostics, 'probe', side_effect=lambda url, _: proxied[url]) as call:
+        assert diagnostics.main() == 0
+        assert {item.args for item in call.call_args_list} == {(url, proxy) for url in urls}
+    assert json.loads((evidence / 'curl-comparison.json').read_text()) == report
+
+    queue.write_text(json.dumps([{'url': url, 'required': url == urls[1]} for url in urls]))
+    with patch.object(sys, 'argv', ['curl_diagnostics.py', str(queue), directory, '--proxy', proxy]), \
+            patch.object(diagnostics, 'probe', side_effect=lambda url, _: proxied[url]):
+        assert diagnostics.main() == 1
+print('PASS curl checks both paths for the entire queue and gates only required regressions')

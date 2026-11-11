@@ -32,9 +32,9 @@ mock = mock.replace("  if phase=='health':", """  if phase=='dns' and host=='rat
    log('peer-ready',time.time())
   if phase=='health':""")
 mock = mock.replace("  if mode=='result' and", """  if mode=='parallel':
-   pause_until(lambda:sum(phase=='dns' for phase,_ in events())>=10)
+   pause_until(lambda:sum(phase=='dns' for phase,_ in events())>=15)
    if host=='h00.example':
-    pause_until(lambda:['dns','h10.example'] in events())
+    pause_until(lambda:['dns','h15.example'] in events())
   if mode=='poll429' and events().count(['result',host])==1:
    pathlib.Path(args[args.index('-D')+1]).write_bytes(b'HTTP/2 429\\r\\n\\r\\n')
    log('rejected',time.time());sys.exit(22)
@@ -59,7 +59,7 @@ with tempfile.TemporaryDirectory() as directory:
                               capture_output=True, text=True, timeout=35)
         return proc, [json.loads(line) for line in trace.read_text().splitlines()]
 
-    hosts = [f'h{i:02}.example' for i in range(12)]
+    hosts = [f'h{i:02}.example' for i in range(17)]
     proc, events = run('parallel', hosts)
     assert proc.returncode == 0, proc.stderr
     assert [row['domain'] for row in json.loads(proc.stdout)['domains']] == hosts
@@ -71,8 +71,8 @@ with tempfile.TemporaryDirectory() as directory:
             peak = max(peak, len(active))
         if phase == 'result-time':
             active.remove(value[0])
-    assert peak == 10 and not active, events
-    assert events.index(['dns', 'h10.example']) < next(i for i, (phase, value) in enumerate(events)
+    assert peak == 15 and not active, events
+    assert events.index(['dns', 'h15.example']) < next(i for i, (phase, value) in enumerate(events)
                                                        if phase == 'result-time' and value[0] == hosts[0])
     assert [payload for phase, payload in events if phase == 'bulk'] == [['2.2.2.2']], events
 
@@ -94,7 +94,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert 'исчерпаны 3 повтора' in proc.stderr
     assert json.loads(proc.stdout)['domains'][1]['complete'] is True
 
-    proc, events = run('ok', ['h00.example'], SUBNET_DNS_CONCURRENCY='11')
+    proc, events = run('ok', ['h00.example'], SUBNET_DNS_CONCURRENCY='16')
     assert proc.returncode == 1 and not events, proc.stderr
 
 print('PASS DNS worker limit, slot refill, shared Retry-After, bounded retries and WHOIS deduplication')
