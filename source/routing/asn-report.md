@@ -1,10 +1,10 @@
 # Общее покрытие ASN правилами маршрутизации
 
-Опубликовано **710** уникальных подсетей (IPv4: **668**, IPv6: **42**). С ними пересекаются анонсы **645** ASN.
+Опубликовано **723** уникальных подсетей (IPv4: **681**, IPv6: **42**). С ними пересекаются анонсы **649** ASN.
 
 Источник правил — [IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/IP.json). Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).
 
-SHA-256 файла IP.json: `a928b361c3332d8dfddfa558b54b99205d47791a11ca374d11602967b39fd9f4`.
+SHA-256 файла IP.json: `89486eed006ea2f964d47270f61a3041f4abfa47c9dade4778b7b85af2f0b8b8`.
 
 «Затронуто» — анонсы ASN, которые хотя бы частично пересекаются с правилами. «Всего» — все анонсы этого ASN в снимке. Один префикс может учитываться у нескольких ASN, если они его анонсируют.
 
@@ -52,7 +52,7 @@ SHA-256 файла IP.json: `a928b361c3332d8dfddfa558b54b99205d47791a11ca374d116
 | AS8193 | "Uzbektelekom" Joint Stock Company | 1 / 105 |
 | AS8291 | The Federal Guard Service of the Russian Federation | 15 / 15 |
 | AS8342 | JSC RTComm.RU | 4 / 100 |
-| AS8359 | MTS PJSC | 13 / 522 |
+| AS8359 | MTS PJSC | 14 / 522 |
 | AS8492 | "OBIT" Ltd. | 7 / 149 |
 | AS8529 | Zain Omantel International FZ-LLC | 2 / 39 |
 | AS8551 | Bezeq International Ltd. | 5 / 855 |
@@ -114,6 +114,7 @@ SHA-256 файла IP.json: `a928b361c3332d8dfddfa558b54b99205d47791a11ca374d116
 | AS18209 | Atria Convergence Technologies Ltd., | 1 / 172 |
 | AS18403 | FPT Telecom Company | 810 / 8467 |
 | AS18680 | Akamai Technologies, Inc. | 1 / 1 |
+| AS19750 | Criteo Corp. | 2 / 20 |
 | AS20454 | SECURED SERVERS LLC | 2 / 162 |
 | AS20485 | JSC TransTeleCom | 1 / 87 |
 | AS20597 | PJSC "Vimpelcom" | 3 / 11 |
@@ -255,7 +256,7 @@ SHA-256 файла IP.json: `a928b361c3332d8dfddfa558b54b99205d47791a11ca374d116
 | AS44066 | firstcolo GmbH | 2 / 74 |
 | AS44112 | SpaceWeb Ltd | 9 / 37 |
 | AS44128 | Internet-Pro LLC | 41 / 41 |
-| AS44386 | LLC Internet Solutions | 5 / 9 |
+| AS44386 | LLC Internet Solutions | 9 / 9 |
 | AS44428 | HOST EXPERT LLC | 1 / 1 |
 | AS44534 | YANDEX LLC | 28 / 28 |
 | AS44559 | IT HOSTLINE LTD | 2 / 1592 |
@@ -263,6 +264,7 @@ SHA-256 файла IP.json: `a928b361c3332d8dfddfa558b54b99205d47791a11ca374d116
 | AS44657 | JSC Steel Industrial Company | 1 / 1 |
 | AS44677 | MTS PJSC | 4 / 14 |
 | AS44704 | Perekrestok-2000 LLC | 3 / 3 |
+| AS44788 | Criteo Technology SAS | 2 / 20 |
 | AS44812 | IP Server LLC | 1 / 53 |
 | AS45102 | Alibaba (US) Technology Co., Ltd. | 13 / 1351 |
 | AS45758 | Advanced Wireless Network Company Limited | 10 / 68 |
@@ -351,6 +353,7 @@ SHA-256 файла IP.json: `a928b361c3332d8dfddfa558b54b99205d47791a11ca374d116
 | AS52376 | Camara Argentina de Internet CABASE | 2 / 10 |
 | AS55286 | B2 Net Solutions Inc. | 3 / 891 |
 | AS55410 | Vodafone Idea Ltd | 8 / 1378 |
+| AS55569 | Criteo APAC | 2 / 20 |
 | AS55836 | Reliance Jio Infocomm Limited | 41 / 6773 |
 | AS56336 | JSC NII "Vektor" | 1 / 1 |
 | AS56340 | Grand Ltd | 2 / 36 |
@@ -577,6 +580,7 @@ SHA-256 файла IP.json: `a928b361c3332d8dfddfa558b54b99205d47791a11ca374d116
 | AS207581 | LLC VK | 2 / 2 |
 | AS207859 | GLAVSTROY Ltd | 1 / 1 |
 | AS207970 | LLC VK | 1 / 1 |
+| AS207986 | LLC OZON BANK | 7 / 7 |
 | AS207990 | HostRoyale Technologies Pvt Ltd | 17 / 1078 |
 | AS208252 | LLC EVRAZ Steel Building | 1 / 1 |
 | AS208388 | AO "Odezhda 3000" | 1 / 1 |
