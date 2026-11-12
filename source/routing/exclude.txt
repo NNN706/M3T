@@ -216,3 +216,19 @@ AS200005
 AS213120
 AS393234
 AS393560
+
+# Apple Inc. and Apple distribution subsidiaries
+AS714
+AS1036
+AS1042
+AS2709
+AS6185
+AS31128
+AS63707
+
+# Facebook / Meta (including corporate and CDN networks)
+AS32934
+AS34825
+AS54115
+AS63293
+AS149642

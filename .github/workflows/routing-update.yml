@@ -21,6 +21,7 @@ on:
       - 'source/routing/asn.txt'
       - 'source/routing/exclude.txt'
       - 'source/routing/config/manual.txt'
+      - 'source/routing/config/prefix-limits.txt'
       - 'source/routing/ip.txt'
 permissions:
   contents: write
@@ -116,6 +117,7 @@ jobs:
           python3 source/tests/test_exclusion_routing.py
           python3 source/tests/test_incremental_routing.py
           python3 source/tests/test_publish_routing.py
+          python3 source/tests/test_prefix_limits.py
           python3 source/tests/test_routing_report.py
           node --test source/tests/xray/test/routing.test.cjs
       - name: Scan sites and compact prefixes
@@ -202,6 +204,7 @@ jobs:
           for directory in "$RUNNER_TEMP/routing-report-input-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/"*/; do
             if [ -d "$directory" ]; then evidence+=(--evidence "$directory"); fi
           done
+          python3 source/tests/test_prefix_limits.py
           python3 source/tests/test_routing_report.py
           python3 source/routing/scripts/routing_report.py source/routing/generated/IP.json "$output/asn-report-full.md" \
             --summary-output "$output/summary.md" --sources source/routing/state/sources.json \

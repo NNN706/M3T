@@ -1,6 +1,7 @@
 """Cross-tag exact aggregation, source attribution, removals and partial retention."""
-import importlib.util,json,pathlib,subprocess,tempfile,random,ipaddress
+import importlib.util,json,pathlib,subprocess,tempfile,random,ipaddress,sys
 root=pathlib.Path(__file__).resolve().parents[1]/'routing'
+sys.path.insert(0, str(root/'scripts'))
 spec=importlib.util.spec_from_file_location('routing',root/'scripts/update_routing.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 original={'rules':[{'ruleTag':'b.example','ip':['192.0.2.128/25','2001:db8::/33']},{'ruleTag':'a.example','ip':['192.0.2.0/25','192.0.2.0/25','2001:db8:8000::/33']}]}
 expected={'rules':[{'ruleTag':'a.example','ip':['192.0.2.0/24','2001:db8::/32']}]}

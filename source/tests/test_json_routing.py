@@ -5,7 +5,10 @@ import json
 from pathlib import Path
 import subprocess
 import tempfile
+import sys
 root=Path(__file__).resolve().parents[1]/'routing'
+sys.path.insert(0, str(root/'scripts'))
+from prefix_limits import PrefixLimits
 spec=importlib.util.spec_from_file_location('routing',root/'scripts/update_routing.py')
 routing=importlib.util.module_from_spec(spec);spec.loader.exec_module(routing)
 raw={'rules':[{'ruleTag':'a.example','ip':['192.0.2.0/25'],'domain':['domain:a.example','domain:api.a.example','domain:shared.example','domain:api.a.example']},
@@ -47,10 +50,14 @@ with tempfile.TemporaryDirectory() as directory:
 # Validate the actual committed migration outputs too.
 ips=json.loads((root/'generated/IP.json').read_text())['rules']
 assert len({r['ruleTag'] for r in ips})==len(ips)
+signature=json.loads((root/'state/sources.json').read_text()).get('ipv4_prefix_limits', {})
+limits=PrefixLimits({int(k):v[0] for k,v in signature.items()}, {int(k):v[1] for k,v in signature.items()})
 for rule in ips:
     nets=[ipaddress.ip_network(x,strict=True) for x in rule['ip']]
     assert len(nets)==len(set(nets))
-    assert nets==[n for version in (4,6) for n in ipaddress.collapse_addresses(n for n in nets if n.version==version)]
+    collapsed=[str(n) for version in (4,6) for n in ipaddress.collapse_addresses(n for n in nets if n.version==version)]
+    expected=limits.finalize({'rules':[{'ruleTag':rule['ruleTag'],'ip':collapsed}]})['rules'][0]['ip']
+    assert rule['ip']==expected
 current_domains=json.loads((root/'generated/domains.json').read_text())
 # The committed JSON describes the previous scan. sites.txt may already have changed.
 # outboundTag is deployment policy, outside the generated domain data.

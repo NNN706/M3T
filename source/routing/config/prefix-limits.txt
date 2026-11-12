@@ -1,0 +1,7 @@
+# ASN IPv4-mask: keep only blocks containing observed DNS IPs.
+# IPv6 is unchanged. Narrower existing prefixes remain narrower.
+# Hetzner Online / Hetzner Cloud
+AS24940 /24
+AS212317 /24
+AS213230 /24
+AS215859 /24
