@@ -231,3 +231,31 @@ with tempfile.TemporaryDirectory() as directory:
         run.assert_not_called()
     assert all(p.read_bytes() == payload for p, payload in published.items())
 print('PASS legacy service transfer, local sections, exact remainder and plain-text checkpoint restoration')
+
+# Compacted output is never the DNS cache: explicit observations stay in state.
+with tempfile.TemporaryDirectory() as directory:
+    tmp = Path(directory)
+    observed = {'rules': [{'ruleTag': 'vtb.ru', 'domain': ['domain:online.vtb.ru', 'domain:vtb.ru']}]}
+    args = argparse.Namespace(scanner=root / 'SubnetResolve.sh', verbose=False, allow_partial=True,
+                              domains_output=tmp/'domains.json', sources_output=tmp/'sources.json',
+                              output=tmp/'IP.json', evidence=tmp/'evidence')
+    write_json(args.domains_output, {'rules': []})
+    write_json(args.sources_output, {'rules': [{'ruleTag':'vtb.ru','ip':['192.0.2.0/24']}],
+                                    'domain_observations': observed})
+    discovery = {'pages':[{'site':'vtb.ru','domains':['online.vtb.ru'],'errors':[]}]}
+    with patch('update_routing.subprocess.run', return_value=subprocess.CompletedProcess([],0,json.dumps(discovery))) as run:
+        incremental_update(args,[('vtb.ru','vtb.ru')],set(),lambda *_:([],[],''))
+        assert run.call_count == 1
+    assert json.loads(args.sources_output.read_text())['domain_observations'] == observed
+    # Full refresh still resolves both cached names even when published output is empty.
+    args.full_refresh=True
+    args.evidence=tmp/'full'
+    response={'domains':[{'domain':host,'complete':True,'results':[{'prefix':'192.0.2.0/24'}]}
+                         for host in ('online.vtb.ru','vtb.ru')]}
+    with patch('update_routing.subprocess.run',side_effect=[
+        subprocess.CompletedProcess([],0,json.dumps(discovery)),
+        subprocess.CompletedProcess([],0,json.dumps(response))]) as run:
+        incremental_update(args,[('vtb.ru','vtb.ru')],set(),lambda *_:([],[],''))
+        dns=run.call_args_list[1].args[0]
+        assert dns[dns.index('--')+1:] == ['online.vtb.ru','vtb.ru']
+print('PASS compact domain output preserves explicit cache and full refresh DNS queue')

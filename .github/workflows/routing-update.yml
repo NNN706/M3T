@@ -119,7 +119,7 @@ jobs:
           python3 source/tests/test_publish_routing.py
           python3 source/tests/test_prefix_limits.py
           python3 source/tests/test_routing_report.py
-          node --test source/tests/xray/test/routing.test.cjs
+          node --test source/tests/xray/test/routing.test.cjs source/tests/xray/test/domain-coverage.test.cjs
       - name: Scan sites and compact prefixes
         shell: bash
         env:
@@ -145,12 +145,6 @@ jobs:
             printf '\n## Полнота сбора\n\n%s\n' '```json'
             cat "$ROUTING_EVIDENCE/completeness.json"
             printf '\n%s\n' '```'
-            printf '\n## Итоговые правила маршрутизации\n'
-            for file in domains.json IP.json; do
-              printf '\n<details>\n<summary>%s</summary>\n\n%s\n' "$file" '```json'
-              cat "$ROUTING_EVIDENCE/$file"
-              printf '\n%s\n\n</details>\n' '```'
-            done
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Save scan evidence
         if: always()
@@ -165,6 +159,21 @@ jobs:
         run: |
           set -euo pipefail
           python3 source/routing/scripts/publish_routing.py --base "$(git rev-parse HEAD)" --output "$ROUTING_EVIDENCE/IP.json" --domains "$ROUTING_EVIDENCE/domains.json" --sources "$ROUTING_EVIDENCE/sources.json" --build-routing --manual-ips "$ROUTING_EVIDENCE/ip.txt"
+
+      - name: Show published routing rules
+        shell: bash
+        env:
+          PUBLISHED_SHA: ${{ steps.publish.outputs.published_sha }}
+        run: |
+          set -euo pipefail
+          {
+            printf '\n## Опубликованные правила маршрутизации\n'
+            for file in domains.json IP.json; do
+              printf '\n<details>\n<summary>%s</summary>\n\n%s\n' "$file" '```json'
+              git show "$PUBLISHED_SHA:source/routing/generated/$file"
+              printf '\n%s\n\n</details>\n' '```'
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
 
   curl-diagnostic:
     needs: update

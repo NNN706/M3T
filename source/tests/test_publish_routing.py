@@ -122,6 +122,35 @@ with tempfile.TemporaryDirectory() as directory:
     assert git(other, 'show', with_manual + ':source/routing/ip.txt') == manual_payload.read_text().strip()
     assert git(other, 'rev-parse', with_manual + '^') == published
 
+    # Semantic compaction and cache publication are atomic; removing a manual
+    # parent/keyword later restores candidates from the explicit state snapshot.
+    git(other, 'reset', '--hard', with_manual)
+    template.write_text(json.dumps({'routing':{'rules':[
+        {'ruleTag':'main','domain':['domain:vtb.ru','keyword:yandex'],'outboundTag':'direct'}]}}))
+    git(other,'add','.');git(other,'commit','-m','Generalized domain rules');git(other,'push')
+    base=git(other,'rev-parse','HEAD')
+    observed={'rules':[
+        {'ruleTag':'online.vtb.ru','domain':['domain:online.vtb.ru']},
+        {'ruleTag':'unrelated','domain':['domain:unrelated.example']},
+        {'ruleTag':'yandex','domain':['domain:mc.yandex.ru']},
+    ]}
+    domain_payload.write_text(json.dumps(observed))
+    sources_payload.write_text(json.dumps({'rules':[],'domain_observations':observed}))
+    compacted=module.publish(repo,payload,base,domains=domain_payload,sources=sources_payload,build_routing=True)
+    git(other,'fetch','origin','test')
+    compact=json.loads(git(other,'show',compacted+':source/routing/generated/domains.json'))
+    assert compact=={'rules':[observed['rules'][1]]}
+    state=json.loads(git(other,'show',compacted+':source/routing/state/sources.json'))
+    assert state['domain_observations']==observed
+    git(other,'reset','--hard',compacted)
+    template.write_text('{"routing":{"rules":[]}}')
+    git(other,'add','.');git(other,'commit','-m','Remove generalized rules');git(other,'push')
+    domain_payload.write_text(json.dumps(compact))
+    restored=module.publish(repo,payload,git(other,'rev-parse','HEAD'),domains=domain_payload,
+                            sources=sources_payload,build_routing=True)
+    git(other,'fetch','origin','test')
+    assert json.loads(git(other,'show',restored+':source/routing/generated/domains.json'))==observed
+
     try:module.publish(repo,payload,changed,branch='main')
     except ValueError:pass
     else:raise AssertionError('main publication enabled')

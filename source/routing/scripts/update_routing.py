@@ -340,6 +340,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     if args.output.exists() and not args.sources_output.exists():
         raise RuntimeError('Инкрементальный сбор требует sources.json для сохранения групп подсетей.')
     previous_sources = json.loads(args.sources_output.read_text()) if args.sources_output.exists() else {'rules': []}
+    previous_domains = previous_sources.get('domain_observations', previous_domains)
     previous_tags = [r['ruleTag'] for r in previous_domains['rules']]
     previous_domains = domain_rules(previous_domains, previous_tags, include_seed=False)
     domain_groups = {r['ruleTag']: set(r['domain']) for r in previous_domains['rules']}
@@ -560,6 +561,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
         legacy = next((rule['ip'] for rule in sources['rules'] if rule['ruleTag'] == 'legacy'), [])
         sources['manual_rules'] = [({**rule, 'ip': legacy} if rule['ruleTag'] == 'legacy' else rule)
                                    for rule in metadata if rule['ruleTag'] != 'legacy' or legacy]
+    sources['domain_observations'] = domains
     sources['pending_dns'] = sorted((retry_names - set(pending)) | set(unresolved))
     if exclusion:
         sources['excluded_asns'] = sorted(excluded_asns)
