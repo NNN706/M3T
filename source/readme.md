@@ -51,7 +51,7 @@ Workflow **Update service routing prefixes** запускается вручну
 
 Перед публикацией workflow получает актуальный `test` и создаёт коммит поверх него. Изменения других файлов сохраняются; при гонке push повторяется до трёх раз без force. Если за время сбора изменились сканер, генератор или прежний `IP.json`, устаревший результат не публикуется — он остаётся в артефактах, включая готовый `IP.json`.
 
-Результаты update: `source/routing/generated/IP.json` — правила `ruleTag`/`ip`, `source/routing/generated/domains.json` — отдельные правила `ruleTag`/`domain`. Оба файла и sources.json публикуются одним коммитом и сохраняются в артефактах. Домены каждого исходного сервиса включают сам сервис и обнаруженные запросы браузера. При неполном сборе сохраняются прежние данные. ASN задаются в `source/routing/asn.txt`.
+Результаты update: `source/routing/generated/IP.json` — правила `ruleTag`/`ip`, `source/routing/generated/domains.json` — отдельные правила `ruleTag`/`domain`. Оба файла и sources.json публикуются одним коммитом и сохраняются в артефактах. Полные домены каждого исходного сервиса, включая сам сервис и запросы браузера, сохраняются в sources.json → domain_observations; domains.json содержит сокращённые правила с тем же покрытием. При неполном сборе сохраняются прежние данные. ASN задаются в `source/routing/asn.txt`.
 
 Старый `source/ip/IP.txt` разово объединён с результатами сканирования: совпадающее покрытие исключено, остаток сохранён под `ruleTag: legacy`, IPv6 сохранены. Совместимые подсети объединены без добавления адресов; принадлежность общих CDN-сетей сохраняется в sources.json. Workflow не импортирует старый список повторно и сохраняет legacy при следующих обновлениях.
 
@@ -83,6 +83,7 @@ Templates/Routing-(RU-Direct)/routing-ru.json одним коммитом. IP-п
 
 - [sites.txt](routing/sites.txt) — сайты и домены для сбора.
 - [ip.txt](routing/ip.txt) — ручные CIDR direct, включая legacy; ASN-исключения применяются.
+- [domains.txt](routing/domains.txt) — ручная основа общих доменных правил, включая группу main.
 - [asn.txt](routing/asn.txt) — ASN для выгрузки анонсов.
 - [exclude.txt](routing/exclude.txt) — исключённые ASN.
 - [asn-report-full.md](routing/asn-report-full.md) — общий отчёт с подсетями и DNS-наблюдениями.
@@ -107,3 +108,8 @@ IPv4 сетей Hetzner ограничены наблюдавшимися /24 ч
 `routing/state/dns-provenance.json`, поэтому ограничение сохраняется при
 инкрементальном и ежедневном полном сборе. Широкий ASN не разворачивается
 целиком в набор /24. Изменение prefix-limits.txt автоматически запускает Update.
+
+Общие full:/domain:/keyword: задаются в routing/domains.txt по секциям #### ruleTag.
+Update дописывает только непокрытые наблюдения, удаляет пустые группы и сохраняет
+полный явный список для DNS в sources.json → domain_observations. Доменные правила
+в routing-ru.json остаются комментариями. Изменения domains.txt запускают Update.

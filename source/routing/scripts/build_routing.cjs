@@ -1,4 +1,5 @@
 const fs = require('node:fs');
+const {activeMatchers, minimize, readManual, respectExclusions} = require('./domain_coverage.cjs');
 const jsonc = require('../../tests/xray/node_modules/jsonc-parser');
 
 function parseTemplate(text) {
@@ -25,6 +26,18 @@ function fragments(data, field) {
   }).filter(rule => rule[field].length > 0);
 }
 
+function compactDomains(template, domains, manual = {rules: []}, excluded = []) {
+  const rules = parseTemplate(template).children?.map(node => jsonc.getNodeValue(node)) || [];
+  const groups = new Map();
+  for (const rule of [...fragments(manual, 'domain'), ...fragments(domains, 'domain')]) {
+    if (!groups.has(rule.ruleTag)) groups.set(rule.ruleTag, new Set());
+    for (const value of rule.domain) groups.get(rule.ruleTag).add(value);
+  }
+  const combined = [...groups].map(([ruleTag, domain]) => ({ruleTag, domain: [...domain], outboundTag: 'direct'}));
+  return {rules: minimize(respectExclusions(combined, excluded), activeMatchers(rules))
+    .map(({outboundTag, ...rule}) => rule)};
+}
+
 function build(template, ips, domains) {
   const array = parseTemplate(template);
   const nodes = array.children || [];
@@ -39,7 +52,7 @@ function build(template, ips, domains) {
     if (insertion < 0) insertion = nodes.length;
   }
   const ipRules = fragments(ips, 'ip');
-  const domainRules = fragments(domains, 'domain');
+  const domainRules = fragments(compactDomains(template, domains), 'domain');
   const render = value => JSON.stringify(value, null, 2).split('\n').map(line => '      ' + line).join('\n');
   const active = ipRules.map(render);
   const commented = domainRules.map(render).join(',\n').split('\n').map(line => '      // ' + line.slice(6));
@@ -67,11 +80,19 @@ function build(template, ips, domains) {
   return result;
 }
 
-if (require.main === module) {
+if (require.main === module && process.argv[2] === '--compact-domains') {
+  const [, templatePath, domainPath, sourcePath, manualPath] = process.argv.slice(2);
+  const source = sourcePath && sourcePath !== '-' ? JSON.parse(fs.readFileSync(sourcePath, 'utf8')) : {};
+  const cached = source.domain_observations;
+  const manual = manualPath && manualPath !== '-' ? readManual(fs.readFileSync(manualPath, 'utf8'), manualPath) : {rules: []};
+  const result = compactDomains(fs.readFileSync(templatePath, 'utf8'), cached || JSON.parse(fs.readFileSync(domainPath, 'utf8')), manual, source.excluded_domains || []);
+  fs.writeFileSync(domainPath + '.tmp', JSON.stringify(result, null, 2) + '\n');
+  fs.renameSync(domainPath + '.tmp', domainPath);
+} else if (require.main === module) {
   const [templatePath, ipPath, domainPath] = process.argv.slice(2);
   const result = build(fs.readFileSync(templatePath, 'utf8'),
     JSON.parse(fs.readFileSync(ipPath, 'utf8')), JSON.parse(fs.readFileSync(domainPath, 'utf8')));
   fs.writeFileSync(templatePath + '.tmp', result);
   fs.renameSync(templatePath + '.tmp', templatePath);
 }
-module.exports = {build};
+module.exports = {build, compactDomains};

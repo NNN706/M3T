@@ -165,7 +165,7 @@ def global_rules(data):
     return result
 
 
-def domain_rules(data, expected, *, include_seed=True):
+def domain_rules(data, expected, *, include_seed=True, allow_keywords=False):
     rules = validate_rule_tags(data, expected, 'Правила доменов')
     result = []
     for rule in rules:
@@ -174,6 +174,11 @@ def domain_rules(data, expected, *, include_seed=True):
             raise ValueError('Expected domain array')
         matchers = {'domain:' + rule['ruleTag']} if include_seed else set()
         for value in values:
+            if allow_keywords and isinstance(value, str) and value.startswith('keyword:'):
+                if not value[8:] or any(ord(char) < 32 for char in value):
+                    raise ValueError('Invalid keyword matcher')
+                matchers.add(value)
+                continue
             if not isinstance(value, str) or not value.startswith(('domain:', 'full:')):
                 raise ValueError('Invalid domain matcher')
             kind, host = value.split(':', 1)
@@ -340,6 +345,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     if args.output.exists() and not args.sources_output.exists():
         raise RuntimeError('Инкрементальный сбор требует sources.json для сохранения групп подсетей.')
     previous_sources = json.loads(args.sources_output.read_text()) if args.sources_output.exists() else {'rules': []}
+    previous_domains = previous_sources.get('domain_observations', previous_domains)
     previous_tags = [r['ruleTag'] for r in previous_domains['rules']]
     previous_domains = domain_rules(previous_domains, previous_tags, include_seed=False)
     domain_groups = {r['ruleTag']: set(r['domain']) for r in previous_domains['rules']}
@@ -560,6 +566,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
         legacy = next((rule['ip'] for rule in sources['rules'] if rule['ruleTag'] == 'legacy'), [])
         sources['manual_rules'] = [({**rule, 'ip': legacy} if rule['ruleTag'] == 'legacy' else rule)
                                    for rule in metadata if rule['ruleTag'] != 'legacy' or legacy]
+    sources['domain_observations'] = domains
     sources['pending_dns'] = sorted((retry_names - set(pending)) | set(unresolved))
     if exclusion:
         sources['excluded_asns'] = sorted(excluded_asns)

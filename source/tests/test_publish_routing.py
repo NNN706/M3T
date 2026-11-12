@@ -19,7 +19,7 @@ with tempfile.TemporaryDirectory() as directory:
     git(repo,'config','user.name','Test');git(repo,'config','user.email','test@example.invalid')
     git(repo,'checkout','-b','test')
     for path in module.LISTS + module.INPUTS[:-1]:
-        target=repo/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text('initial\n')
+        target=repo/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text('# fixture: no manual domains\n' if path == 'source/routing/domains.txt' else 'initial\n')
     git(repo,'add','.');git(repo,'commit','-m','Initial');git(repo,'push','origin','test')
     base=git(repo,'rev-parse','HEAD')
     subprocess.run(['git','clone','--branch','test',str(remote),str(other)],check=True,capture_output=True)
@@ -121,6 +121,49 @@ with tempfile.TemporaryDirectory() as directory:
     git(other, 'fetch', 'origin', 'test')
     assert git(other, 'show', with_manual + ':source/routing/ip.txt') == manual_payload.read_text().strip()
     assert git(other, 'rev-parse', with_manual + '^') == published
+
+    # Semantic compaction and cache publication are atomic; removing a manual
+    # parent/keyword later restores candidates from the explicit state snapshot.
+    git(other, 'reset', '--hard', with_manual)
+    template.write_text(json.dumps({'routing':{'rules':[
+        {'ruleTag':'main','domain':['domain:vtb.ru','keyword:yandex'],'outboundTag':'direct'}]}}))
+    git(other,'add','.');git(other,'commit','-m','Generalized domain rules');git(other,'push')
+    base=git(other,'rev-parse','HEAD')
+    observed={'rules':[
+        {'ruleTag':'online.vtb.ru','domain':['domain:online.vtb.ru']},
+        {'ruleTag':'unrelated','domain':['domain:unrelated.example']},
+        {'ruleTag':'yandex','domain':['domain:mc.yandex.ru']},
+    ]}
+    domain_payload.write_text(json.dumps(observed))
+    sources_payload.write_text(json.dumps({'rules':[],'domain_observations':observed}))
+    compacted=module.publish(repo,payload,base,domains=domain_payload,sources=sources_payload,build_routing=True)
+    git(other,'fetch','origin','test')
+    compact=json.loads(git(other,'show',compacted+':source/routing/generated/domains.json'))
+    assert compact=={'rules':[observed['rules'][1]]}
+    state=json.loads(git(other,'show',compacted+':source/routing/state/sources.json'))
+    assert state['domain_observations']==observed
+    git(other,'reset','--hard',compacted)
+    template.write_text('{"routing":{"rules":[]}}')
+    git(other,'add','.');git(other,'commit','-m','Remove generalized rules');git(other,'push')
+    domain_payload.write_text(json.dumps(compact))
+    restored=module.publish(repo,payload,git(other,'rev-parse','HEAD'),domains=domain_payload,
+                            sources=sources_payload,build_routing=True)
+    git(other,'fetch','origin','test')
+    assert json.loads(git(other,'show',restored+':source/routing/generated/domains.json'))==observed
+
+    # Latest manual text can change during a scan; publication uses the newest
+    # rules without repeating discovery or overwriting the edited list.
+    git(other,'reset','--hard',restored)
+    manual_domains=other/'source/routing/domains.txt'
+    manual_domains.write_text('#### main\nkeyword:yandex\ndomain:vtb.ru\n')
+    git(other,'add','.');git(other,'commit','-m','Edit manual domains');git(other,'push')
+    manual_result=module.publish(repo,payload,restored,domains=domain_payload,
+                                sources=sources_payload,build_routing=True)
+    git(other,'fetch','origin','test')
+    compact=json.loads(git(other,'show',manual_result+':source/routing/generated/domains.json'))
+    assert compact=={'rules':[
+        {'ruleTag':'main','domain':['domain:vtb.ru','keyword:yandex']},observed['rules'][1]]}
+    assert git(other,'show',manual_result+':source/routing/domains.txt')==manual_domains.read_text().strip()
 
     try:module.publish(repo,payload,changed,branch='main')
     except ValueError:pass
