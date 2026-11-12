@@ -73,7 +73,18 @@ async function visit(browser, item, index, out, options={}) {
     }
     result.ok = true;
   } catch (e) {
-    result.error = e.message;
+    const tls = /net::(ERR_CERT_[A-Z_]+|ERR_SSL_PINNED_KEY_NOT_IN_CERT_CHAIN)/.exec(e.message);
+    const messages = {
+      ERR_CERT_AUTHORITY_INVALID: 'Не удалось проверить доверие к издателю TLS-сертификата',
+      ERR_CERT_DATE_INVALID: 'TLS-сертификат просрочен или ещё не действует',
+      ERR_CERT_COMMON_NAME_INVALID: 'Имя сайта не совпадает с TLS-сертификатом',
+      ERR_CERT_REVOKED: 'TLS-сертификат отозван',
+    };
+    if (tls) {
+      result.errorKind = 'tls-certificate';
+      result.errorCode = tls[1];
+    }
+    result.error = tls ? messages[tls[1]] || 'Ошибка проверки TLS-сертификата' : e.message;
     try {await page.screenshot({path:path.join(out,`failure-${index}.png`),timeout:2000});} catch {}
   } finally {
     result.finalURL = page.url(); result.failedResources = failedResources;
@@ -85,19 +96,31 @@ async function visit(browser, item, index, out, options={}) {
 }
 async function main() {
   const [sites,required,out,proxy] = process.argv.slice(2);
+  const queue = targets(fs.readFileSync(sites,'utf8'),JSON.parse(fs.readFileSync(required,'utf8')));
+  if (out === '--queue') {
+    process.stdout.write(JSON.stringify(queue) + '\n');
+    return;
+  }
   if (!/^socks5:\/\/127\.0\.0\.1:\d+$/.test(proxy || '')) throw Error('Нужен SOCKS5 SSH tunnel на loopback');
   fs.mkdirSync(out,{recursive:true});
-  const queue = targets(fs.readFileSync(sites,'utf8'),JSON.parse(fs.readFileSync(required,'utf8')));
   const browser = await chromium.launch({headless:true,proxy:{server:proxy},args:['--disable-quic','--proxy-bypass-list=<-loopback>']});
   let results;
   try {results=await pool(queue,(item,i)=>visit(browser,item,i,out));} finally {await browser.close();}
   const report = {sha:process.env.GITHUB_SHA,run:process.env.GITHUB_RUN_ID,finished:new Date().toISOString(),results};
   fs.writeFileSync(path.join(out,'sites.json'),JSON.stringify(report,null,2)+'\n');
   const failed = results.filter(r=>!r.ok);
+  const curlPath = path.join(out, 'curl-comparison.json');
+  const curl = new Map(fs.existsSync(curlPath)
+    ? JSON.parse(fs.readFileSync(curlPath, 'utf8')).map(row => [row.url, row]) : []);
+  const cell = value => value.replaceAll('|', '/').replace(/\r?\n/g, ' ');
   const summary = ['## Xray routing test',`Commit: ${report.sha || 'local'}`,`Завершено: ${report.finished}`,
     `Всего: ${results.length}; обязательных ошибок: ${failed.filter(r=>r.required).length}; предупреждений: ${failed.filter(r=>!r.required).length}`,
-    '', '| Сайт | Обязательный | Результат | Время |','|---|---|---|---|',
-    ...results.map(r=>`| ${r.url.replaceAll('|','%7C')} | ${r.required?'да':'нет'} | ${(r.ok?'OK':r.error).replaceAll('|','/').replaceAll('\n',' ')} | ${(r.elapsedMs/1000).toFixed(1)} с |`) ].join('\n')+'\n';
+    '', '| Сайт | Обязательный | curl напрямую | curl через Xray | Сравнение curl | Chromium через Xray | Время Chromium |',
+    '|---|---|---|---|---|---|---|',
+    ...results.map(r => {
+      const comparison = curl.get(r.url);
+      return `| ${r.url.replaceAll('|','%7C')} | ${r.required?'да':'нет'} | ${comparison?.direct ?? '—'} | ${comparison?.proxy ?? '—'} | ${comparison?.outcome ?? '—'} | ${cell(r.ok?'OK':r.error)} | ${(r.elapsedMs/1000).toFixed(1)} с |`;
+    }) ].join('\n')+'\n';
   fs.writeFileSync(path.join(out,'summary.md'),summary);
   if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,summary);
   process.exitCode = failed.some(r=>r.required)?1:0;

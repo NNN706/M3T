@@ -8,7 +8,7 @@ import tempfile
 from unittest.mock import patch
 
 root = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(root / 'routing'))
+sys.path.insert(0, str(root / 'routing/scripts'))
 from update_routing import incremental_update, write_json
 
 with tempfile.TemporaryDirectory() as directory:
@@ -193,3 +193,41 @@ with tempfile.TemporaryDirectory() as directory:
     assert json.loads((args.evidence / 'completeness.json').read_text())['complete'] is False
 
 print('PASS expired shared scan budget preserves output and records incomplete refresh')
+
+# Observed service ranges leave ip.txt, and its plain-text checkpoint is reusable.
+with tempfile.TemporaryDirectory() as directory:
+    tmp = Path(directory)
+    args = argparse.Namespace(scanner=root / 'SubnetResolve.sh', verbose=False, allow_partial=True,
+                              domains_output=tmp / 'domains.json', sources_output=tmp / 'sources.json',
+                              output=tmp / 'IP.json', evidence=tmp / 'evidence',
+                              manual_ips=tmp / 'ip.txt', manual_rules=tmp / 'manual.txt')
+    original = '#### Локальные подсети\n10.0.0.0/8\n\n#### Остальные подсети\n192.0.2.0/24\n'
+    args.manual_ips.write_text(original)
+    args.manual_rules.write_text('#### manual.example\n198.51.100.0/24\n')
+    discovery = {'pages': [{'site': 'z.example', 'domains': [], 'errors': []}]}
+    response = {'domain': 'z.example', 'complete': True, 'results': [{'prefix': '192.0.2.0/24'}]}
+    with patch('update_routing.subprocess.run', side_effect=[
+        subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+        subprocess.CompletedProcess([], 0, json.dumps(response)),
+    ]):
+        incremental_update(args, [('z.example', 'z.example')], set(), lambda *_: ([], [], ''))
+    published = {p: p.read_bytes() for p in (args.output, args.domains_output, args.sources_output, args.manual_ips)}
+    assert json.loads(args.sources_output.read_text())['rules'] == [
+        {'ruleTag': 'legacy', 'ip': ['10.0.0.0/8']},
+        {'ruleTag': 'manual.example', 'ip': ['198.51.100.0/24']},
+        {'ruleTag': 'z.example', 'ip': ['192.0.2.0/24']},
+    ]
+    assert '\n192.0.2.0/24\n' not in args.manual_ips.read_text()
+    assert '192.0.2.' not in args.manual_ips.read_text()
+    assert (args.evidence / 'ip.txt').read_bytes() == args.manual_ips.read_bytes()
+    # Restore the original inputs, as on another clean runner resuming this scan.
+    args.manual_ips.write_text(original)
+    for p in (args.output, args.domains_output, args.sources_output):
+        p.unlink()
+    args.resume = args.evidence
+    args.evidence = tmp / 'restored'
+    with patch('update_routing.subprocess.run') as run:
+        incremental_update(args, [('z.example', 'z.example')], set(), lambda *_: ([], [], ''))
+        run.assert_not_called()
+    assert all(p.read_bytes() == payload for p, payload in published.items())
+print('PASS legacy service transfer, local sections, exact remainder and plain-text checkpoint restoration')

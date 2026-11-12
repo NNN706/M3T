@@ -2,7 +2,7 @@
 
 Workflow **Xray RU Direct deployment and browser test** работает в `test` при изменениях шаблона, списка сайтов или тестового сценария. Доступен ручной запуск. `main` не меняется.
 
-- Конфиг берётся из `Templates/Routing-(RU-Direct)/routing-ru.json`, включая DNS и порядок правил. Генерируемые `source/routing/IP.json` и `domains.json` этим сценарием не подключаются.
+- Конфиг берётся из `Templates/Routing-(RU-Direct)/routing-ru.json`, включая DNS и порядок правил. Update предварительно встраивает IP.json в этот файл и записывает domains.json в комментариях; Xray проверяет опубликованный коммит.
 - Тестовый конфиг сохраняет `direct`, заменяет `proxy` на `block` и использует `block` по умолчанию. Внутренние DNS-запросы направляются через `direct` отдельным правилом по `inboundTag`.
 - Xray и Chromium запускаются на Admiralteskiy. Временный контейнер публикует SOCKS5 на свободном порту loopback. QUIC отключён; прямого обхода прокси нет.
 - Очередь: `source/routing/sites.txt` и обязательные URL из `required-sites.json`, без повторов. До 10 сайтов одновременно, один проход, до 60 секунд на открытие интерфейса, затем 10 секунд JavaScript/прокрутки. Никакой авторизации.
@@ -15,7 +15,7 @@ Workflow **Xray RU Direct deployment and browser test** работает в `tes
 
 ## Обязательные сайты
 
-Редактируйте **`source/xray-test/required-sites.json`**:
+Редактируйте **`source/tests/xray/required-sites.json`**:
 
 ```json
 {"url":"https://example.ru/login","text":"Войти|Личный кабинет","selector":"input:not([type=hidden]), button"}
@@ -27,16 +27,13 @@ Workflow **Xray RU Direct deployment and browser test** работает в `tes
 
 Artifacts содержат `sites.json`, таблицу, снимки неоткрывшихся страниц, конфиг и логи Xray. SHA, digest, имя контейнера и время позволяют сопоставить запуск с Grafana. Измеряется весь Xray с DNS/соединениями, а не отдельно память matcher. Бюджеты RAM/CPU не определяют статус CI.
 
-Локальная проверка: `cd source/xray-test && npm ci && npx playwright install --only-shell chromium && npm test`. На Linux системные зависимости Chromium должны быть установлены администратором раннера заранее; workflow не вызывает интерактивный sudo.
+Локальная проверка: `cd source/tests/xray && npm ci && npx playwright install --only-shell chromium && npm test`. На Linux системные зависимости Chromium должны быть установлены администратором раннера заранее; workflow не вызывает интерактивный sudo.
 
 В Update service routing prefixes после публикации запускается тот же Xray workflow.
-На одном Admiralteskiy выполняются два curl-запроса к каждому обязательному URL
-напрямую, затем два через SOCKS Xray. Сравнение появляется в Summary, а коды,
-адреса, редиректы и тайминги обеих попыток сохраняются в артефакте. Если напрямую
-есть успешный HTTP-ответ, а через Xray его нет, диагностика помечает это как ошибку.
-Chromium сохраняет собственную проверку обязательных сайтов. Отчёт маршрутизации
-строится после диагностики даже при её ошибке.
-
-Если проверка завершается с ошибкой, отдельный шаг повторяет прямой curl для
-обязательных сайтов с ошибкой Chromium и сайтов без успешного curl через Xray.
-Повтор виден в Summary и в артефакте curl-direct-after-failure.json.
+На одном Admiralteskiy выполняются два curl-запроса к каждому URL из общей
+очереди напрямую, затем два через SOCKS Xray. В каждом проходе проверяется до
+15 сайтов одновременно. Сводка Xray routing test показывает оба результата
+curl рядом с результатом Chromium. Коды, адреса, редиректы и тайминги попыток
+сохраняются в артефакте. Для обязательного сайта ошибка Chromium или отсутствие
+успешного ответа через Xray при успешном прямом curl приводит к ошибке job.
+Отчёт маршрутизации строится после диагностики даже при её ошибке.

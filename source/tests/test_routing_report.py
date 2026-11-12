@@ -7,7 +7,7 @@ import tempfile
 from unittest.mock import patch
 
 root = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(root / 'routing'))
+sys.path.insert(0, str(root / 'routing/scripts'))
 from routing_report import build_report, read_provenance
 
 with tempfile.TemporaryDirectory() as directory:
@@ -58,7 +58,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert 'IPv4: **3**, IPv6: **1**' in report
     assert 'анонсы **3** ASN' in report
     assert sha256(ip_file.read_bytes()).hexdigest() in report
-    assert '[IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/IP.json)' in report
+    assert '[IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/generated/IP.json)' in report
     assert '| AS100 | Example &#124; Inc. | 2 / 2 |' in report
     assert '| AS101 | Other origin | 2 / 2 |' in report
     assert '| AS103 | — | 1 / 1 |' in report
@@ -81,6 +81,18 @@ with tempfile.TemporaryDirectory() as directory:
     assert 'old.example' not in read_provenance(ip_file, previous, [evidence])
     (evidence / 'IP.json').write_text('{"rules":[]}')
     assert 'old.example' in read_provenance(ip_file, previous, [evidence])
+
+    import runpy
+    full = ip_file.parent / 'asn-report-full.md'
+    summary = ip_file.parent / 'summary.md'
+    provenance_output = ip_file.parent / 'provenance.json'
+    with patch('sys.argv', ['routing_report.py', str(ip_file), str(full),
+                          '--summary-output', str(summary), '--provenance-output', str(provenance_output)]), \
+         patch('asn_routes.MIN_TABLE_ROWS', 1), \
+         patch('asn_routes.cached_export', side_effect=lambda filename, _, read: read(Path(directory) / filename)):
+        runpy.run_path(str(root / 'routing/scripts/routing_report.py'), run_name='__main__')
+    assert '## AS100' in full.read_text() and '192.0.2.0/25' in full.read_text()
+    assert '## AS100' not in summary.read_text()
 
     ip_file.write_text('{"rules":[]}')
     with patch('routing_report.cached_export') as download:

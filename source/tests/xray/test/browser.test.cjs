@@ -90,7 +90,7 @@ test('real Chromium: redirects, SPA, challenge, blank, HTTP error, timeout, fail
     await new Promise(r=>tls.listen(0,'127.0.0.1',r));
     try {
       const invalidTLS=await visit(browser,{url:`https://127.0.0.1:${tls.address().port}/`,required:true,text:'Fixture Login',selector:'button'},20,out,{timeout:1500,dwell:0});
-      assert.equal(invalidTLS.ok,false);assert.match(invalidTLS.error,/CERT_/);
+      assert.equal(invalidTLS.ok,false);assert.equal(invalidTLS.errorKind,'tls-certificate');assert.equal(invalidTLS.errorCode,'ERR_CERT_AUTHORITY_INVALID');assert.match(invalidTLS.error,/TLS-сертификата/);
     } finally {tls.closeAllConnections();tls.close();}
     assert(proxy.count()>0,'Requests must traverse SOCKS');
     const bad=await browser.newContext({proxy:{server:'socks5://127.0.0.1:1'}});

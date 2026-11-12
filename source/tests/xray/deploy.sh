@@ -3,7 +3,7 @@ set -euo pipefail
 
 : "${XRAY_IMAGE:?Set the pinned official Xray image in the workflow}"
 [[ $XRAY_IMAGE =~ ^ghcr\.io/xtls/xray-core:[a-zA-Z0-9_.-]+@sha256:[a-f0-9]{64}$ ]]
-root=$(cd "$(dirname "$0")/../.." && pwd)
+root=$(cd "$(dirname "$0")/../../.." && pwd)
 evidence=${XRAY_EVIDENCE:-"${RUNNER_TEMP:?}/xray-evidence"}
 mkdir -p "$evidence"
 container_state_dir=$(mktemp -d "$evidence/container.XXXXXX")
@@ -35,7 +35,7 @@ if ! run_docker info --format 'Docker {{.ServerVersion}}, data root {{.DockerRoo
   printf 'Docker недоступен через %s. Проверьте доступ к daemon на Admiralteskiy.\n' "${docker_command[*]}" >&2
   exit 1
 fi
-node "$root/source/xray-test/prepare.cjs" "$root/Templates/Routing-(RU-Direct)/routing-ru.json" "$evidence"
+node "$root/source/tests/xray/prepare.cjs" "$root/Templates/Routing-(RU-Direct)/routing-ru.json" "$evidence"
 chmod 644 "$evidence/config.json"
 config_mount="$evidence/config.json:/etc/xray/config.json:ro"
 config_sha=$(git -C "$root" rev-parse HEAD 2>/dev/null || printf local)
@@ -86,13 +86,10 @@ printf 'Container: %s\nImage: %s\nSHA: %s\nStarted: %s\n'   "$container" "$XRAY_
 cat "$evidence/deployment.txt" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
 curl_status=0
 if [ -f "$evidence/curl-direct.json" ]; then
-  python3 "$root/source/xray-test/curl_diagnostics.py" "$root/source/xray-test/required-sites.json" \
+  python3 "$root/source/tests/xray/curl_diagnostics.py" "$evidence/curl-queue.json" \
     "$evidence" --proxy "$binding" || curl_status=$?
-  if [ -f "$evidence/curl-comparison.md" ]; then
-    cat "$evidence/curl-comparison.md" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
-  fi
 fi
 browser_status=0
-node "$root/source/xray-test/browse.cjs" "$root/source/routing/sites.txt" "$root/source/xray-test/required-sites.json" "$evidence" "socks5://$binding" || browser_status=$?
+node "$root/source/tests/xray/browse.cjs" "$root/source/routing/sites.txt" "$root/source/tests/xray/required-sites.json" "$evidence" "socks5://$binding" || browser_status=$?
 if [ "$browser_status" -ne 0 ]; then exit "$browser_status"; fi
 exit "$curl_status"

@@ -127,7 +127,14 @@ def write_verbose(output, report, rows, names, prefixes, provenance, explicit_pr
                 explicit = sorted({tag for tag, original in explicit_prefixes
                                    if original.version == network.version and original.overlaps(network)
                                    and any(prefix.overlaps(original) for prefix in published)})
-                hosts = ['Ручной импорт' if tag == 'legacy' else f'Входной ASN `{tag}`' for tag in explicit]
+                hosts = []
+                for tag in explicit:
+                    if tag == 'legacy':
+                        hosts.append('Ручной импорт')
+                    elif re.fullmatch(r'AS[0-9]+', tag):
+                        hosts.append(f'Входной ASN `{tag}`')
+                    else:
+                        hosts.append(f'Ручное разрешение `{tag}`')
             published_text = ', '.join(f'`{prefix}`' for prefix in published)
             text.append(f'| `{network}` | {published_text} | {", ".join(hosts) or "Нет наблюдений"} |')
         text.append('')
@@ -162,7 +169,7 @@ def build_report(path, *, verbose_output=None, provenance=None, sources=None):
         f'(IPv4: **{counts[4]}**, IPv6: **{counts[6]}**). '
         f'С ними пересекаются анонсы **{len(rows)}** ASN.',
         '',
-        'Источник правил — [IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/IP.json). '
+        'Источник правил — [IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/generated/IP.json). '
         'Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).',
         '',
         f'SHA-256 файла IP.json: `{sha256(data).hexdigest()}`.',
@@ -181,10 +188,13 @@ def build_report(path, *, verbose_output=None, provenance=None, sources=None):
     if verbose_output is not None:
         explicit_prefixes = []
         if sources is not None:
-            for rule in json.loads(sources.read_bytes())['rules']:
+            source_data = json.loads(sources.read_bytes())
+            for rule in source_data['rules']:
                 tag = rule['ruleTag']
                 if tag == 'legacy' or re.fullmatch(r'AS[0-9]+', tag):
                     explicit_prefixes.extend((tag, ipaddress.ip_network(prefix)) for prefix in rule['ip'])
+            explicit_prefixes.extend((rule['ruleTag'], ipaddress.ip_network(prefix))
+                                     for rule in source_data.get('manual_rules', []) for prefix in rule['ip'])
         write_verbose(verbose_output, report, rows, names, prefixes, provenance or {}, explicit_prefixes)
     return '\n'.join(report) + '\n'
 
@@ -194,19 +204,20 @@ if __name__ == '__main__':
     parser.add_argument('ip_json', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--sources', type=Path)
-    parser.add_argument('--verbose-output', type=Path)
+    parser.add_argument('--summary-output', type=Path, help='Optional short summary for Actions only')
     parser.add_argument('--previous-provenance', type=Path)
     parser.add_argument('--provenance-output', type=Path)
     parser.add_argument('--evidence', action='append', default=[], type=Path)
     args = parser.parse_args()
-    if bool(args.verbose_output) != bool(args.provenance_output):
-        parser.error('--verbose-output and --provenance-output must be used together')
+    if not args.provenance_output:
+        parser.error('--provenance-output is required')
     try:
         provenance = None
-        if args.verbose_output:
+        if args.provenance_output:
             provenance = read_provenance(args.ip_json, args.previous_provenance, args.evidence)
             args.provenance_output.write_text(json.dumps(provenance, indent=2) + '\n', encoding='utf-8')
-        report = build_report(args.ip_json, verbose_output=args.verbose_output, provenance=provenance, sources=args.sources)
-        args.output.write_text(report, encoding='utf-8')
+        report = build_report(args.ip_json, verbose_output=args.output, provenance=provenance, sources=args.sources)
+        if args.summary_output:
+            args.summary_output.write_text(report, encoding='utf-8')
     except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
         parser.exit(1, f'Не удалось сформировать общий отчёт ASN. {error}\n')

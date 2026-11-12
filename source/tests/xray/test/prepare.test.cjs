@@ -24,8 +24,8 @@ test('reject invalid JSONC, unknown outbound and unsafe negative probe',()=>{
   input=base();input.routing.rules=[{ip:['geoip:ru'],outboundTag:'direct'}];assert.throws(()=>prepare(JSON.stringify(input)));
 });
 test('real repository template remains valid and unchanged',()=>{
-  const text=fs.readFileSync('../../Templates/Routing-(RU-Direct)/routing-ru.json','utf8');
+  const text=fs.readFileSync('../../../Templates/Routing-(RU-Direct)/routing-ru.json','utf8');
   const {config}=prepare(text);assert.equal(config.routing.domainStrategy,'IPOnDemand');
   assert.equal(config.outbounds[0].protocol,'blackhole');
-  assert.equal(fs.readFileSync('../../Templates/Routing-(RU-Direct)/routing-ru.json','utf8'),text);
+  assert.equal(fs.readFileSync('../../../Templates/Routing-(RU-Direct)/routing-ru.json','utf8'),text);
 });

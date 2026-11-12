@@ -1,11 +1,12 @@
 """Real local Git remote verifies publication when test advances during a scan."""
 import importlib.util
+import json
 from pathlib import Path
 import subprocess
 import tempfile
 
 root = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location('publish', root/'routing/publish_routing.py')
+spec = importlib.util.spec_from_file_location('publish', root/'routing/scripts/publish_routing.py')
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 def git(repo,*args):
@@ -35,8 +36,8 @@ with tempfile.TemporaryDirectory() as directory:
     assert git(other,'rev-parse',published+'^')==latest
     assert git(other,'show',published+':unrelated.txt')=='keep this'
     assert git(other,'show',published+':'+module.OUTPUT)=='{"rules":[]}'
-    assert git(other,'show',published+':source/routing/domains.json')=='{"rules":[]}'
-    assert set(git(other,'diff-tree','--no-commit-id','--name-only','-r',published).splitlines())=={module.OUTPUT,'source/routing/domains.json','source/routing/sources.json'}
+    assert git(other,'show',published+':source/routing/generated/domains.json')=='{"rules":[]}'
+    assert set(git(other,'diff-tree','--no-commit-id','--name-only','-r',published).splitlines())=={module.OUTPUT,'source/routing/generated/domains.json','source/routing/state/sources.json'}
     assert git(repo,'status','--porcelain')==''
     assert git(repo,'worktree','list','--porcelain').count('worktree ')==1
     module.publish(repo,payload,published)
@@ -93,6 +94,34 @@ with tempfile.TemporaryDirectory() as directory:
     git(other, 'fetch', 'origin', 'test')
     assert git(other, 'diff-tree', '--no-commit-id', '--name-only', '-r', report_commit) == module.REPORT
     assert git(other, 'show', f'{report_commit}:{module.REPORT}') == '# Current report'
+    git(other, 'reset', '--hard', report_commit)
+    template = other / module.TEMPLATE
+    template.parent.mkdir(parents=True, exist_ok=True)
+    template.write_text('{"routing":{"rules":[{"protocol":["bittorrent"],"outboundTag":"direct"}]}}')
+    git(other, 'add', '.')
+    git(other, 'commit', '-m', 'Add routing template')
+    git(other, 'push')
+    assembled_base = git(other, 'rev-parse', 'HEAD')
+    domain_payload.write_text('{"rules":[{"ruleTag":"result","domain":["domain:result.example"]}]}')
+    published = module.publish(repo, payload, assembled_base, domains=domain_payload,
+                               sources=sources_payload, build_routing=True)
+    assert published == git(other, 'ls-remote', 'origin', 'refs/heads/test').split()[0]
+    git(other, 'fetch', 'origin', 'test')
+    assembled = git(other, 'show', published + ':' + module.TEMPLATE)
+    assert '"192.0.2.0/24"' in assembled and '"domain:result.example"' in assembled
+    assert '"outboundTag": "direct"' in assembled
+    changed_files = set(git(other, 'diff-tree', '--no-commit-id', '--name-only', '-r', published).splitlines())
+    assert module.TEMPLATE in changed_files and 'source/routing/generated/domains.json' in changed_files
+    assert module.publish(repo, payload, published, domains=domain_payload,
+                          sources=sources_payload, build_routing=True) == published
+    manual_payload = tmp / 'ip.txt'
+    manual_payload.write_text('#### Локальные подсети\n10.0.0.0/8\n\n#### Остальные подсети\n')
+    with_manual = module.publish(repo, payload, published, domains=domain_payload,
+                                 sources=sources_payload, build_routing=True, manual_ips=manual_payload)
+    git(other, 'fetch', 'origin', 'test')
+    assert git(other, 'show', with_manual + ':source/routing/ip.txt') == manual_payload.read_text().strip()
+    assert git(other, 'rev-parse', with_manual + '^') == published
+
     try:module.publish(repo,payload,changed,branch='main')
     except ValueError:pass
     else:raise AssertionError('main publication enabled')

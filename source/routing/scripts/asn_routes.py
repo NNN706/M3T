@@ -99,6 +99,30 @@ class BgpTable:
         return cached_export('table.jsonl', 7200, read)
 
 
+def broadest_routes(routes, table):
+    """Prefer an enclosing announcement of the WHOIS origin."""
+    origins = {int(row['asn'][2:]) for row in routes}
+    snapshot = table.prefixes(origins) if origins else {}
+    enclosing = {}
+    for origin, prefixes in snapshot.items():
+        for version in (4, 6):
+            enclosing[origin, version] = sorted(
+                (network for network in map(ipaddress.ip_network, prefixes)
+                 if network.version == version),
+                key=lambda network: (network.prefixlen, network.network_address),
+            )
+    selected = {}
+    for row in routes:
+        key = row['asn'], row['prefix']
+        if key not in selected:
+            original = ipaddress.ip_network(row['prefix'])
+            origin = int(row['asn'][2:])
+            broadest = next((network for network in enclosing.get((origin, original.version), ())
+                             if original.subnet_of(network)), original)
+            selected[key] = str(broadest)
+    return [{**row, 'prefix': selected[row['asn'], row['prefix']]} for row in routes]
+
+
 def asn_names(path, origins):
     with path.open(encoding='utf-8', newline='') as stream:
         rows = csv.DictReader(stream)

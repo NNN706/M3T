@@ -18,8 +18,10 @@ on:
     branches: [test]
     paths:
       - 'source/routing/sites.txt'
-      - 'source/routing/ASN.txt'
-      - 'source/routing/exclude'
+      - 'source/routing/asn.txt'
+      - 'source/routing/exclude.txt'
+      - 'source/routing/config/manual.txt'
+      - 'source/routing/ip.txt'
 permissions:
   contents: write
   actions: read
@@ -32,7 +34,7 @@ jobs:
     runs-on: [self-hosted, Linux, X64]
     timeout-minutes: ${{ inputs.full_refresh && 260 || 120 }}
     outputs:
-      checkout_ref: ${{ steps.scan-ref.outputs.sha }}
+      checkout_ref: ${{ steps.publish.outputs.published_sha }}
     steps:
       - name: Verify runner
         run: |
@@ -46,10 +48,6 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: test
-      - name: Record scan revision
-        id: scan-ref
-        shell: bash
-        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Find checkpoint from previous routing run
         if: inputs.resume_run_id != ''
         id: resume
@@ -93,6 +91,9 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
+      - name: Prepare routing assembler
+        shell: bash
+        run: npm ci --prefix source/tests/xray --ignore-scripts --no-audit --no-fund
       - name: Prepare Chromium without interactive sudo
         shell: bash
         run: |
@@ -115,6 +116,8 @@ jobs:
           python3 source/tests/test_exclusion_routing.py
           python3 source/tests/test_incremental_routing.py
           python3 source/tests/test_publish_routing.py
+          python3 source/tests/test_routing_report.py
+          node --test source/tests/xray/test/routing.test.cjs
       - name: Scan sites and compact prefixes
         shell: bash
         env:
@@ -131,12 +134,12 @@ jobs:
             refresh=(--full-refresh)
             scan_timeout=245m
           fi
-          timeout --verbose --kill-after=10s "$scan_timeout" python3 source/routing/update_routing.py --incremental --exclude-asns --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" "${refresh[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
+          timeout --verbose --kill-after=10s "$scan_timeout" python3 source/routing/scripts/update_routing.py --incremental --exclude-asns --verbose --allow-partial --evidence "$ROUTING_EVIDENCE" "${resume[@]}" "${refresh[@]}" 2>&1 | tee "$ROUTING_EVIDENCE/scan.log"
           if ! python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1]))["complete"])' "$ROUTING_EVIDENCE/completeness.json"; then
             echo '::warning::Неполный сбор: доступные подсети и обнаруженные домены подготовлены к публикации; прежние записи сохранены. См. routing-evidence.'
           fi
           {
-            cat "$ROUTING_EVIDENCE/asn-report.md"
+            cat "$ROUTING_EVIDENCE/scan-summary.md"
             printf '\n## Полнота сбора\n\n%s\n' '```json'
             cat "$ROUTING_EVIDENCE/completeness.json"
             printf '\n%s\n' '```'
@@ -154,11 +157,12 @@ jobs:
           name: routing-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ env.ROUTING_EVIDENCE }}
           retention-days: 7
-      - name: Publish IP.json on current test
+      - name: Publish routing files on current test
+        id: publish
         shell: bash
         run: |
           set -euo pipefail
-          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" --output "$ROUTING_EVIDENCE/IP.json" --domains "$ROUTING_EVIDENCE/domains.json" --sources "$ROUTING_EVIDENCE/sources.json"
+          python3 source/routing/scripts/publish_routing.py --base "$(git rev-parse HEAD)" --output "$ROUTING_EVIDENCE/IP.json" --domains "$ROUTING_EVIDENCE/domains.json" --sources "$ROUTING_EVIDENCE/sources.json" --build-routing --manual-ips "$ROUTING_EVIDENCE/ip.txt"
 
   curl-diagnostic:
     needs: update
@@ -199,12 +203,12 @@ jobs:
             if [ -d "$directory" ]; then evidence+=(--evidence "$directory"); fi
           done
           python3 source/tests/test_routing_report.py
-          python3 source/routing/routing_report.py source/routing/IP.json "$output/asn-report.md" \
-            --verbose-output "$output/asn-report-verbose.md" --sources source/routing/sources.json \
-            --previous-provenance source/routing/dns-provenance.json \
+          python3 source/routing/scripts/routing_report.py source/routing/generated/IP.json "$output/asn-report-full.md" \
+            --summary-output "$output/summary.md" --sources source/routing/state/sources.json \
+            --previous-provenance source/routing/state/dns-provenance.json \
             --provenance-output "$output/dns-provenance.json" "${evidence[@]}"
-          cat "$output/asn-report.md" >> "$GITHUB_STEP_SUMMARY"
-          printf '\n[Подробный отчёт ASN с доменами](https://github.com/NNN706/M3T/blob/test/source/routing/asn-report-verbose.md)\n' >> "$GITHUB_STEP_SUMMARY"
+          cat "$output/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          printf '\n[Подробный отчёт ASN с доменами](https://github.com/NNN706/M3T/blob/test/source/routing/asn-report-full.md)\n' >> "$GITHUB_STEP_SUMMARY"
       - name: Save overall routing report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -216,6 +220,6 @@ jobs:
         run: |
           set -euo pipefail
           output="$RUNNER_TEMP/routing-report-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
-          python3 source/routing/publish_routing.py --base "$(git rev-parse HEAD)" \
-            --report "$output/asn-report.md" --report-verbose "$output/asn-report-verbose.md" \
+          python3 source/routing/scripts/publish_routing.py --base "$(git rev-parse HEAD)" \
+            --report "$output/asn-report-full.md" \
             --provenance "$output/dns-provenance.json"

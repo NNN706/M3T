@@ -10,7 +10,7 @@ import tempfile
 from unittest.mock import patch
 
 root = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(root / 'routing'))
+sys.path.insert(0, str(root / 'routing/scripts'))
 from exclusion_policy import ExclusionPolicy, read_excluded_asns
 from update_routing import incremental_update, write_json
 
@@ -115,10 +115,12 @@ with tempfile.TemporaryDirectory() as directory:
     assert sources['excluded_domains'] == ['cloud.example', 'ipv6.other.example', 'mixed.example']
     assert {r['ruleTag']:r['ip'] for r in sources['rules']} == {
         'cloud.example': ['192.0.2.0/25', '198.51.100.0/24'],
-        'legacy': ['192.0.2.0/25', '2001:db8::/48'],
+        'legacy': ['2001:db8::/48'],
     }
     stats = json.loads((args.evidence / 'completeness.json').read_text())
     assert stats['complete'] and stats['excluded_ipv4_skipped_before_whois'] == 3, stats
+    assert stats['domains_excluded_by_asn_without_prefix'] == ['cloud.example'], stats
+    assert stats['domains_without_any_prefix'] == [], stats
 
     published = {path: path.read_bytes() for path in (*baseline, args.output)}
     args.resume = args.evidence
@@ -162,3 +164,85 @@ with tempfile.TemporaryDirectory() as directory:
     assert json.loads(args.domains_output.read_text()) == domains
 
 print('PASS Cloudflare/Fastly early IPv4 filtering, mixed IPs, domain exclusions, resume and IPv6 subtraction')
+
+# Manual rules override the denied ASN only at the explicitly configured CIDRs.
+with tempfile.TemporaryDirectory() as directory:
+    tmp = Path(directory)
+    args = argparse.Namespace(
+        scanner=scanner, verbose=False, allow_partial=True, resume=None,
+        domains_output=tmp / 'domains.json', sources_output=tmp / 'sources.json',
+        output=tmp / 'IP.json', evidence=tmp / 'evidence', manual_rules=tmp / 'manual.json',
+    )
+    manual = {'rules': [{'ruleTag': 'manual.example', 'ip': ['52.208.237.0/24', '54.154.123.0/24']}]}
+    write_json(args.manual_rules, manual)
+    policy = ExclusionPolicy({16509}, ['52.48.0.0/14', '52.208.0.0/13', '54.154.0.0/15', '63.32.0.0/14'])
+    write_json(args.sources_output, {'rules': [{'ruleTag': 'legacy', 'ip': [
+        '52.48.0.0/14', '52.208.0.0/13', '54.154.0.0/15', '63.32.0.0/14',
+    ]}]})
+    write_json(args.domains_output, {'rules': []})
+    entries = [('manual.example', 'manual.example')]
+    discovery = {'pages': [{'site': 'manual.example', 'domains': [], 'errors': []}]}
+    response = {'domain': 'manual.example', 'complete': True, 'results': [],
+                'excluded_ips': ['52.208.237.126', '54.154.123.78'], 'errors': []}
+    for full_refresh, partial in ((False, False), (True, False), (True, True)):
+        args.full_refresh = full_refresh
+        discovery['pages'][0]['errors'] = ['Fixture browser failure'] if partial else []
+        with patch('update_routing.subprocess.run', side_effect=[
+            subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+            subprocess.CompletedProcess([], 0, json.dumps(response)),
+        ]), patch('exclusion_policy.lookup_addresses', return_value=set()):
+            incremental_update(args, entries, set(), lambda *_: ([], [], ''), policy)
+        assert json.loads(args.output.read_bytes()) == manual
+        assert json.loads(args.sources_output.read_bytes())['manual_rules'] == manual['rules']
+    manual['rules'][0]['ip'].remove('54.154.123.0/24')
+    write_json(args.manual_rules, manual)
+    args.full_refresh = False
+    with patch('update_routing.subprocess.run', side_effect=[
+        subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+        subprocess.CompletedProcess([], 0, json.dumps(response)),
+    ]), patch('exclusion_policy.lookup_addresses', return_value=set()):
+        incremental_update(args, entries, set(), lambda *_: ([], [], ''), policy)
+    assert json.loads(args.output.read_bytes()) == manual
+    manual['rules'].insert(0, {'ruleTag': 'legacy', 'ip': ['52.48.0.0/14'],
+                               'respect_exclusions': True})
+    write_json(args.manual_rules, manual)
+    with patch('update_routing.subprocess.run', side_effect=[
+        subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+        subprocess.CompletedProcess([], 0, json.dumps(response)),
+    ]), patch('exclusion_policy.lookup_addresses', return_value=set()):
+        incremental_update(args, entries, set(), lambda *_: ([], [], ''), policy)
+    assert json.loads(args.output.read_bytes())['rules'] == manual['rules'][1:]
+    manual['rules'] = manual['rules'][1:]
+    write_json(args.manual_rules, manual)
+    args.manual_ips = tmp / 'ip.txt'
+    args.manual_ips.write_text('# Imported CIDRs\n192.0.2.0/25\n192.0.2.128/25 # sibling\n52.48.0.0/14\n')
+    def run_manual_ips():
+        with patch('update_routing.subprocess.run', side_effect=[
+            subprocess.CompletedProcess([], 0, json.dumps(discovery)),
+            subprocess.CompletedProcess([], 0, json.dumps(response)),
+        ]), patch('exclusion_policy.lookup_addresses', return_value=set()):
+            incremental_update(args, entries, set(), lambda *_: ([], [], ''), policy)
+    run_manual_ips()
+    assert json.loads(args.output.read_bytes())['rules'] == [
+        {'ruleTag': 'legacy', 'ip': ['192.0.2.0/24']}, *manual['rules']]
+    args.manual_ips.write_text('')
+    run_manual_ips()
+    assert json.loads(args.output.read_bytes()) == manual
+    previous = args.output.read_bytes()
+    args.manual_ips.write_text('192.0.2.1/24')
+    try:
+        run_manual_ips()
+    except ValueError as error:
+        assert 'ip.txt, строка 1' in str(error)
+    else:
+        raise AssertionError('Invalid manual CIDR accepted')
+    assert args.output.read_bytes() == previous
+    args.manual_ips.write_text('')
+    args.manual_rules = tmp / 'manual.txt'
+    args.manual_rules.write_text('#### manual.example\n52.208.237.0/24\n')
+    run_manual_ips()
+    assert json.loads(args.output.read_bytes()) == manual
+    assert '#### Локальные подсети' in args.manual_ips.read_text()
+    assert '#### Остальные подсети' in args.manual_ips.read_text()
+print('PASS manual CIDR file: comments, exact collapse, exclusions, removal and invalid input preserves output')
+print('PASS Amazon manual /24 rules survive full and partial refresh and can be removed')

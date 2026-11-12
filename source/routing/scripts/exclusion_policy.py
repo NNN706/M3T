@@ -9,7 +9,7 @@ import socket
 from asn_routes import cached_export, table_prefixes
 
 
-EXCLUDE_FILE = Path(__file__).with_name('exclude')
+EXCLUDE_FILE = Path(__file__).resolve().parent.parent / 'exclude.txt'
 
 
 def read_excluded_asns(path):
