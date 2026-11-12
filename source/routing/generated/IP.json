@@ -15,16 +15,18 @@
         "178.104.0.0/15",
         "188.40.0.0/16",
         "213.180.192.0/19"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "AS15632",
       "ip": [
         "185.154.124.0/24",
         "217.12.96.0/20",
         "2a00:4c00:3::/48"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "AS197068",
       "ip": [
@@ -111,8 +113,9 @@
         "193.17.93.0/24",
         "2a11:27c0::/38",
         "2a11:27c0:1000::/42"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "AS33842",
       "ip": [
@@ -164,8 +167,9 @@
         "195.209.64.0/18",
         "195.209.192.0/20",
         "212.193.144.0/20"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "AS44128",
       "ip": [
@@ -185,8 +189,9 @@
         "193.107.236.0/22",
         "213.189.216.0/21",
         "2a01:5560::/32"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "AS44386",
       "ip": [
@@ -279,8 +284,9 @@
         "2a00:b4c0::/32",
         "2a14:25c0::/32",
         "2a14:25c4::/30"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "AS51115",
       "ip": [
@@ -292,8 +298,9 @@
         "185.65.148.0/22",
         "185.94.108.0/22",
         "2a03:70c0::/32"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "AS57724",
       "ip": [
@@ -314,15 +321,17 @@
         "185.223.92.0/24",
         "217.114.42.0/24",
         "2a0a:4180::/48"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "AS8291",
       "ip": [
         "95.173.128.0/20",
         "194.226.0.0/16"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "AS8732",
       "ip": [
@@ -343,16 +352,18 @@
         "213.79.64.0/18",
         "213.171.32.0/19",
         "2a02:290::/32"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "AS8901",
       "ip": [
         "37.230.128.0/17",
         "185.173.0.0/22",
         "212.11.128.0/19"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "async-online4.vtb.ru",
       "ip": [
@@ -378,8 +389,9 @@
         "87.240.128.0/18",
         "93.186.224.0/20",
         "193.168.46.0/23"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "cbro.online.sberbank.ru",
       "ip": [
@@ -400,8 +412,9 @@
         "190.2.128.0/20",
         "199.127.61.0/24",
         "216.106.188.0/24"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "cloud.ru",
       "ip": [
@@ -542,15 +555,17 @@
         "213.248.32.0/19",
         "217.12.38.0/24",
         "217.66.144.0/22"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "cloud.vk.com",
       "ip": [
         "178.176.128.0/24",
         "185.32.248.0/22"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "contell.ru",
       "ip": [
@@ -568,8 +583,9 @@
         "77.87.214.0/23",
         "83.69.240.0/22",
         "195.128.49.0/24"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "ddos-guard.net",
       "ip": [
@@ -588,34 +604,39 @@
         "195.174.0.0/15",
         "210.210.144.0/23",
         "213.155.157.0/24"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "ddp-mobile.online.sberbank.ru",
       "ip": [
         "194.54.14.0/23"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "esia.gosuslugi.ru",
       "ip": [
         "109.207.0.0/20",
         "213.59.192.0/18"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "esmdtpep.vtb.ru",
       "ip": [
         "195.242.82.0/23"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "fornex.com",
       "ip": [
         "2.58.65.0/24",
         "31.172.64.0/24"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "ifconfig.me",
       "ip": [
@@ -635,8 +656,9 @@
         "94.131.80.0/20",
         "185.87.199.0/24",
         "195.133.59.0/24"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "ipinfo.io",
       "ip": [
@@ -649,8 +671,9 @@
       "ruleTag": "landvps.ru",
       "ip": [
         "185.189.255.0/24"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "legacy",
       "ip": [
@@ -883,8 +906,9 @@
         "fc00::/7",
         "fe80::/10",
         "ff00::/8"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "lk.megafon.ru",
       "ip": [
@@ -903,8 +927,9 @@
       "ip": [
         "78.108.80.0/24",
         "95.142.36.0/24"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "memstech.ru",
       "ip": [
@@ -956,8 +981,9 @@
       "ruleTag": "nuc-cdp.digital.gov.ru",
       "ip": [
         "185.194.32.0/24"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "raiffeisen.ru",
       "ip": [
@@ -999,8 +1025,9 @@
         "213.178.155.0/24",
         "213.226.112.0/24",
         "213.226.114.0/24"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "selectel.ru",
       "ip": [
@@ -1013,8 +1040,9 @@
         "91.238.108.0/24",
         "194.76.124.0/24",
         "213.33.184.0/24"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "smartape.ru",
       "ip": [
@@ -1022,14 +1050,16 @@
         "91.219.148.0/22",
         "185.9.144.0/22",
         "188.127.224.0/20"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "spb.megafon.ru",
       "ip": [
         "185.17.9.0/24"
-      ]
-    },
+        ],
+        "outboundTag": "direct"
+      },
     {
       "ruleTag": "spb.mts.ru",
       "ip": [
