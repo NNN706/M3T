@@ -141,6 +141,12 @@ def global_rules(data):
         for index, network in enumerate(networks):
             groups.setdefault(owners[index], []).append(str(network))
     result = {'rules':[{'ruleTag':tag, 'ip':groups[tag]} for tag in sorted(groups)]}
+    if data.get('ipv4_prefix_limits'):
+        from prefix_limits import PrefixLimits
+        signature = data['ipv4_prefix_limits']
+        limits = PrefixLimits({int(k): v[0] for k, v in signature.items()},
+                              {int(k): v[1] for k, v in signature.items()})
+        result = limits.finalize(result)
     # Independent integer interval check, not another call to collapse_addresses.
     def coverage(networks):
         merged = []
@@ -211,6 +217,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     entries = [(host, url) for host, url in entries if host not in invalid]
     manual_path = getattr(args, 'manual_rules', None)
     manual_ips = getattr(args, 'manual_ips', None)
+    limits = getattr(args, 'prefix_limit_policy', None)
+    previous_provenance = getattr(args, 'previous_provenance', None)
     raw_manual_ips = []
     if manual_ips is not None:
         outputs['ip.txt'] = manual_ips
@@ -279,6 +287,10 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
         manifest['inputs']['manual_rules'] = routing_fingerprint({'manual': manual_path})['manual']
     if manual_ips is not None:
         manifest['inputs']['manual_ips'] = routing_fingerprint({'manual': manual_ips})['manual']
+    if limits is not None:
+        manifest['prefix_limits'] = limits.signature()
+        manifest['inputs']['prefix_limits'] = routing_fingerprint({'policy': args.prefix_limits})['policy']
+        manifest['inputs']['dns_provenance'] = routing_fingerprint({'provenance': previous_provenance})['provenance']
     if full_refresh:
         manifest['full_refresh'] = True
     if ipv4_index is not None:
@@ -290,6 +302,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     implementation = routing_fingerprint({
         'generator': Path(__file__), 'asn_routes': Path(__file__).with_name('asn_routes.py'),
         'exclusion_policy': Path(__file__).with_name('exclusion_policy.py'),
+        'prefix_limits': Path(__file__).with_name('prefix_limits.py'),
     })
     saved = None
     if resume:
@@ -532,7 +545,15 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     if exclusion:
         sources = exclusion.filter_ip_rules(sources)
         domains = exclusion.filter_domain_rules(domains, excluded_domains)
-    sources = redistribute_legacy(apply_manual_rules(sources, manual))
+    sources = apply_manual_rules(sources, manual)
+    if limits is not None:
+        from prefix_limits import merge_observations
+        previous = json.loads(previous_provenance.read_bytes()) if previous_provenance.is_file() else {}
+        provenance = merge_observations(previous, responses)
+        manual_metadata = limits.filter_rules({'rules': sources.get('manual_rules', [])}, domains, provenance)['rules']
+        sources = limits.filter_rules(sources, domains, provenance)
+        sources['manual_rules'] = manual_metadata
+    sources = redistribute_legacy(sources)
     metadata = sources.get('manual_rules')
     sources = compact_rules(sources, [rule['ruleTag'] for rule in sources['rules']], dual_stack=True)
     if metadata:
@@ -543,6 +564,11 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     if exclusion:
         sources['excluded_asns'] = sorted(excluded_asns)
         sources['excluded_domains'] = sorted(excluded_domains)
+    if limits is not None:
+        sources['ipv4_prefix_limits'] = limits.signature()
+        if limits.unobserved:
+            print(f'Ограничение ASN: широких записей без сохранённых DNS-IP — {len(limits.unobserved)}; '
+                  'они не включены в direct. См. prefix_limits_without_dns в полноте сбора.', file=sys.stderr)
     result = global_rules(sources)
     if args.evidence:
         (args.evidence / 'scan-summary.md').write_text(report)
@@ -554,6 +580,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
             'domains_excluded_by_asn_without_prefix': sorted(excluded_without_prefix),
             'incomplete_dns_bgp_details': {host: incomplete_details[host] for host in unresolved},
             'excluded_ipv4_skipped_before_whois': len(excluded_ips),
+            'prefix_limits_without_dns': limits.unobserved if limits else [],
             'excluded_domains': sorted(excluded_domains & (known | discovered)),
             'asns_without_prefixes': as_missing,
             'asn_export_error': asn_error,
@@ -566,6 +593,9 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     write_json(args.domains_output, domains)
     write_json(args.sources_output, sources)
     if manual_ips is not None:
+        if limits is not None:
+            narrowed = limits.filter_rules({'rules': [{'ruleTag': 'legacy', 'ip': raw_manual_ips}]}, domains, provenance)
+            raw_manual_ips = [value for rule in narrowed['rules'] for value in rule['ip']]
         remaining = redistribute_legacy({'rules': [
             *[rule for rule in sources['rules'] if rule['ruleTag'] != 'legacy'],
             {'ruleTag': 'legacy', 'ip': raw_manual_ips},
@@ -620,6 +650,8 @@ def main():
         parser.error('--resume requires --incremental and --evidence')
     args.manual_rules = args.sites.parent / 'config/manual.txt'
     args.manual_ips = args.sites.with_name('ip.txt')
+    args.prefix_limits = args.sites.parent / 'config/prefix-limits.txt'
+    args.previous_provenance = args.sites.parent / 'state/dns-provenance.json'
     entries = services(args.sites, asn)
     explicit = {tag for tag, _ in entries if asn(tag)}
     entries = [(tag, value) for tag, value in entries if not asn(tag)]
@@ -644,6 +676,13 @@ def main():
     if args.incremental:
         policy = None
         table = BgpTable()
+        args.prefix_limit_policy = None
+        if args.prefix_limits.is_file():
+            from prefix_limits import PrefixLimits
+            try:
+                args.prefix_limit_policy = PrefixLimits.load(args.prefix_limits, table)
+            except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
+                parser.exit(1, f'Ограничения подсетей: не удалось загрузить конфигурацию или BGP-снимок. {error}\n')
         if args.exclude_asns:
             from exclusion_policy import ExclusionPolicy
             try:

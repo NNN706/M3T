@@ -6,8 +6,11 @@ on:
       - 'source/SubnetResolve.sh'
       - 'source/tests/**'
       - 'source/routing/scripts/**'
+      - 'source/routing/generated/**'
+      - 'source/routing/state/sources.json'
       - 'source/routing/exclude.txt'
       - 'source/routing/config/manual.txt'
+      - 'source/routing/config/prefix-limits.txt'
       - 'source/routing/ip.txt'
       - '.github/workflows/subnetresolve-test.yml'
   workflow_dispatch:
@@ -82,6 +85,7 @@ jobs:
           python3 source/tests/test_exclusion_routing.py 2>&1 | tee "$TEST_ARTIFACTS/exclusion-routing.log"
           python3 source/tests/test_incremental_routing.py 2>&1 | tee "$TEST_ARTIFACTS/incremental-routing.log"
           python3 source/tests/test_publish_routing.py 2>&1 | tee "$TEST_ARTIFACTS/publish-routing.log"
+          python3 source/tests/test_prefix_limits.py 2>&1 | tee "$TEST_ARTIFACTS/prefix-limits.log"
           python3 source/tests/test_routing_report.py 2>&1 | tee "$TEST_ARTIFACTS/routing-report.log"
           python3 source/tests/test_routing.py 2>&1 | tee "$TEST_ARTIFACTS/routing.log"
           python3 source/tests/test_progress_changes.py 2>&1 | tee "$TEST_ARTIFACTS/progress-changes.log"

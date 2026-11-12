@@ -7,13 +7,13 @@ import subprocess
 import tempfile
 
 LISTS = ['source/routing/sites.txt', 'source/routing/asn.txt']
-INPUTS = ['source/routing/scripts/build_routing.cjs', 'source/routing/config/manual.txt', 'source/routing/ip.txt', 'source/routing/scripts/exclusion_policy.py', 'source/routing/exclude.txt', 'source/routing/scripts/asn_routes.py', 'source/SubnetResolve.sh',
+INPUTS = ['source/routing/config/prefix-limits.txt', 'source/routing/scripts/prefix_limits.py', 'source/routing/state/dns-provenance.json', 'source/routing/scripts/build_routing.cjs', 'source/routing/config/manual.txt', 'source/routing/ip.txt', 'source/routing/scripts/exclusion_policy.py', 'source/routing/exclude.txt', 'source/routing/scripts/asn_routes.py', 'source/SubnetResolve.sh',
           'source/routing/scripts/update_routing.py', 'source/routing/generated/domains.json', 'source/routing/state/sources.json', 'source/routing/generated/IP.json']
 OUTPUT = 'source/routing/generated/IP.json'
 TEMPLATE = 'Templates/Routing-(RU-Direct)/routing-ru.json'
 REPORT = 'source/routing/asn-report-full.md'
 PROVENANCE = 'source/routing/state/dns-provenance.json'
-REPORT_INPUTS = [OUTPUT, 'source/routing/state/sources.json', REPORT, PROVENANCE, 'source/routing/scripts/routing_report.py', 'source/routing/scripts/asn_routes.py']
+REPORT_INPUTS = ['source/routing/config/prefix-limits.txt', 'source/routing/scripts/prefix_limits.py', 'source/routing/state/dns-provenance.json', OUTPUT, 'source/routing/state/sources.json', REPORT, PROVENANCE, 'source/routing/scripts/routing_report.py', 'source/routing/scripts/asn_routes.py']
 
 def git(repo, *args, check=True):
     return subprocess.run(['git', '-C', str(repo), *args], text=True,
