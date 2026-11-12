@@ -21,6 +21,12 @@
       ]
     },
     {
+      "ruleTag": "avito.ru",
+      "domain": [
+        "domain:avito.ru"
+      ]
+    },
+    {
       "ruleTag": "beget.com",
       "domain": [
         "domain:beget.com",
@@ -69,6 +75,7 @@
         "domain:const.uno",
         "domain:criteo.com",
         "domain:crm.elama-partner.ru",
+        "domain:crm.sigmatraffic.ru",
         "domain:datadrivenpromotion.com",
         "domain:deepcall.ru",
         "domain:digitaltarget.ru",
@@ -330,7 +337,6 @@
     {
       "ruleTag": "spb.mts.ru",
       "domain": [
-        "domain:avito.ru",
         "domain:hicloud.com",
         "domain:mtscdn.ru",
         "domain:serving-sys.ru"
