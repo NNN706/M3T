@@ -10,6 +10,7 @@ on:
       - 'source/routing/state/sources.json'
       - 'source/routing/exclude.txt'
       - 'source/routing/config/manual.txt'
+      - 'source/routing/domains.txt'
       - 'source/routing/config/prefix-limits.txt'
       - 'source/routing/ip.txt'
       - '.github/workflows/subnetresolve-test.yml'

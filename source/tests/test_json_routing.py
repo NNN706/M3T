@@ -66,7 +66,7 @@ current_domains['rules'] = [
     for rule in current_domains['rules']
 ]
 assert current_domains == routing.domain_rules(
-    current_domains, [rule['ruleTag'] for rule in current_domains['rules']], include_seed=False
+    current_domains, [rule['ruleTag'] for rule in current_domains['rules']], include_seed=False, allow_keywords=True
 ), 'domains.json differs from canonical domain rules (ignoring outboundTag)' 
 assert 'asn.txt' in {entry.name for entry in root.iterdir()}
 assert 'ASN.txt' not in {entry.name for entry in root.iterdir()}

@@ -40,7 +40,6 @@ nalog.gov.ru
 gov.ru
 max.ru
 vk.com
-dns-shop.ru
 mvideo.ru
 spb.megafon.ru
 lk.megafon.ru
@@ -60,3 +59,4 @@ memstech.ru
 mobile.vkusvill.ru
 vkusvill.ru
 cdek.ru
+avito.ru

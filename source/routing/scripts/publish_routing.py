@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import tempfile
 
-LISTS = ['source/routing/sites.txt', 'source/routing/asn.txt']
+LISTS = ['source/routing/sites.txt', 'source/routing/asn.txt', 'source/routing/domains.txt']
 INPUTS = ['source/routing/scripts/domain_coverage.cjs', 'source/routing/config/prefix-limits.txt', 'source/routing/scripts/prefix_limits.py', 'source/routing/state/dns-provenance.json', 'source/routing/scripts/build_routing.cjs', 'source/routing/config/manual.txt', 'source/routing/ip.txt', 'source/routing/scripts/exclusion_policy.py', 'source/routing/exclude.txt', 'source/routing/scripts/asn_routes.py', 'source/SubnetResolve.sh',
           'source/routing/scripts/update_routing.py', 'source/routing/generated/domains.json', 'source/routing/state/sources.json', 'source/routing/generated/IP.json']
 OUTPUT = 'source/routing/generated/IP.json'
@@ -59,8 +59,10 @@ def publish_payloads(repo, base, payloads, inputs, message, *, build_routing=Fal
                     subprocess.run([
                         'node', str(Path(__file__).with_name('build_routing.cjs')), '--compact-domains',
                         str(worktree / TEMPLATE), str(worktree / 'source/routing/generated/domains.json'),
-                        *([str(worktree / 'source/routing/state/sources.json')]
-                          if 'source/routing/state/sources.json' in payloads else []),
+                        str(worktree / 'source/routing/state/sources.json')
+                        if 'source/routing/state/sources.json' in payloads else '-',
+                        str(worktree / 'source/routing/domains.txt')
+                        if (worktree / 'source/routing/domains.txt').is_file() else '-',
                     ], check=True)
                     subprocess.run([
                         'node', str(Path(__file__).with_name('build_routing.cjs')),

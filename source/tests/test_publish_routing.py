@@ -19,7 +19,7 @@ with tempfile.TemporaryDirectory() as directory:
     git(repo,'config','user.name','Test');git(repo,'config','user.email','test@example.invalid')
     git(repo,'checkout','-b','test')
     for path in module.LISTS + module.INPUTS[:-1]:
-        target=repo/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text('initial\n')
+        target=repo/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text('# fixture: no manual domains\n' if path == 'source/routing/domains.txt' else 'initial\n')
     git(repo,'add','.');git(repo,'commit','-m','Initial');git(repo,'push','origin','test')
     base=git(repo,'rev-parse','HEAD')
     subprocess.run(['git','clone','--branch','test',str(remote),str(other)],check=True,capture_output=True)
@@ -150,6 +150,20 @@ with tempfile.TemporaryDirectory() as directory:
                             sources=sources_payload,build_routing=True)
     git(other,'fetch','origin','test')
     assert json.loads(git(other,'show',restored+':source/routing/generated/domains.json'))==observed
+
+    # Latest manual text can change during a scan; publication uses the newest
+    # rules without repeating discovery or overwriting the edited list.
+    git(other,'reset','--hard',restored)
+    manual_domains=other/'source/routing/domains.txt'
+    manual_domains.write_text('#### main\nkeyword:yandex\ndomain:vtb.ru\n')
+    git(other,'add','.');git(other,'commit','-m','Edit manual domains');git(other,'push')
+    manual_result=module.publish(repo,payload,restored,domains=domain_payload,
+                                sources=sources_payload,build_routing=True)
+    git(other,'fetch','origin','test')
+    compact=json.loads(git(other,'show',manual_result+':source/routing/generated/domains.json'))
+    assert compact=={'rules':[
+        {'ruleTag':'main','domain':['domain:vtb.ru','keyword:yandex']},observed['rules'][1]]}
+    assert git(other,'show',manual_result+':source/routing/domains.txt')==manual_domains.read_text().strip()
 
     try:module.publish(repo,payload,changed,branch='main')
     except ValueError:pass

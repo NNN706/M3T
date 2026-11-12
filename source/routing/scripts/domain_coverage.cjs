@@ -37,4 +37,33 @@ function minimize(rules, active = []) {
     .filter(row => row.group === group && kept.has(row)).map(row => row.value))].sort()}))
     .filter(rule => rule.domain.length).sort((a, b) => compare(a.ruleTag, b.ruleTag));
 }
-module.exports = {covers, activeMatchers, minimize};
+function readManual(text, label = 'domains.txt') {
+  const rules = [], tags = new Set();
+  let current;
+  for (const [index, raw] of text.split(/\r?\n/).entries()) {
+    const line = raw.trim();
+    if (line.startsWith('#### ')) {
+      const ruleTag = line.slice(5).trim();
+      if (!ruleTag || tags.has(ruleTag)) throw Error(`${label}:${index+1}: пустой или повторяющийся ruleTag`);
+      tags.add(ruleTag); current = {ruleTag, domain: []}; rules.push(current);
+      continue;
+    }
+    if (!line || line.startsWith('#')) continue;
+    const value = line.split(/\s+#/, 1)[0].trim();
+    if (!current) throw Error(`${label}:${index+1}: перед правилами нужен заголовок #### ruleTag`);
+    if (!/^(full|domain|keyword):\S+$/.test(value)) throw Error(`${label}:${index+1}: ожидается full:, domain: или keyword: с непустым значением`);
+    current.domain.push(value);
+  }
+  return {rules};
+}
+function respectExclusions(rules, excluded) {
+  const blocked = new Set(excluded);
+  return rules.map(rule => ({...rule, domain: rule.domain.flatMap(value => {
+    const parsed = matcher(value);
+    if (!parsed) return [value];
+    if (!excluded.some(host => covers(value, 'full:' + host))) return [value];
+    if (parsed.kind === 'domain' && !blocked.has(parsed.text)) return ['full:' + parsed.text];
+    return [];
+  })})).filter(rule => rule.domain.length);
+}
+module.exports = {covers, activeMatchers, minimize, readManual, respectExclusions};

@@ -165,7 +165,7 @@ def global_rules(data):
     return result
 
 
-def domain_rules(data, expected, *, include_seed=True):
+def domain_rules(data, expected, *, include_seed=True, allow_keywords=False):
     rules = validate_rule_tags(data, expected, 'Правила доменов')
     result = []
     for rule in rules:
@@ -174,6 +174,11 @@ def domain_rules(data, expected, *, include_seed=True):
             raise ValueError('Expected domain array')
         matchers = {'domain:' + rule['ruleTag']} if include_seed else set()
         for value in values:
+            if allow_keywords and isinstance(value, str) and value.startswith('keyword:'):
+                if not value[8:] or any(ord(char) < 32 for char in value):
+                    raise ValueError('Invalid keyword matcher')
+                matchers.add(value)
+                continue
             if not isinstance(value, str) or not value.startswith(('domain:', 'full:')):
                 raise ValueError('Invalid domain matcher')
             kind, host = value.split(':', 1)

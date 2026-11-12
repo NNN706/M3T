@@ -83,6 +83,7 @@ Templates/Routing-(RU-Direct)/routing-ru.json одним коммитом. IP-п
 
 - [sites.txt](routing/sites.txt) — сайты и домены для сбора.
 - [ip.txt](routing/ip.txt) — ручные CIDR direct, включая legacy; ASN-исключения применяются.
+- [domains.txt](routing/domains.txt) — ручная основа общих доменных правил, включая группу main.
 - [asn.txt](routing/asn.txt) — ASN для выгрузки анонсов.
 - [exclude.txt](routing/exclude.txt) — исключённые ASN.
 - [asn-report-full.md](routing/asn-report-full.md) — общий отчёт с подсетями и DNS-наблюдениями.
@@ -107,3 +108,8 @@ IPv4 сетей Hetzner ограничены наблюдавшимися /24 ч
 `routing/state/dns-provenance.json`, поэтому ограничение сохраняется при
 инкрементальном и ежедневном полном сборе. Широкий ASN не разворачивается
 целиком в набор /24. Изменение prefix-limits.txt автоматически запускает Update.
+
+Общие full:/domain:/keyword: задаются в routing/domains.txt по секциям #### ruleTag.
+Update дописывает только непокрытые наблюдения, удаляет пустые группы и сохраняет
+полный явный список для DNS в sources.json → domain_observations. Доменные правила
+в routing-ru.json остаются комментариями. Изменения domains.txt запускают Update.
