@@ -1249,262 +1249,186 @@
         "outboundTag": "direct"
       },
       // {
-      //   "ruleTag": "2ip.io",
+      //   "ruleTag": "main",
       //   "domain": [
-      //     "domain:favicon.yandex.net",
-      //     "domain:get-v6.2ip.io",
-      //     "domain:luxcdn.com",
-      //     "domain:s.luxcdn.com",
-      //     "full:2ip.io"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "2ip.ru",
-      //   "domain": [
-      //     "domain:2ip.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "alfabank.ru",
-      //   "domain": [
-      //     "domain:alfabank.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "async-online4.vtb.ru",
-      //   "domain": [
-      //     "domain:async-online4.vtb.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "back.vtb.fp.f6.security",
-      //   "domain": [
-      //     "domain:back.vtb.fp.f6.security"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "beget.com",
-      //   "domain": [
-      //     "domain:api-cp.beget.com",
-      //     "domain:assets-site.beget.com",
+      //     "keyword:selectel",
+      //     "keyword:timeweb",
+      //     "keyword:sberbank",
+      //     "keyword:yandex",
+      //     "domain:vk.com",
+      //     "domain:vk.ru",
+      //     "domain:mws.ru",
+      //     "domain:ihc.ru",
+      //     "domain:reg.ru",
+      //     "domain:ruvds.com",
       //     "domain:beget.com",
-      //     "domain:img.beget.com",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:privacy-cs.mail.ru",
-      //     "domain:sgtm.beget.com",
-      //     "domain:top-fwz1.mail.ru",
-      //     "domain:vk.com"
+      //     "domain:smartape.ru",
+      //     "domain:ddos-guard.net",
+      //     "domain:cdnvideo.com",
+      //     "domain:cloud.ru",
+      //     "domain:landvps.ru",
+      //     "domain:fornex.com",
+      //     "domain:contell.ru",
+      //     "domain:datahouse.ru",
+      //     "domain:majordomo.ru",
+      //     "domain:f6.security",
+      //     "domain:vtb.ru",
+      //     "domain:gov.ru",
+      //     "domain:gosuslugi.ru",
+      //     "domain:raiffeisen.ru",
+      //     "domain:tbank-online.com",
+      //     "domain:alfabank.ru",
+      //     "domain:vkusnoitochka.ru",
+      //     "domain:rostics.ru",
+      //     "domain:max.ru",
+      //     "domain:mvideo.ru",
+      //     "domain:megafon.ru",
+      //     "domain:mts.ru",
+      //     "domain:dns-shop.ru",
+      //     "domain:ipinfo.io",
+      //     "domain:ifconfig.me",
+      //     "domain:2ip.io",
+      //     "domain:2ip.ru",
+      //     "domain:ok.ru",
+      //     "domain:mail.ru",
+      //     "domain:ozon.ru",
+      //     "domain:iitrust.ru",
+      //     "domain:memstech.ru",
+      //     "domain:vkusvill.ru",
+      //     "domain:cdek.ru",
+      //     "domain:dzen.ru"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
-      //   "ruleTag": "cbro.online.sberbank.ru",
-      //   "domain": [
-      //     "domain:cbro.online.sberbank.ru"
-      //   ],
+      //   "ruleTag": "2ip.io",
+      //   "domain": ["domain:luxcdn.com"],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "cdek.ru",
-      //   "domain": [
-      //     "domain:cdek.ru",
-      //     "domain:servicepipe.tech"
-      //   ],
+      //   "domain": ["domain:servicepipe.tech"],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "cdnvideo.com",
       //   "domain": [
-      //     "domain:api.sypexgeo.net",
-      //     "domain:api.yadrocrm.ru",
-      //     "domain:cdnvideo.com",
-      //     "domain:extreme-ip-lookup.com",
-      //     "domain:www.cdnvideo.com"
+      //     "domain:sypexgeo.net",
+      //     "domain:yadrocrm.ru",
+      //     "domain:extreme-ip-lookup.com"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "cloud.ru",
       //   "domain": [
-      //     "domain:2002--slt.stbid.ru",
-      //     "domain:20b6425d-3a25-4a96-94c3-d99808c1e115.dsp.mts.ru",
-      //     "domain:2e486159-267c-4f86-8a28-1378002e9152.dsp.mts.ru",
-      //     "domain:3182419811793495384628.cm.a.mts.ru",
-      //     "domain:4007390581794417585806.cm.a.mts.ru",
-      //     "domain:5582802101794417585826.cm.a.mts.ru",
-      //     "domain:5916233741794420117442.cm.a.mts.ru",
-      //     "domain:5f2df96c-8ae5-4783-9ea2-ecb925c16fc8.dsp.mts.ru",
-      //     "domain:9360834981794299986160.cm.a.mts.ru",
-      //     "domain:a.adiam.tech",
-      //     "domain:a.adspector.io",
-      //     "domain:a.ussp.io",
-      //     "domain:a.utraff.com",
-      //     "domain:a.videohead.tech",
-      //     "domain:abt.s3.yandex.net",
+      //     "domain:stbid.ru",
+      //     "domain:adiam.tech",
+      //     "domain:adspector.io",
+      //     "domain:ussp.io",
+      //     "domain:utraff.com",
+      //     "domain:videohead.tech",
       //     "domain:acint.net",
-      //     "domain:ad.adriver.ru",
-      //     "domain:ads.adtec.ru",
-      //     "domain:ads.betweendigital.com",
-      //     "domain:ads.gpm-ssp.ru",
-      //     "domain:ads.tds.bid",
-      //     "domain:am8.bigdata-it.ru",
-      //     "domain:am9.bigdata-it.ru",
-      //     "domain:an.yandex.ru",
-      //     "domain:api.cloud.ru",
-      //     "domain:api.mindbox.ru",
-      //     "domain:bid.sspnet.tech",
-      //     "domain:cdn-video.cloud.ru",
-      //     "domain:cdn.al-adtech.com",
-      //     "domain:cdn.cloud.ru",
-      //     "domain:ck.silvermob.com",
-      //     "domain:cloud.ru",
-      //     "domain:cm-ssp.voxexchange.io",
-      //     "domain:cm.a.mts.ru",
-      //     "domain:code.moviead55.ru",
+      //     "domain:adriver.ru",
+      //     "domain:adtec.ru",
+      //     "domain:betweendigital.com",
+      //     "domain:gpm-ssp.ru",
+      //     "domain:tds.bid",
+      //     "domain:bigdata-it.ru",
+      //     "domain:mindbox.ru",
+      //     "domain:sspnet.tech",
+      //     "domain:al-adtech.com",
+      //     "domain:silvermob.com",
+      //     "domain:voxexchange.io",
+      //     "domain:moviead55.ru",
       //     "domain:const.uno",
-      //     "domain:creatives.al-adtech.com",
-      //     "domain:crm.allbdata.ru",
-      //     "domain:crm.board-traff.ru",
-      //     "domain:crm.deepcall.ru",
-      //     "domain:crm.direct-client.ru",
-      //     "domain:crm.info-it-data.ru",
-      //     "domain:crm.megabdatait.ru",
-      //     "domain:crm.megabigteh.ru",
-      //     "domain:crm.newbigtech.ru",
-      //     "domain:crm.r3ka.ru",
-      //     "domain:crm.sertmarket.shop",
-      //     "domain:crm.techbigdata.ru",
-      //     "domain:crm.viva-lead.ru",
-      //     "domain:d26e0371-4904-4dbb-8810-bdc36887f93f.dsp.mts.ru",
-      //     "domain:dis.criteo.com",
-      //     "domain:dm-eu.hybrid.ai",
-      //     "domain:dm.hybrid.ai",
-      //     "domain:dmg.digitaltarget.ru",
-      //     "domain:dmp.sbermarketing.ru",
-      //     "domain:dsp.nrich.ai",
-      //     "domain:e6ae6a4a-f665-4480-aabf-4c838165834d.dsp.mts.ru",
-      //     "domain:eac9628e-8819-4514-9cda-02203eb05a79.dsp.mts.ru",
-      //     "domain:ev.adriver.ru",
-      //     "domain:exchange.buzzoola.com",
-      //     "domain:f4c97d91-3463-4cfe-b468-d786b9eedda8.dsp.mts.ru",
-      //     "domain:gck.needcallbuy.ru",
-      //     "domain:id.cloud.ru",
-      //     "domain:id.uma.media",
+      //     "domain:allbdata.ru",
+      //     "domain:board-traff.ru",
+      //     "domain:deepcall.ru",
+      //     "domain:direct-client.ru",
+      //     "domain:info-it-data.ru",
+      //     "domain:megabdatait.ru",
+      //     "domain:megabigteh.ru",
+      //     "domain:newbigtech.ru",
+      //     "domain:r3ka.ru",
+      //     "domain:sertmarket.shop",
+      //     "domain:techbigdata.ru",
+      //     "domain:viva-lead.ru",
+      //     "domain:criteo.com",
+      //     "domain:hybrid.ai",
+      //     "domain:digitaltarget.ru",
+      //     "domain:sbermarketing.ru",
+      //     "domain:nrich.ai",
+      //     "domain:buzzoola.com",
+      //     "domain:needcallbuy.ru",
+      //     "domain:uma.media",
       //     "domain:kimberlite.io",
-      //     "domain:kraken-mdt.rambler.ru",
-      //     "domain:kraken.rambler.ru",
-      //     "domain:lead.justagent.ru",
-      //     "domain:m.kombinat.digital",
-      //     "domain:marketplace.cloud.ru",
-      //     "domain:match.ohmy.bid",
-      //     "domain:matching.mobilebanner.ru",
-      //     "domain:mc.acint.net",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
+      //     "domain:rambler.ru",
+      //     "domain:justagent.ru",
+      //     "domain:kombinat.digital",
+      //     "domain:ohmy.bid",
+      //     "domain:mobilebanner.ru",
       //     "domain:otclick-adv.ru",
-      //     "domain:pixel.konnektu.ru",
-      //     "domain:privacy-cs.mail.ru",
+      //     "domain:konnektu.ru",
       //     "domain:prodmp.ru",
-      //     "domain:px.adhigh.net",
-      //     "domain:px.segmel.com",
+      //     "domain:adhigh.net",
+      //     "domain:segmel.com",
       //     "domain:qoopler.ru",
-      //     "domain:r.ussp.io",
-      //     "domain:rtb-dsp.gnezdo.ru",
-      //     "domain:rtb-eu.b.otm-r.com",
-      //     "domain:rtb.hhkld.com",
-      //     "domain:rtb.moe.video",
+      //     "domain:gnezdo.ru",
+      //     "domain:otm-r.com",
+      //     "domain:hhkld.com",
+      //     "domain:moe.video",
       //     "domain:rutarget.ru",
-      //     "domain:s.suprion.ru",
-      //     "domain:s.uuidksinc.net",
-      //     "domain:sentry.sbercloud.tech",
-      //     "domain:sm.rtb.mts.ru",
+      //     "domain:suprion.ru",
+      //     "domain:uuidksinc.net",
+      //     "domain:sbercloud.tech",
       //     "domain:smi2.ru",
-      //     "domain:sp.linkssp.ru",
-      //     "domain:ssp-rtb.sape.ru",
-      //     "domain:ssp.adriver.ru",
-      //     "domain:ssp.al-adtech.com",
-      //     "domain:ssp.bidster.net",
-      //     "domain:st.top100.ru",
-      //     "domain:sync.adkernel.com",
-      //     "domain:sync.adsp.io",
-      //     "domain:sync.adspend.space",
-      //     "domain:sync.bumlam.com",
-      //     "domain:sync.dmp.otm-r.com",
-      //     "domain:sync.dvgroup.com",
-      //     "domain:sync.opendsp.ru",
-      //     "domain:sync.programmatica.com",
-      //     "domain:sync.videonow.ru",
-      //     "domain:tech.punchmedia.ru",
-      //     "domain:tms.dmp.wi-fi.ru",
-      //     "domain:tms.gpmdata.ru",
-      //     "domain:top-fwz1.mail.ru",
-      //     "domain:tracking.datadrivenpromotion.com",
-      //     "domain:uaas.yandex.ru",
-      //     "domain:vma.mts.ru",
-      //     "domain:web-static.mindbox.ru",
-      //     "domain:www.acint.net",
-      //     "domain:x01.aidata.io"
+      //     "domain:linkssp.ru",
+      //     "domain:sape.ru",
+      //     "domain:bidster.net",
+      //     "domain:top100.ru",
+      //     "domain:adkernel.com",
+      //     "domain:adsp.io",
+      //     "domain:adspend.space",
+      //     "domain:bumlam.com",
+      //     "domain:dvgroup.com",
+      //     "domain:opendsp.ru",
+      //     "domain:programmatica.com",
+      //     "domain:videonow.ru",
+      //     "domain:punchmedia.ru",
+      //     "domain:wi-fi.ru",
+      //     "domain:gpmdata.ru",
+      //     "domain:datadrivenpromotion.com",
+      //     "domain:aidata.io"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "cloud.vk.com",
       //   "domain": [
-      //     "domain:cdn.vkcloud-static.ru",
-      //     "domain:cloud.vk.com",
-      //     "domain:cloud.vk.ru",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:privacy-cs.mail.ru",
-      //     "domain:prod-msk.vkcloud-static.ru",
-      //     "domain:sdk-api.apptracer.ru",
-      //     "domain:top-fwz1.mail.ru",
-      //     "domain:vk.com",
-      //     "domain:vkcloud-cms-prod.s3.prodcloud.vk.team",
-      //     "domain:vkcloud-next.vktech-static.ru",
-      //     "domain:vkcs-scripts.mrgcdn.ru"
+      //     "domain:vkcloud-static.ru",
+      //     "domain:apptracer.ru",
+      //     "domain:vk.team",
+      //     "domain:vktech-static.ru",
+      //     "domain:mrgcdn.ru"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "contell.ru",
       //   "domain": [
-      //     "domain:admin.verbox.ru",
-      //     "domain:contell.ru",
-      //     "domain:lk.contell.ru",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:static.me-talk.ru",
-      //     "domain:widget.me-talk.ru"
+      //     "domain:verbox.ru",
+      //     "domain:me-talk.ru"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "datahouse.ru",
       //   "domain": [
-      //     "domain:api-maps.yandex.ru",
-      //     "domain:big4.ooouptime.ru",
-      //     "domain:code.jivo.ru",
-      //     "domain:code.jivosite.com",
-      //     "domain:cp.datahouse.ru",
-      //     "domain:datahouse.ru",
-      //     "domain:halk.cdn.filanco.ru",
-      //     "domain:log.api-maps.yandex.ru",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:node-sber1-az1-23.jivo.ru",
-      //     "domain:privacy-cs.mail.ru",
-      //     "domain:telemetry.jivo.ru",
-      //     "domain:top-fwz1.mail.ru",
-      //     "domain:vi-sber1-22.jivo.ru",
-      //     "domain:vk.com",
-      //     "domain:yandex.ru",
+      //     "domain:ooouptime.ru",
+      //     "domain:jivo.ru",
+      //     "domain:jivosite.com",
+      //     "domain:filanco.ru",
       //     "domain:yastatic.net"
       //   ],
       //   "outboundTag": "direct"
@@ -1512,706 +1436,161 @@
       // {
       //   "ruleTag": "ddos-guard.net",
       //   "domain": [
-      //     "domain:abt.s3.yandex.net",
-      //     "domain:captcha.ddos-guard.net",
-      //     "domain:code.jivo.ru",
-      //     "domain:code.jivosite.com",
-      //     "domain:ddos-guard.net",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:node-sber1-az1-23.jivosite.com",
-      //     "domain:snap.licdn.com",
-      //     "domain:tcd.mng.tl",
-      //     "domain:uaas.yandex.ru",
-      //     "domain:vi-sber1-25.jivosite.com",
-      //     "domain:widgets.mango-office.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "ddp-mobile.online.sberbank.ru",
-      //   "domain": [
-      //     "domain:ddp-mobile.online.sberbank.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "dns-shop.ru",
-      //   "domain": [
-      //     "domain:dns-shop.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "esia.gosuslugi.ru",
-      //   "domain": [
-      //     "domain:esia.gosuslugi.ru",
-      //     "domain:sfd.gosuslugi.ru",
-      //     "domain:www.gosuslugi.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "esmdtpep.vtb.ru",
-      //   "domain": [
-      //     "domain:esmdtpep.vtb.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "finance.ozon.ru",
-      //   "domain": [
-      //     "domain:finance.ozon.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "fornex.com",
-      //   "domain": [
-      //     "domain:ru.fornex.com"
+      //     "domain:licdn.com",
+      //     "domain:mng.tl",
+      //     "domain:mango-office.ru"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "gosuslugi.ru",
-      //   "domain": [
-      //     "domain:gosuslugi.ru",
-      //     "domain:gu-st.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "gov.ru",
-      //   "domain": [
-      //     "domain:gov.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "h2.vtb.ru",
-      //   "domain": [
-      //     "domain:h2.vtb.ru"
-      //   ],
+      //   "domain": ["domain:gu-st.ru"],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "ihc.ru",
       //   "domain": [
-      //     "domain:code.jivosite.com",
-      //     "domain:dp.speed.ihc.ru",
-      //     "domain:hk.speed.ihc.ru",
-      //     "domain:ihc.ru",
-      //     "domain:ix.speed.ihc.ru",
-      //     "domain:mc.webvisor.org",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:my.ihc.ru",
-      //     "domain:nl.speed.ihc.ru",
-      //     "domain:node-sb1-az1-26.jivosite.com",
-      //     "domain:ru.tophosts.net",
-      //     "domain:telemetry.jivosite.com",
-      //     "domain:vi-sber1-24.jivosite.com",
-      //     "domain:vk.com",
-      //     "domain:www.ihc.ru"
+      //     "domain:webvisor.org",
+      //     "domain:tophosts.net"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "ipinfo.io",
-      //   "domain": [
-      //     "domain:p.typekit.net",
-      //     "domain:use.typekit.net"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "landvps.ru",
-      //   "domain": [
-      //     "domain:adfstat.yandex.ru",
-      //     "domain:landvps.ru",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:my.landvps.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "lk.megafon.ru",
-      //   "domain": [
-      //     "domain:api.megafon.ru",
-      //     "domain:lk.megafon.ru"
-      //   ],
+      //   "domain": ["domain:typekit.net"],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "mail.ru",
       //   "domain": [
-      //     "domain:531311.ms.dzen.ru",
-      //     "domain:531511.ms.dzen.ru",
-      //     "domain:551121.ms.dzen.ru",
-      //     "domain:551511.ms.dzen.ru",
-      //     "domain:account.mail.ru",
-      //     "domain:ad.mail.ru",
-      //     "domain:an.mail.ru",
-      //     "domain:api.okcdn.ru",
-      //     "domain:api.vkvideo.ru",
-      //     "domain:avatars.dzeninfra.ru",
-      //     "domain:b2.mail.ru",
-      //     "domain:bs.yandex.ru",
-      //     "domain:counter.yadro.ru",
-      //     "domain:dzen.ru",
-      //     "domain:home.imgsmail.ru",
-      //     "domain:img.imgsmail.ru",
-      //     "domain:imgs2.imgsmail.ru",
-      //     "domain:iv.okcdn.ru",
-      //     "domain:limg.imgsmail.ru",
-      //     "domain:login.vk.com",
-      //     "domain:mail.ru",
-      //     "domain:media-trend.mail.ru",
-      //     "domain:o2.mail.ru",
-      //     "domain:pogoda.imgsmail.ru",
-      //     "domain:portal.mail.ru",
-      //     "domain:r.mradx.net",
-      //     "domain:r3.mail.ru",
-      //     "domain:reklama.mail.ru",
-      //     "domain:resizer.mail.ru",
-      //     "domain:rs.mail.ru",
-      //     "domain:st.vkvideo.ru",
-      //     "domain:stat.radar.imgsmail.ru",
-      //     "domain:static.dzeninfra.ru",
-      //     "domain:stats.dzen.ru",
-      //     "domain:sun9-2.vkuserphoto.ru",
-      //     "domain:sun9-38.vkuserphoto.ru",
-      //     "domain:sun9-39.vkuserphoto.ru",
-      //     "domain:sun9-40.vkuserphoto.ru",
-      //     "domain:sun9-47.userapi.com",
-      //     "domain:sun9-47.vkuserphoto.ru",
-      //     "domain:sun9-48.vkuserphoto.ru",
-      //     "domain:sun9-49.vkuserphoto.ru",
-      //     "domain:sun9-53.vkuserphoto.ru",
-      //     "domain:sun9-6.vkuserphoto.ru",
-      //     "domain:sun9-67.vkuserphoto.ru",
-      //     "domain:sun9-77.vkuserphoto.ru",
-      //     "domain:sun9-81.vkuserphoto.ru",
-      //     "domain:sun9-82.vkuserphoto.ru",
-      //     "domain:sun9-87.vkuserphoto.ru",
-      //     "domain:telemetry.dzen.ru",
-      //     "domain:trk.mail.ru",
-      //     "domain:vd252.okcdn.ru",
-      //     "domain:vd370.okcdn.ru",
-      //     "domain:vd405.okcdn.ru",
-      //     "domain:vd434.okcdn.ru",
-      //     "domain:vd469.okcdn.ru",
-      //     "domain:vd476.okcdn.ru",
-      //     "domain:vd483.okcdn.ru",
-      //     "domain:vd512.okcdn.ru",
-      //     "domain:vd519.okcdn.ru",
-      //     "domain:vd524.okcdn.ru",
-      //     "domain:vd534.okcdn.ru",
-      //     "domain:vd537.okcdn.ru",
-      //     "domain:vd613.okcdn.ru",
-      //     "domain:vd623.okcdn.ru",
-      //     "domain:vd635.okcdn.ru",
-      //     "domain:vd643.okcdn.ru",
-      //     "domain:vd645.okcdn.ru",
-      //     "domain:vd676.okcdn.ru",
-      //     "domain:vd680.okcdn.ru",
-      //     "domain:vd710.okcdn.ru",
-      //     "domain:vd719.okcdn.ru",
-      //     "domain:vd737.okcdn.ru",
-      //     "domain:vd756.okcdn.ru",
+      //     "domain:okcdn.ru",
       //     "domain:vkvideo.ru",
-      //     "domain:xray.mail.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "majordomo.ru",
-      //   "domain": [
-      //     "domain:abt.s3.yandex.net",
-      //     "domain:api.majordomo.ru",
-      //     "domain:code.jivosite.com",
-      //     "domain:majordomo.ru",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:my.majordomo.ru",
-      //     "domain:node-sb1-az1-26.jivosite.com",
-      //     "domain:privacy-cs.mail.ru",
-      //     "domain:top-fwz1.mail.ru",
-      //     "domain:uaas.yandex.ru",
-      //     "domain:vk.com",
-      //     "domain:www.majordomo.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "max.ru",
-      //   "domain": [
-      //     "domain:max.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "mb.vtb.ru",
-      //   "domain": [
-      //     "domain:mb.vtb.ru"
+      //     "domain:dzeninfra.ru",
+      //     "domain:yadro.ru",
+      //     "domain:imgsmail.ru",
+      //     "domain:mradx.net",
+      //     "domain:vkuserphoto.ru",
+      //     "domain:userapi.com"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "memstech.ru",
-      //   "domain": [
-      //     "domain:memstech.ru",
-      //     "domain:mon.b2b-mems.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "mobile.vkusvill.ru",
-      //   "domain": [
-      //     "domain:mobile.vkusvill.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "mpsbol.ant.sberbank.ru",
-      //   "domain": [
-      //     "domain:mpsbol.ant.sberbank.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "mvideo.ru",
-      //   "domain": [
-      //     "domain:mvideo.ru",
-      //     "domain:static.mvideo.ru",
-      //     "domain:www.mvideo.ru"
-      //   ],
+      //   "domain": ["domain:b2b-mems.ru"],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "mws.ru",
       //   "domain": [
-      //     "domain:1325848681794439906951.cm.a.mts.ru",
-      //     "domain:1686587501794300151369.cm.a.mts.ru",
-      //     "domain:1cd5c3c7d5a445d59c7f73b38cf6da12.ops.beeline.ru",
-      //     "domain:2359741341794393788476.cm.a.mts.ru",
-      //     "domain:3565207081794340010766.cm.a.mts.ru",
-      //     "domain:4129606181794437662354.cm.a.mts.ru",
-      //     "domain:4135084311794335388817.cm.a.mts.ru",
-      //     "domain:4211347531794420125527.cm.a.mts.ru",
-      //     "domain:4636494031794306066312.cm.a.mts.ru",
-      //     "domain:4876386651794402572427.cm.a.mts.ru",
-      //     "domain:5089274751794342141239.cm.a.mts.ru",
-      //     "domain:5650439931794446002298.cm.a.mts.ru",
-      //     "domain:5817185321794261790587.cm.a.mts.ru",
-      //     "domain:5819685921794266382441.cm.a.mts.ru",
-      //     "domain:5882964711793495484340.cm.a.mts.ru",
-      //     "domain:6790708701793721784494.cm.a.mts.ru",
-      //     "domain:6982539211794400180415.cm.a.mts.ru",
-      //     "domain:8009731741794377404982.cm.a.mts.ru",
-      //     "domain:8173850941794417593033.cm.a.mts.ru",
-      //     "domain:8598688961794390072643.cm.a.mts.ru",
-      //     "domain:9b919a95-7b12-4059-907a-1b85107a2299.dsp.mts.ru",
-      //     "domain:a.giraff.io",
-      //     "domain:a.lotus-dsp.ru",
-      //     "domain:abt.s3.yandex.net",
-      //     "domain:ad.adriver.ru",
-      //     "domain:adriver-sync.rutarget.ru",
-      //     "domain:ads.giftclick.ru",
-      //     "domain:an.yandex.ru",
-      //     "domain:api.a.mts.ru",
-      //     "domain:api.s.mindbox.ru",
-      //     "domain:bls-report.getshop.tv",
-      //     "domain:cm.a.mts.ru",
-      //     "domain:cmr.bidderstack.com",
-      //     "domain:content.adriver.ru",
-      //     "domain:cr-frontend.weborama-tech.ru",
-      //     "domain:e9252003-b88e-47a5-961a-d5d01a13046a.dsp.mts.ru",
-      //     "domain:ev.adriver.ru",
-      //     "domain:match.new-programmatic.com",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:mws.ru",
-      //     "domain:pixel.dsp.onetarget.ru",
-      //     "domain:pixel.getads.ru",
-      //     "domain:privacy-cs.mail.ru",
-      //     "domain:px2.admon.pro",
-      //     "domain:redirect-frontend.weborama-tech.ru",
-      //     "domain:redirect.frontend.weborama.fr",
-      //     "domain:rtb.dynotech.io",
-      //     "domain:sentry.mws.ru",
-      //     "domain:sm.rtb.mts.ru",
-      //     "domain:ssp.afp.ai",
-      //     "domain:ssp.bidvol.com",
-      //     "domain:static.a.mts.ru",
-      //     "domain:sync.digitalcaramel.com",
-      //     "domain:sync.dmp.melvad.com",
-      //     "domain:sync.dsp.solta.io",
-      //     "domain:sync.rambler.ru",
-      //     "domain:sync.upravel.com",
-      //     "domain:t.dsp.abdm.ru",
-      //     "domain:t.dsp.nitrortb.ru",
-      //     "domain:tag.a.mts.ru",
-      //     "domain:top-fwz1.mail.ru",
-      //     "domain:uaas.yandex.ru",
-      //     "domain:web-static.s.mindbox.ru"
+      //     "domain:beeline.ru",
+      //     "domain:giraff.io",
+      //     "domain:lotus-dsp.ru",
+      //     "domain:giftclick.ru",
+      //     "domain:getshop.tv",
+      //     "domain:bidderstack.com",
+      //     "domain:weborama-tech.ru",
+      //     "domain:new-programmatic.com",
+      //     "domain:onetarget.ru",
+      //     "domain:getads.ru",
+      //     "domain:admon.pro",
+      //     "domain:weborama.fr",
+      //     "domain:dynotech.io",
+      //     "domain:afp.ai",
+      //     "domain:bidvol.com",
+      //     "domain:digitalcaramel.com",
+      //     "domain:melvad.com",
+      //     "domain:solta.io",
+      //     "domain:upravel.com",
+      //     "domain:abdm.ru",
+      //     "domain:nitrortb.ru"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "nalog.gov.ru",
       //   "domain": [
-      //     "domain:chat-bot.nalog.ru",
-      //     "domain:cnt.sputnik.ru",
-      //     "domain:data.nalog.ru",
-      //     "domain:nalog.gov.ru",
-      //     "domain:pos.gosuslugi.ru",
-      //     "domain:stat.sputnik.ru",
-      //     "domain:vashkontrol.ru",
-      //     "domain:www.nalog.gov.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "nuc-cdp.digital.gov.ru",
-      //   "domain": [
-      //     "domain:nuc-cdp.digital.gov.ru"
+      //     "domain:nalog.ru",
+      //     "domain:sputnik.ru",
+      //     "domain:vashkontrol.ru"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "ok.ru",
-      //   "domain": [
-      //     "domain:732231.ms.ok.ru",
-      //     "domain:ad.mail.ru",
-      //     "domain:counter.yadro.ru",
-      //     "domain:dzen.ru",
-      //     "domain:limg.imgsmail.ru",
-      //     "domain:ok.ru",
-      //     "domain:r.mradx.net",
-      //     "domain:r3.mail.ru",
-      //     "domain:rs.mail.ru",
-      //     "domain:st-ok-pts.cdn-vk.ru",
-      //     "domain:st-ok.cdn-vk.ru",
-      //     "domain:st.okcdn.ru",
-      //     "domain:trk.mail.ru",
-      //     "domain:xray.mail.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "online.vtb.ru",
-      //   "domain": [
-      //     "domain:online.vtb.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "ozon.ru",
-      //   "domain": [
-      //     "domain:ozon.ru"
-      //   ],
+      //   "domain": ["domain:cdn-vk.ru"],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "raiffeisen.ru",
-      //   "domain": [
-      //     "domain:cdn-rf.raiffeisen.ru",
-      //     "domain:oapi.raiffeisen.ru",
-      //     "domain:r-chat.raiffeisen.ru",
-      //     "domain:raiffeisen.ru",
-      //     "domain:ru.id.facct.ru",
-      //     "domain:www.raiffeisen.ru"
-      //   ],
+      //   "domain": ["domain:facct.ru"],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "reg.ru",
       //   "domain": [
-      //     "domain:api.flocktory.com",
-      //     "domain:api.wavesend.ru",
-      //     "domain:avatars.mds.yandex.net",
-      //     "domain:cdn.wavesend.ru",
-      //     "domain:event-logger-bff.svc.reg.ru",
-      //     "domain:external.login.reg.ru",
-      //     "domain:header-bff.svc.reg.ru",
-      //     "domain:img.reg.ru",
-      //     "domain:login.reg.ru",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:reg.ru",
-      //     "domain:showcase-static.reg.ru",
-      //     "domain:sw.reg.ru",
-      //     "domain:www.reg.ru",
-      //     "domain:yandex.ru",
-      //     "domain:yastatic.net"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "rostics.ru",
-      //   "domain": [
-      //     "domain:rostics.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "ruvds.com",
-      //   "domain": [
-      //     "domain:adc-ping-test.ruvds.com",
-      //     "domain:admin.verbox.ru",
-      //     "domain:almaty-ping-test.ruvds.com",
-      //     "domain:ams9-ping-test.ruvds.com",
-      //     "domain:astana-ping-test.ruvds.com",
-      //     "domain:biznet-ping-test.ruvds.com",
-      //     "domain:frn-ping-test.ruvds.com",
-      //     "domain:itpark-ping-test.ruvds.com",
-      //     "domain:izmir-ping-test.ruvds.com",
-      //     "domain:linx-ping-test.ruvds.com",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:nsk-ping-test.ruvds.com",
-      //     "domain:ok-ping-test.ruvds.com",
-      //     "domain:ovio-ping-test.ruvds.com",
-      //     "domain:porttelecom-ping-test.ruvds.com",
-      //     "domain:rus-ping-test.ruvds.com",
-      //     "domain:rusm9-ping-test.ruvds.com",
-      //     "domain:ruvds.com",
-      //     "domain:smartcom-ping-test.ruvds.com",
-      //     "domain:smarts-ping-test.ruvds.com",
-      //     "domain:static.me-talk.ru",
-      //     "domain:swiss-ping-test.ruvds.com",
-      //     "domain:telemax-ping-test.ruvds.com",
-      //     "domain:ufanet-ping-test.ruvds.com",
-      //     "domain:uk-ping-test.ruvds.com",
-      //     "domain:vk.com",
-      //     "domain:widget.me-talk.ru",
-      //     "domain:yekat-ping-test.ruvds.com"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "s2.vtb.ru",
-      //   "domain": [
-      //     "domain:s2.vtb.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "sberbank.ru",
-      //   "domain": [
-      //     "domain:sberbank.ru"
+      //     "domain:flocktory.com",
+      //     "domain:wavesend.ru"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "selectel.ru",
-      //   "domain": [
-      //     "domain:6ef4e6a1-9d49-47ac-bfed-170f67a815cf.selcdn.net",
-      //     "domain:anonymizer-regular.is.selectel.org",
-      //     "domain:api.s.mindbox.ru",
-      //     "domain:api.selectel.ru",
-      //     "domain:cdn.selectel.ru",
-      //     "domain:chatwoot.selectel.ru",
-      //     "domain:hog.selectel.ru",
-      //     "domain:mc.yandex.ru",
-      //     "domain:metrics.selectel.ru",
-      //     "domain:privacy-cs.mail.ru",
-      //     "domain:relay.selectel.ru",
-      //     "domain:selectel.ru",
-      //     "domain:tcd.mng.tl",
-      //     "domain:top-fwz1.mail.ru",
-      //     "domain:vk.com",
-      //     "domain:web-static.s.mindbox.ru",
-      //     "domain:widgets.mango-office.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "smartape.ru",
-      //   "domain": [
-      //     "domain:cp.smartape.ru",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mcw.mango-office.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:smartape.ru",
-      //     "domain:widgets-mcw.mango-office.ru",
-      //     "domain:widgets.mango-office.ru",
-      //     "domain:www.smartape.ru"
-      //   ],
+      //   "domain": ["domain:selcdn.net"],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "spb.megafon.ru",
-      //   "domain": [
-      //     "domain:ducip.megafon.ru",
-      //     "domain:fp-back.facct.ru",
-      //     "domain:ru.id.facct.ru",
-      //     "domain:spb.megafon.ru",
-      //     "domain:static.popmechanic.ru"
-      //   ],
+      //   "domain": ["domain:popmechanic.ru"],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "spb.mts.ru",
       //   "domain": [
-      //     "domain:1416232981794340017831.cm.a.mts.ru",
-      //     "domain:2399342921794300238215.cm.a.mts.ru",
-      //     "domain:2415138441794342153836.cm.a.mts.ru",
-      //     "domain:2472168571794417604394.cm.a.mts.ru",
-      //     "domain:2507129031794377425246.cm.a.mts.ru",
-      //     "domain:2569500681794402591460.cm.a.mts.ru",
-      //     "domain:2934199061794266471230.cm.a.mts.ru",
-      //     "domain:2994809501794439922000.cm.a.mts.ru",
-      //     "domain:4394285141794261891524.cm.a.mts.ru",
-      //     "domain:4975811741794393809345.cm.a.mts.ru",
-      //     "domain:5409217191794335397399.cm.a.mts.ru",
-      //     "domain:6340847681794390093975.cm.a.mts.ru",
-      //     "domain:7302874391794306076193.cm.a.mts.ru",
-      //     "domain:7937829981794420137567.cm.a.mts.ru",
-      //     "domain:8230726771794400191606.cm.a.mts.ru",
-      //     "domain:9071633211794437681600.cm.a.mts.ru",
-      //     "domain:9847219361794446014709.cm.a.mts.ru",
-      //     "domain:ac.avito.ru",
-      //     "domain:bs.serving-sys.ru",
-      //     "domain:cdn.mtscdn.ru",
-      //     "domain:dtm-dre.platform.hicloud.com",
-      //     "domain:identitystatic.mts.ru",
-      //     "domain:login.mts.ru",
-      //     "domain:mts.ru",
-      //     "domain:mtsopros.mts.ru",
-      //     "domain:pn.mts.ru",
-      //     "domain:qp-storage.media.mts.ru",
-      //     "domain:sentry.obs.mts.ru",
-      //     "domain:serving.a.mts.ru",
-      //     "domain:spb.mts.ru",
-      //     "domain:static.mts.ru",
-      //     "domain:www.avito.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "sso-mb.vtb.ru",
-      //   "domain": [
-      //     "domain:sso-mb.vtb.ru"
+      //     "domain:avito.ru",
+      //     "domain:serving-sys.ru",
+      //     "domain:mtscdn.ru",
+      //     "domain:hicloud.com"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "tbank-online.com",
       //   "domain": [
-      //     "domain:2260358961794266483993.cm.a.mts.ru",
+      //     "domain:tbank.ru",
+      //     "domain:tinkoff.ru",
       //     "domain:2w.ru",
-      //     "domain:3036551891794377430378.cm.a.mts.ru",
-      //     "domain:3930159131794340027045.cm.a.mts.ru",
-      //     "domain:4830143981794300251190.cm.a.mts.ru",
-      //     "domain:5007509551794417610245.cm.a.mts.ru",
-      //     "domain:6655435111794306084179.cm.a.mts.ru",
-      //     "domain:7061394141794437684678.cm.a.mts.ru",
-      //     "domain:7621231031794402596495.cm.a.mts.ru",
-      //     "domain:8992254961794390097914.cm.a.mts.ru",
-      //     "domain:9184320031794335405752.cm.a.mts.ru",
-      //     "domain:9501822521794261904662.cm.a.mts.ru",
-      //     "domain:9884912371794342162126.cm.a.mts.ru",
-      //     "domain:api-common.tbank-online.com",
-      //     "domain:api-common.tinkoff.ru",
-      //     "domain:as.tbank-online.com",
-      //     "domain:as.tbank.ru",
-      //     "domain:cdn.tbank-online.com",
-      //     "domain:cobrowsing-cdn.tbank.ru",
-      //     "domain:dss.hybrid.ai",
-      //     "domain:es.tbank.ru",
-      //     "domain:eye.targetads.io",
-      //     "domain:fingerprint.t-static-online.com",
-      //     "domain:freessl.tbank.ru",
-      //     "domain:hrc.tbank.ru",
-      //     "domain:id.tbank-online.com",
-      //     "domain:id.tbank.ru",
-      //     "domain:imgproxy-cdn.tbank-online.com",
-      //     "domain:le.tbank.ru",
-      //     "domain:mddc.tbank.ru",
-      //     "domain:polls-media.t-static-online.com",
-      //     "domain:rap.skcrtxr.com",
-      //     "domain:sso-forms-prod.t-static.ru",
+      //     "domain:targetads.io",
+      //     "domain:t-static-online.com",
+      //     "domain:t-static.ru",
+      //     "domain:skcrtxr.com",
       //     "domain:statad.ru",
-      //     "domain:tbank-online.com",
-      //     "domain:web2web.tbank-online.com",
-      //     "domain:www.cdn-tinkoff.ru",
-      //     "domain:www.tbank-online.com"
+      //     "domain:cdn-tinkoff.ru"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "timeweb.cloud",
       //   "domain": [
-      //     "domain:api.mindbox.ru",
-      //     "domain:cloud.roistat.com",
-      //     "domain:content.timeweb.com",
-      //     "domain:mc.yandex.ru",
-      //     "domain:mdd.yandex.net",
-      //     "domain:s3.twcstorage.ru",
-      //     "domain:sentry.timeweb.cloud",
-      //     "domain:timeweb.cloud",
-      //     "domain:web-static.mindbox.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "tls1.iitrust.ru",
-      //   "domain": [
-      //     "domain:tls1.iitrust.ru"
+      //     "domain:roistat.com",
+      //     "domain:twcstorage.ru"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "vk.com",
       //   "domain": [
-      //     "domain:ads.vk.com",
-      //     "domain:ads.vk.ru",
-      //     "domain:akashi.vk-portal.net",
-      //     "domain:api.vk.ru",
-      //     "domain:id.vk.com",
-      //     "domain:id.vk.ru",
-      //     "domain:login.vk.ru",
-      //     "domain:mincifry-cert.vk.ru",
-      //     "domain:r0.mradx.net",
-      //     "domain:r3-test.vk.ru",
-      //     "domain:st.vk.ru",
-      //     "domain:st1-94.vk.ru",
-      //     "domain:stats.vk-portal.net",
-      //     "domain:tns-counter.ru",
-      //     "domain:vk.ru",
-      //     "domain:web.api.vk.ru",
-      //     "domain:www.tns-counter.ru"
+      //     "domain:vk-portal.net",
+      //     "domain:tns-counter.ru"
       //   ],
       //   "outboundTag": "direct"
       // },
       // {
       //   "ruleTag": "vkusnoitochka.ru",
-      //   "domain": [
-      //     "domain:sentry-devtools.qsrapp.ru",
-      //     "domain:vkusnoitochka.ru"
-      //   ],
+      //   "domain": ["domain:qsrapp.ru"],
       //   "outboundTag": "direct"
       // },
-      // {
-      //   "ruleTag": "vkusvill.ru",
-      //   "domain": [
-      //     "domain:img.vkusvill.ru",
-      //     "domain:vkusvill.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // },
-      // {
-      //   "ruleTag": "vtb.ru",
-      //   "domain": [
-      //     "domain:vtb.ru"
-      //   ],
-      //   "outboundTag": "direct"
-      // }
       {
-        "port": "21,22,23,25,587,465,143,993,110,995",
+        "port": "21,22,23,25,587,465,143,993,110,995,6881-6889",
         "outboundTag": "direct"
       }
     ],
