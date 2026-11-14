@@ -12,6 +12,7 @@ INPUTS = ['source/routing/scripts/domain_coverage.cjs', 'source/routing/config/p
 OUTPUT = 'source/routing/generated/IP.json'
 TEMPLATE = 'Templates/Routing-(RU-Direct)/routing-ru.json'
 REPORT = 'source/routing/asn-report-full.md'
+REPORT_README = 'source/readme.md'
 PROVENANCE = 'source/routing/state/dns-provenance.json'
 REPORT_INPUTS = ['source/routing/scripts/domain_coverage.cjs', 'source/routing/config/prefix-limits.txt', 'source/routing/scripts/prefix_limits.py', 'source/routing/state/dns-provenance.json', OUTPUT, 'source/routing/state/sources.json', REPORT, PROVENANCE, 'source/routing/scripts/routing_report.py', 'source/routing/scripts/asn_routes.py']
 
@@ -36,6 +37,8 @@ def publish(repo, output, base, branch='test', domains=None, sources=None, *, bu
 
 
 def publish_payloads(repo, base, payloads, inputs, message, *, build_routing=False):
+    if REPORT in payloads:
+        payloads = {**payloads, REPORT_README: payloads[REPORT]}
     for attempt in range(3):
         git(repo, 'fetch', 'origin', 'refs/heads/test')
         head = git(repo, 'rev-parse', 'FETCH_HEAD').stdout.strip()
