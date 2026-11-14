@@ -221,7 +221,7 @@ jobs:
             --previous-provenance source/routing/state/dns-provenance.json \
             --provenance-output "$output/dns-provenance.json" "${evidence[@]}"
           cat "$output/summary.md" >> "$GITHUB_STEP_SUMMARY"
-          printf '\n[Подробный отчёт ASN с доменами](https://github.com/NNN706/M3T/blob/test/source/routing/asn-report-full.md)\n' >> "$GITHUB_STEP_SUMMARY"
+          printf '\n[Подробный отчёт ASN с доменами](https://github.com/NNN706/M3T/blob/test/source/readme.md)\n' >> "$GITHUB_STEP_SUMMARY"
       - name: Save overall routing report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
