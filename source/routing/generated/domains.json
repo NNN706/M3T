@@ -52,6 +52,7 @@
     {
       "ruleTag": "cloud.ru",
       "domain": [
+        "domain:a.udsp.io",
         "domain:acint.net",
         "domain:adhigh.net",
         "domain:adiam.tech",
@@ -74,6 +75,7 @@
         "domain:cloud.ru",
         "domain:const.uno",
         "domain:criteo.com",
+        "domain:crm.bizupprogress.ru",
         "domain:crm.elama-partner.ru",
         "domain:crm.lead-fixer.ru",
         "domain:crm.sigmatraffic.ru",
