@@ -128,6 +128,13 @@
         "outboundTag": "direct"
       },
       {
+        "ip": [
+          "5.252.32.109",
+          "185.215.4.61"
+        ],
+        "outboundTag": "proxy"
+      },
+      {
         "ruleTag": "2ip.io",
         "ip": [
           "5.178.80.0/21",
