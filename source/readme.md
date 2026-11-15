@@ -3,7 +3,7 @@
 Запуск (Bash и curl):
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/NNN706/M3T/test/source/SubnetResolve.sh) -4s https://visor.sberbank.ru/get api-web.samokat.ru
+bash <(curl -fsSL https://raw.githubusercontent.com/NNN706/M3T/main/source/SubnetResolve.sh) -4s <domain>
 ```
 
 Домены и HTTP(S) URL указываются через пробел. Без аргументов скрипт спросит их. Из URL автоматически извлекается домен.
