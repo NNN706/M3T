@@ -1,49 +1,56 @@
-**Параллельные DNS (DoH) запросы к трём провайдерам:**
-- Google DNS (`dns.google`)
-- AdGuard DNS Unfiltered (`unfiltered.adguard-dns.com`)
-- Яндекс DoT (`common.dot.dns.yandex.net`)
+# Маршрутизация direct
 
-**VK / Mail.ru / OK:**
-vk.com, vk.ru, userapi.com, okcdn.ru, mail.ru, vkuserphoto.ru, apptracer.ru, vk-analytics.ru, broker.ru, ertelecom.ru, lds.online, vladlink.net, paywb.com, yggno.de, mycdn.me, appsmail.ru, odkl.ru, apiok.ru, sferum-dev.ru   
+[Конфигурация routing-ru.json](routing-ru.json) · [Полный ASN-отчёт](../../source/readme.md) · [Запуск SubnetResolve](../../source/docs/SubnetResolve.md)
 
-**Ozon:**
-ozon.ru, ozone.ru, ozonusercontent.ru, o-courier.ru, ocourier.ru   
+Пути в описании ниже относятся к папке `source/routing/`.
 
-**Макс:**
-max.ru, oneme.ru   
+| Файл | Назначение |
+| --- | --- |
+| [sites.txt](../../source/routing/sites.txt) | Исходные сайты, домены и URL |
+| [ip.txt](../../source/routing/ip.txt) | Ручные подсети, включая legacy; с учётом ASN-исключений |
+| [domains.txt](../../source/routing/domains.txt) | Ручные общие full:/domain:/keyword: по секциям #### ruleTag |
+| [asn.txt](../../source/routing/asn.txt) | ASN для получения всех анонсов |
+| [exclude.txt](../../source/routing/exclude.txt) | ASN, исключённые из direct |
+| [asn-report-full.md](../../source/routing/asn-report-full.md) | Полный общий отчёт: ASN, подсети, домены |
 
-**Wildberries:**
-wildberries.ru, wbbasket.ru, wbpay.ru, wbstatic.ru, geobasket.ru, wibes.ru, wildberries.by  
+`generated/` — собранные правила IP и domains. Не редактировать вручную.
+`state/` — данные для объединения результатов и сохранения DNS-наблюдений.
+`config/manual.txt` — специальные ручные разрешения, включая разрешённые Amazon /24.
+`scripts/` — генератор, фильтры, сборщик конфигурации и публикация.
 
-**Т-Банк / Тинькофф :**
-tbank.ru, tinkoff.ru, tinkoff-app.ru, cdn-tinkoff.ru, t-static.ru, tcsgroup.io, diginetica.net, tinsurance.ru, tmiaf.ru, dolyame.ru, t-tech.team  
+В ip.txt одна CIDR на строку; пустые строки и комментарии `#` допустимы.
+Update перечитывает списки, собирает routing-ru.json и передаёт опубликованный коммит в тест Xray.
+Доменные правила в итоговом routing-ru.json остаются закомментированными.
 
-**Госуслуги / Госорганы:**
-gosuslugi.ru, gu-st.ru, rt.ru, gov.ru, government.ru, kremlin.ru, mos.ru, mosreg.ru, cikrf.ru, izbirkom.ru, госуслуги.рф, выборы.рф, Президент.рф (xn-- домены)  
+Целиком покрытые наблюдениями сервисов CIDR переносятся из ip.txt в их исходные группы.
+Частично покрытый ручной блок не разрезается. Итоговый IP.json объединяется глобально;
+при выборе группы хранения приоритет у сервиса. Точная принадлежность — в state/sources.json.
 
-**Яндекс:**
-yandex.ru, yandex.com, yandex.net, yastatic.net, ya.ru, kinopoisk.ru, dzen.ru, dzeninfra.ru, auto.ru  
+`config/prefix-limits.txt` задаёт ограничение IPv4 по ASN: `AS24940 /24`.
+Для Hetzner сохраняются только /24 с IP из сохранённых DNS/BGP-наблюдений
+или текущего сканирования. Широкие сети без наблюдений не включаются в direct;
+они перечисляются в `prefix_limits_without_dns` отчёта о полноте сбора.
+Уже более узкие маски и IPv6 не расширяются. Соседние ограниченные /24
+не склеиваются обратно в /23. Настройка действует при обычном Update и full refresh.
+Домены Hetzner сохраняются; Apple и Facebook/Meta исключаются по ASN через exclude.txt.
 
-**Банки:**
-vtb.ru, alfabank.ru, alfadirect.ru  
+Ручная основа доменного вывода хранится в `domains.txt`: секция `#### main`
+с общими keyword/domain, затем остальные группы с `#### ruleTag`.
+По одной записи `full:`, `domain:` или `keyword:` на строку; комментарии `#` допустимы.
+Итоговый `generated/domains.json` объединяет эту основу с наблюдениями и удаляет
+покрытые записи и пустые группы, сохраняя теги оставшихся правил.
+Все доменные правила в routing-ru.json остаются закомментированными.
+Редактируйте ручные обобщения в domains.txt: комментарии routing-файла пересоздаются сборщиком.
 
-**Финтех / Почта / ЖД / HH:**
-rzd.ru, pochta.ru, hh.ru, headhunter.ru, x5.ru, 5ka.ru, beru.ru, digitalaccess.ru  
+Также учитываются активные безусловные доменные правила `outboundTag: direct`
+из шаблона. Другие outbound и условия по IP/порту/inbound не используются
+для удаления общих записей. Автоматически новые обобщения не создаются.
+Известные ASN-исключённые имена не возвращаются через ручные правила:
+при исключённом поддомене общий domain сужается до full; полностью запрещённые
+правила и keyword, покрывающие запрещённое имя, не включаются в итоговый вывод.
+Исходные записи domains.txt при этом сохраняются для редактирования.
 
-**Медиа / Ритейл  / Разное:**
-rbc.ru, kp.ru, ntv.ru, ivi.ru, kion.ru, litres.ru, magnit.ru, megamarket.ru, mts.ru, mts.tv, okko.tv, ottplay.ru, perekrestok.ru, premier.one, pyaterochka.ru, res-nsdi.ru, rambler.ru, rutube.ru, t2.ru, tutu.ru, vseinstrumenty.ru, vi.ru, vkusvill.ru, wink.ru, wink.rt.ru, yappy.ru, zarplata.ru, f6.security, gpmd.ru  
-
-**Сбер:**
-sber.ru, sberbank.ru, sberpay.ru, 2gis.ru, 2gis.com, avito.ru, avito.st, platiqr.ru, multiqr.ru, sbdv.ru, mysbertips.ru, hh.ru, headhunter.ru  
-
-**Образование / Игры:**
-umschool.net, code-class.ru, summerstage.ru, my.games, cxhub.ru   
-
-**БКС (Брокер / Банк):**
-bcs-bank.ru, bcs-broker.ru, bcs.ru, be-broker.ru  
-
-**Block**
-
-- mradx.net
-- adriver.ru
-- luxcdn.com
+Полный список обнаруженных доменов хранится в `state/sources.json` → `domain_observations`.
+Он используется для точного кеша DNS и ежедневного full refresh независимо от сокращения.
+Если ручное общее правило удалено, публикация восстановит нужные конкретные правила из
+этого списка. Summary показывает опубликованные файлы, артефакт сканирования сохраняет наблюдения.

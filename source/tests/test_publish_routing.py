@@ -92,7 +92,8 @@ with tempfile.TemporaryDirectory() as directory:
                             module.REPORT_INPUTS, 'Report')
     report_commit = git(other, 'ls-remote', 'origin', 'refs/heads/test').split()[0]
     git(other, 'fetch', 'origin', 'test')
-    assert git(other, 'diff-tree', '--no-commit-id', '--name-only', '-r', report_commit) == module.REPORT
+    assert set(git(other, 'diff-tree', '--no-commit-id', '--name-only', '-r', report_commit).splitlines()) == {module.REPORT, module.REPORT_README}
+    assert git(other, 'show', f'{report_commit}:{module.REPORT_README}') == '# Current report'
     assert git(other, 'show', f'{report_commit}:{module.REPORT}') == '# Current report'
     git(other, 'reset', '--hard', report_commit)
     template = other / module.TEMPLATE
