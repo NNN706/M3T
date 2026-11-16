@@ -4,8 +4,11 @@
       "ruleTag": "2ip.io",
       "domain": [
         "domain:get-v6.2ip.io",
+        "domain:ident.mygaru.com",
+        "domain:image6.pubmatic.com",
         "domain:luxcdn.com",
-        "full:2ip.io"
+        "full:2ip.io",
+        "full:id5-sync.com"
       ]
     },
     {
@@ -79,6 +82,7 @@
         "domain:crm.elama-partner.ru",
         "domain:crm.lead-fixer.ru",
         "domain:crm.sigmatraffic.ru",
+        "domain:crm.tehdataportal.ru",
         "domain:datadrivenpromotion.com",
         "domain:deepcall.ru",
         "domain:digitaltarget.ru",
