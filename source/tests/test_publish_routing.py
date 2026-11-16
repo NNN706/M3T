@@ -166,7 +166,26 @@ with tempfile.TemporaryDirectory() as directory:
         {'ruleTag':'main','domain':['domain:vtb.ru','keyword:yandex']},observed['rules'][1]]}
     assert git(other,'show',manual_result+':source/routing/domains.txt')==manual_domains.read_text().strip()
 
-    try:module.publish(repo,payload,changed,branch='main')
+    try:module.publish(repo,payload,changed,branch='unsupported')
     except ValueError:pass
-    else:raise AssertionError('main publication enabled')
+    else:raise AssertionError('unsupported branch publication enabled')
 print('PASS latest-parent publication, concurrent edit retained, unchanged no-op, newer lists retained and newer output protected, worktree cleaned')
+
+# Publish to main without changing test; both routing output and reports use the selected branch.
+with tempfile.TemporaryDirectory() as directory:
+    root=Path(directory); remote=root/'remote.git'; repo=root/'repo'
+    git(root,'init','--bare',str(remote))
+    git(root,'clone',str(remote),str(repo))
+    git(repo,'config','user.name','Test');git(repo,'config','user.email','test@example.invalid')
+    git(repo,'checkout','-b','main')
+    (repo/'seed').write_text('initial')
+    git(repo,'add','.');git(repo,'commit','-m','Initial');git(repo,'push','origin','main')
+    base=git(repo,'rev-parse','HEAD');git(repo,'push','origin','HEAD:refs/heads/test')
+    payload=root/'IP.json';payload.write_text('{"rules":[]}')
+    result=module.publish(repo,payload,base,branch='main')
+    assert git(repo,'ls-remote','origin','refs/heads/main').split()[0]==result
+    assert git(repo,'ls-remote','origin','refs/heads/test').split()[0]==base
+    report=module.publish_payloads(repo,result,{module.REPORT:b'# Report\n'},module.REPORT_INPUTS,'Report',branch='main')
+    assert git(repo,'ls-remote','origin','refs/heads/main').split()[0]==report
+    assert git(repo,'ls-remote','origin','refs/heads/test').split()[0]==base
+print('PASS main routing/report publication isolated from test')

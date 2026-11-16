@@ -46,7 +46,7 @@ jobs:
           python3 test/curl_diagnostics.py
   deploy-and-browse:
     needs: validate
-    if: github.ref == 'refs/heads/test'
+    if: github.ref == 'refs/heads/test' || github.ref == 'refs/heads/main'
     runs-on: [self-hosted, Linux, X64]
     timeout-minutes: 30
     steps:

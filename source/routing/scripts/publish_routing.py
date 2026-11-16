@@ -1,4 +1,4 @@
-"""Publish routing output on the latest test branch without overwriting newer inputs."""
+"""Publish routing output on the selected branch without overwriting newer inputs."""
 import argparse
 import os
 from pathlib import Path
@@ -21,8 +21,8 @@ def git(repo, *args, check=True):
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=check)
 
 def publish(repo, output, base, branch='test', domains=None, sources=None, *, build_routing=False, manual_ips=None):
-    if branch != 'test':
-        raise ValueError('Only test publication is enabled')
+    if branch not in ('main', 'test'):
+        raise ValueError('Only main and test publication is enabled')
     payloads = {OUTPUT:output.read_bytes()}
     if domains is not None:
         payloads['source/routing/generated/domains.json'] = domains.read_bytes()
@@ -33,14 +33,16 @@ def publish(repo, output, base, branch='test', domains=None, sources=None, *, bu
     if build_routing and domains is None:
         raise ValueError('Сборка routing-ru.json требует domains.json')
     return publish_payloads(repo, base, payloads, INPUTS, 'Update service routing prefixes',
-                            build_routing=build_routing)
+                            build_routing=build_routing, branch=branch)
 
 
-def publish_payloads(repo, base, payloads, inputs, message, *, build_routing=False):
+def publish_payloads(repo, base, payloads, inputs, message, *, build_routing=False, branch='test'):
+    if branch not in ('main', 'test'):
+        raise ValueError('Only main and test publication is enabled')
     if REPORT in payloads:
         payloads = {**payloads, REPORT_README: payloads[REPORT]}
     for attempt in range(3):
-        git(repo, 'fetch', 'origin', 'refs/heads/test')
+        git(repo, 'fetch', 'origin', f'refs/heads/{branch}')
         head = git(repo, 'rev-parse', 'FETCH_HEAD').stdout.strip()
         guarded = git(repo, 'diff', '--name-only', base, head, '--', *inputs).stdout.splitlines()
         if guarded:
@@ -80,19 +82,19 @@ def publish_payloads(repo, base, payloads, inputs, message, *, build_routing=Fal
                 git(worktree, '-c', 'user.name=github-actions[bot]',
                     '-c', 'user.email=41898282+github-actions[bot]@users.noreply.github.com',
                     'commit', '-m', message)
-                pushed = git(worktree, 'push', 'origin', 'HEAD:refs/heads/test', check=False)
+                pushed = git(worktree, 'push', 'origin', f'HEAD:refs/heads/{branch}', check=False)
                 if pushed.returncode == 0:
-                    print('Published to test: ' + ', '.join(payloads))
+                    print(f'Published to {branch}: ' + ', '.join(payloads))
                     return git(worktree, 'rev-parse', 'HEAD').stdout.strip()
                 # Retry only when the remote branch advanced; authentication and policy errors remain failures.
-                git(repo, 'fetch', 'origin', 'refs/heads/test')
+                git(repo, 'fetch', 'origin', f'refs/heads/{branch}')
                 newest = git(repo, 'rev-parse', 'FETCH_HEAD').stdout.strip()
                 if newest == head:
                     raise RuntimeError('GitHub rejected publication: ' + pushed.stderr.strip())
-                print('test advanced during publication; retrying on its latest commit.')
+                print(f'{branch} advanced during publication; retrying on its latest commit.')
             finally:
                 git(repo, 'worktree', 'remove', '--force', str(worktree))
-    raise RuntimeError('test kept changing during publication; output retained in artifacts.')
+    raise RuntimeError(f'{branch} kept changing during publication; output retained in artifacts.')
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -105,6 +107,7 @@ def main():
     parser.add_argument('--manual-ips', type=Path)
     parser.add_argument('--domains', type=Path)
     parser.add_argument('--base', required=True)
+    parser.add_argument('--branch', choices=('main', 'test'), default='test')
     parser.add_argument('--build-routing', action='store_true')
     args = parser.parse_args()
     if args.provenance and not args.report:
@@ -118,10 +121,10 @@ def main():
         if args.provenance:
             payloads[PROVENANCE] = args.provenance.read_bytes()
         published = publish_payloads(args.repo.resolve(), args.base, payloads,
-                         REPORT_INPUTS, 'Update overall routing ASN report')
+                         REPORT_INPUTS, 'Update overall routing ASN report', branch=args.branch)
     else:
         published = publish(args.repo.resolve(), args.output, args.base, domains=args.domains,
-                            sources=args.sources, build_routing=args.build_routing, manual_ips=args.manual_ips)
+                            sources=args.sources, build_routing=args.build_routing, manual_ips=args.manual_ips, branch=args.branch)
     if os.environ.get('GITHUB_OUTPUT'):
         with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
             output.write(f'published_sha={published}\n')
