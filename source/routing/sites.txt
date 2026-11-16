@@ -112,3 +112,10 @@ ws-api.oneme.ru
 id.tbank.ru
 goya.rutube.ru
 speller.yandex.net
+analytics.vk.ru
+target.vk.ru
+r.vk.ru
+login.vk.ru
+st-ok.cdn-vk.ru
+cloud.vk.ru
+ord.vk.ru
