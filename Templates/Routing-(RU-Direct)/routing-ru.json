@@ -135,6 +135,27 @@
         "outboundTag": "proxy"
       },
       {
+        "ruleTag": "1l-s2s.mail.ru",
+        "ip": [
+          "87.240.128.0/18",
+          "88.212.192.0/20",
+          "90.156.192.0/18",
+          "93.186.224.0/20",
+          "95.163.0.0/16",
+          "95.213.0.0/16",
+          "195.234.80.0/24"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "ruleTag": "2gis.ru",
+        "ip": [
+          "91.236.48.0/22",
+          "95.129.232.0/21"
+        ],
+        "outboundTag": "direct"
+      },
+      {
         "ruleTag": "2ip.io",
         "ip": [
           "5.178.80.0/21",
@@ -158,6 +179,13 @@
           "185.154.124.0/24",
           "217.12.96.0/20",
           "2a00:4c00:3::/48"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "ruleTag": "AS196747",
+        "ip": [
+          "109.207.0.0/20"
         ],
         "outboundTag": "direct"
       },
@@ -270,6 +298,7 @@
         "ip": [
           "31.77.71.0/24",
           "37.235.241.0/24",
+          "48.103.149.0/24",
           "78.17.98.0/24",
           "78.17.181.0/24",
           "80.71.224.0/24",
@@ -386,12 +415,10 @@
           "89.221.228.0/22",
           "89.221.232.0/21",
           "90.156.148.0/22",
-          "90.156.192.0/18",
           "91.219.224.0/22",
           "91.231.132.0/22",
           "94.100.176.0/20",
           "94.139.240.0/20",
-          "95.163.0.0/16",
           "109.120.180.0/22",
           "109.120.188.0/22",
           "128.140.168.0/21",
@@ -462,7 +489,6 @@
           "45.155.60.0/24",
           "91.192.92.0/24",
           "91.215.40.0/22",
-          "95.129.232.0/21",
           "153.80.233.0/24",
           "176.57.64.0/22",
           "185.9.185.0/24",
@@ -517,9 +543,23 @@
         "outboundTag": "direct"
       },
       {
+        "ruleTag": "ams2-cdn.2gis.com",
+        "ip": [
+          "178.176.0.0/14"
+        ],
+        "outboundTag": "direct"
+      },
+      {
         "ruleTag": "async-online4.vtb.ru",
         "ip": [
           "185.179.144.0/22"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "ruleTag": "auto.mail.ru",
+        "ip": [
+          "185.32.248.0/22"
         ],
         "outboundTag": "direct"
       },
@@ -540,8 +580,6 @@
         "ruleTag": "beget.com",
         "ip": [
           "5.101.152.0/21",
-          "87.240.128.0/18",
-          "93.186.224.0/20",
           "193.168.46.0/23"
         ],
         "outboundTag": "direct"
@@ -559,7 +597,6 @@
           "37.48.64.0/18",
           "38.91.100.0/23",
           "88.99.125.0/24",
-          "95.213.0.0/16",
           "104.238.220.0/24",
           "151.236.64.0/18",
           "173.234.14.0/23",
@@ -657,7 +694,6 @@
           "131.153.52.0/22",
           "131.222.134.0/23",
           "135.106.192.0/18",
-          "139.45.224.0/19",
           "141.101.248.0/24",
           "145.79.24.0/21",
           "145.223.120.0/21",
@@ -730,14 +766,6 @@
         "outboundTag": "direct"
       },
       {
-        "ruleTag": "cloud.vk.com",
-        "ip": [
-          "178.176.128.0/24",
-          "185.32.248.0/22"
-        ],
-        "outboundTag": "direct"
-      },
-      {
         "ruleTag": "contell.ru",
         "ip": [
           "185.154.20.0/22",
@@ -761,23 +789,12 @@
       {
         "ruleTag": "ddos-guard.net",
         "ip": [
-          "77.75.144.0/21",
-          "80.77.164.0/24",
+          "62.152.40.0/21",
           "81.88.80.0/22",
-          "82.102.128.0/18",
-          "87.245.216.0/21",
-          "89.212.128.0/18",
-          "95.180.0.0/17",
-          "118.68.0.0/14",
-          "157.157.0.0/16",
+          "85.132.112.0/24",
           "185.5.160.0/22",
           "186.2.163.0/24",
-          "190.115.16.0/24",
-          "195.174.0.0/15",
-          "210.210.128.0/18",
-          "212.95.160.0/19",
-          "212.199.0.0/16",
-          "213.155.128.0/19"
+          "190.115.16.0/24"
         ],
         "outboundTag": "direct"
       },
@@ -789,9 +806,15 @@
         "outboundTag": "direct"
       },
       {
+        "ruleTag": "dom.gosuslugi.ru",
+        "ip": [
+          "217.107.64.0/18"
+        ],
+        "outboundTag": "direct"
+      },
+      {
         "ruleTag": "esia.gosuslugi.ru",
         "ip": [
-          "109.207.0.0/20",
           "213.59.192.0/18"
         ],
         "outboundTag": "direct"
@@ -806,8 +829,15 @@
       {
         "ruleTag": "fornex.com",
         "ip": [
-          "2.58.65.0/24",
+          "2.58.64.0/23",
           "31.172.64.0/24"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "ruleTag": "goya.rutube.ru",
+        "ip": [
+          "77.220.220.0/23"
         ],
         "outboundTag": "direct"
       },
@@ -824,18 +854,32 @@
         "outboundTag": "direct"
       },
       {
-        "ruleTag": "ipinfo.io",
+        "ruleTag": "kinopoisk.ru",
         "ip": [
-          "81.218.0.0/16",
-          "87.245.192.0/20",
-          "194.44.0.0/17",
-          "194.44.128.0/18",
-          "194.44.192.0/19",
-          "194.44.224.0/21",
-          "194.44.232.0/23",
-          "194.44.234.0/24",
-          "194.44.236.0/22",
-          "194.44.240.0/20"
+          "2.58.66.0/24",
+          "80.78.249.0/24",
+          "81.163.16.0/20",
+          "82.145.213.0/24",
+          "84.38.176.0/20",
+          "87.242.88.0/21",
+          "103.75.125.0/24",
+          "103.75.127.0/24",
+          "110.238.80.0/20",
+          "111.91.0.0/20",
+          "135.106.128.0/22",
+          "148.153.84.0/23",
+          "185.62.200.0/22",
+          "185.133.42.0/24",
+          "188.42.104.0/24",
+          "193.169.128.0/24",
+          "194.67.64.0/20"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "ruleTag": "kz.mcs.mail.ru",
+        "ip": [
+          "176.123.176.0/22"
         ],
         "outboundTag": "direct"
       },
@@ -894,7 +938,6 @@
           "81.177.122.0/24",
           "81.195.169.0/24",
           "81.200.126.0/23",
-          "84.38.188.0/23",
           "84.201.128.0/18",
           "85.118.181.0/24",
           "85.143.101.0/24",
@@ -926,7 +969,6 @@
           "91.232.12.0/22",
           "91.232.93.0/24",
           "91.235.26.0/24",
-          "91.236.48.0/22",
           "92.246.149.0/24",
           "92.255.0.0/17",
           "93.77.160.0/19",
@@ -966,7 +1008,6 @@
           "185.22.180.0/22",
           "185.32.187.0/24",
           "185.38.87.0/24",
-          "185.62.200.0/22",
           "185.72.228.0/22",
           "185.99.9.0/24",
           "185.121.243.0/24",
@@ -1030,7 +1071,6 @@
           "200.169.178.0/24",
           "203.0.113.0/24",
           "212.109.214.0/23",
-          "212.164.136.0/21",
           "212.176.213.0/24",
           "212.233.80.0/22",
           "213.130.80.0/21",
@@ -1038,7 +1078,6 @@
           "213.184.152.0/21",
           "213.208.168.0/23",
           "213.221.41.0/24",
-          "213.248.64.0/18",
           "216.152.144.0/24",
           "217.21.61.0/24",
           "217.23.148.0/24",
@@ -1083,7 +1122,6 @@
       {
         "ruleTag": "lk.megafon.ru",
         "ip": [
-          "178.177.0.0/18",
           "188.162.0.0/16"
         ],
         "outboundTag": "direct"
@@ -1091,7 +1129,6 @@
       {
         "ruleTag": "mail.ru",
         "ip": [
-          "88.212.192.0/20",
           "141.8.128.0/18"
         ],
         "outboundTag": "direct"
@@ -1125,16 +1162,12 @@
           "23.111.96.0/24",
           "23.111.203.0/24",
           "23.111.217.0/24",
-          "81.163.16.0/20",
           "83.222.4.0/23",
           "83.222.12.0/22",
-          "87.242.88.0/21",
           "88.212.240.0/24",
           "91.192.80.0/24",
           "91.216.195.0/24",
-          "135.106.128.0/22",
           "147.45.109.0/24",
-          "185.133.42.0/24",
           "185.149.240.0/22",
           "188.93.52.0/22",
           "194.85.16.0/24",
@@ -1175,8 +1208,7 @@
         "ruleTag": "reg.ru",
         "ip": [
           "82.147.67.0/24",
-          "194.58.116.0/24",
-          "194.67.64.0/20"
+          "194.58.116.0/24"
         ],
         "outboundTag": "direct"
       },
@@ -1205,6 +1237,27 @@
           "213.178.155.0/24",
           "213.226.112.0/24",
           "213.226.114.0/24"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "ruleTag": "rzd.ru",
+        "ip": [
+          "212.164.0.0/16"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "ruleTag": "sc.gosuslugi.ru",
+        "ip": [
+          "85.143.124.0/22"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "ruleTag": "search.gosuslugi.ru",
+        "ip": [
+          "85.143.160.0/21"
         ],
         "outboundTag": "direct"
       },
@@ -1290,6 +1343,20 @@
         ],
         "outboundTag": "direct"
       },
+      {
+        "ruleTag": "warface.mail.ru",
+        "ip": [
+          "195.211.128.0/22"
+        ],
+        "outboundTag": "direct"
+      },
+      // {
+      //   "ruleTag": "2gis.ru",
+      //   "domain": [
+      //     "domain:2gis.ru"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
       // {
       //   "ruleTag": "2ip.io",
       //   "domain": [
@@ -1310,6 +1377,13 @@
       //   "ruleTag": "alfabank.ru",
       //   "domain": [
       //     "domain:alfabank.ru"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
+      //   "ruleTag": "ams2-cdn.2gis.com",
+      //   "domain": [
+      //     "domain:ams2-cdn.2gis.com"
       //   ],
       //   "outboundTag": "direct"
       // },
@@ -1372,6 +1446,7 @@
       //     "domain:const.uno",
       //     "domain:criteo.com",
       //     "domain:crm.elama-partner.ru",
+      //     "domain:crm.lead-fixer.ru",
       //     "domain:crm.sigmatraffic.ru",
       //     "domain:datadrivenpromotion.com",
       //     "domain:deepcall.ru",
@@ -1400,7 +1475,6 @@
       //     "domain:nrich.ai",
       //     "domain:ohmy.bid",
       //     "domain:opendsp.ru",
-      //     "domain:otclick-adv.ru",
       //     "domain:otm-r.com",
       //     "domain:prodmp.ru",
       //     "domain:programmatica.com",
@@ -1429,7 +1503,8 @@
       //     "domain:videohead.tech",
       //     "domain:videonow.ru",
       //     "domain:viva-lead.ru",
-      //     "domain:voxexchange.io"
+      //     "domain:voxexchange.io",
+      //     "domain:xdeep.space"
       //   ],
       //   "outboundTag": "direct"
       // },
@@ -1450,6 +1525,14 @@
       //     "domain:contell.ru",
       //     "domain:me-talk.ru",
       //     "domain:verbox.ru"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
+      //   "ruleTag": "corp.mail.ru",
+      //   "domain": [
+      //     "domain:corp.vkcdn.ru",
+      //     "domain:vk.company"
       //   ],
       //   "outboundTag": "direct"
       // },
@@ -1505,6 +1588,20 @@
       //   "outboundTag": "direct"
       // },
       // {
+      //   "ruleTag": "government.ru",
+      //   "domain": [
+      //     "domain:government.ru"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
+      //   "ruleTag": "goya.rutube.ru",
+      //   "domain": [
+      //     "domain:goya.rutube.ru"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
       //   "ruleTag": "ihc.ru",
       //   "domain": [
       //     "domain:ihc.ru",
@@ -1517,6 +1614,42 @@
       //   "ruleTag": "ipinfo.io",
       //   "domain": [
       //     "full:typekit.net"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
+      //   "ruleTag": "kinopoisk.ru",
+      //   "domain": [
+      //     "domain:ads-media.wildberries.ru",
+      //     "domain:banners.adfox.ru",
+      //     "domain:cs.ifedata.ru",
+      //     "domain:dsp.mpartner.digital",
+      //     "domain:events.myweb3id.io",
+      //     "domain:kinopoisk.ru",
+      //     "domain:match.targetrtb.com",
+      //     "domain:mitdmp.whiteboxdigital.ru",
+      //     "domain:rtb-eu-warsaw.intent.ai",
+      //     "domain:sync.gonet-ads.com",
+      //     "domain:t.adx.opera.com",
+      //     "domain:t.rtbwave.com",
+      //     "domain:tracker.smartcallback.ru",
+      //     "domain:tt.ttarget.ru"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
+      //   "ruleTag": "kremlin.ru",
+      //   "domain": [
+      //     "domain:kremlin.ru"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
+      //   "ruleTag": "kz.mcs.mail.ru",
+      //   "domain": [
+      //     "domain:cdn.vkcloud-static.kz",
+      //     "domain:kz.cloud.vk.kz",
+      //     "domain:prod-kz.vkcloud-static.kz"
       //   ],
       //   "outboundTag": "direct"
       // },
@@ -1640,6 +1773,13 @@
       //   "outboundTag": "direct"
       // },
       // {
+      //   "ruleTag": "rzd.ru",
+      //   "domain": [
+      //     "domain:rzd.ru"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
       //   "ruleTag": "selectel.ru",
       //   "domain": [
       //     "domain:selcdn.net"
@@ -1698,6 +1838,20 @@
       //   "ruleTag": "vkusnoitochka.ru",
       //   "domain": [
       //     "domain:qsrapp.ru"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
+      //   "ruleTag": "ws-api.oneme.ru",
+      //   "domain": [
+      //     "domain:ws-api.oneme.ru"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
+      //   "ruleTag": "ya.ru",
+      //   "domain": [
+      //     "domain:ya.ru"
       //   ],
       //   "outboundTag": "direct"
       // }
