@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory() as directory:
         assert 'exclude:2' in str(error), error
     else:
         raise AssertionError('Invalid ASN was accepted')
-    policy = ExclusionPolicy(origins, ['192.0.2.128/25', '203.0.113.0/24', '2001:db8:1::/48'])
+    policy = ExclusionPolicy(origins, ['11.0.2.128/25', '13.0.113.0/24', '2001:db8:1::/48'])
     scanner = root / 'SubnetResolve.sh'
     index = tmp / 'index.json'
     write_json(index, policy.ipv4_index())
@@ -35,10 +35,10 @@ with tempfile.TemporaryDirectory() as directory:
     module = ast.parse(Path(__file__).with_name('test_pipeline.py').read_text())
     mock = next(ast.literal_eval(node.value) for node in module.body if isinstance(node, ast.Assign)
                 and any(isinstance(target, ast.Name) and target.id == 'MOCK' for target in node.targets))
-    mock = mock.replace("  if mode=='result'", """  if host=='cloud.example':print(json.dumps({'n':[{'A':['192.0.2.128','192.0.2.255']}]}));sys.exit(0)
-  if host=='mixed.example':print(json.dumps({'n':[{'A':['192.0.2.127','192.0.2.128','198.51.100.1','203.0.113.1']}]}));sys.exit(0)
+    mock = mock.replace("  if mode=='result'", """  if host=='cloud.example':print(json.dumps({'n':[{'A':['11.0.2.128','11.0.2.255']}]}));sys.exit(0)
+  if host=='mixed.example':print(json.dumps({'n':[{'A':['11.0.2.127','11.0.2.128','12.51.100.1','13.0.113.1']}]}));sys.exit(0)
   if mode=='result'""")
-    mock = mock.replace("  if mode=='bgp' and ip", """  if mode=='incomplete' and ip=='198.51.100.1':continue
+    mock = mock.replace("  if mode=='bgp' and ip", """  if mode=='incomplete' and ip=='12.51.100.1':continue
   if mode=='bgp' and ip""")
     mock = mock.replace("print('13335 | '+ip", "print('1 | '+ip")
     bin_dir = tmp / 'bin'
@@ -64,32 +64,32 @@ with tempfile.TemporaryDirectory() as directory:
     proc, events = scan('cloud.example')
     only = json.loads(proc.stdout)
     assert proc.returncode == 0 and only['complete'] and not only['results'], proc.stderr
-    assert only['excluded_ips'] == ['192.0.2.128', '192.0.2.255']
+    assert only['excluded_ips'] == ['11.0.2.128', '11.0.2.255']
     assert not any(phase.startswith('bgp') or phase == 'bulk' for phase, _ in events), events
 
     proc, events = scan('cloud.example', 'mixed.example')
     assert proc.returncode == 0, proc.stderr
     rows = json.loads(proc.stdout)
     mixed = rows['domains'][1]
-    assert mixed['excluded_ips'] == ['192.0.2.128', '203.0.113.1'] and mixed['complete'], mixed
-    assert [ip for phase, ip in events if phase == 'bulk'] == [['192.0.2.127', '198.51.100.1']], events
+    assert mixed['excluded_ips'] == ['11.0.2.128', '13.0.113.1'] and mixed['complete'], mixed
+    assert [ip for phase, ip in events if phase == 'bulk'] == [['11.0.2.127', '12.51.100.1']], events
     assert ['bgp-health', ['1.1.1.1']] not in events
     assert next(i for i, event in enumerate(events) if event[0] == 'bgp-health') > max(
         i for i, event in enumerate(events) if event[0] == 'result')
 
     proc, _ = scan('mixed.example', mode='incomplete')
-    assert proc.returncode == 3 and json.loads(proc.stdout)['excluded_ips'] == ['192.0.2.128', '203.0.113.1'], proc.stderr
+    assert proc.returncode == 3 and json.loads(proc.stdout)['excluded_ips'] == ['11.0.2.128', '13.0.113.1'], proc.stderr
     checkpoint, = (tmp / 'cache' / 'SubnetResolve').glob('bgp-resume.*')
     proc, events = scan('--resume-bgp', str(checkpoint), policy_enabled=False)
     assert proc.returncode == 0, proc.stderr
-    assert [ips for phase, ips in events if phase == 'bulk'] == [['198.51.100.1']], events
+    assert [ips for phase, ips in events if phase == 'bulk'] == [['12.51.100.1']], events
 
     args = argparse.Namespace(scanner=scanner, verbose=False, allow_partial=False,
                               domains_output=tmp / 'domains.json', sources_output=tmp / 'sources.json',
                               output=tmp / 'IP.json', evidence=tmp / 'evidence')
     write_json(args.sources_output, {'rules': [
-        {'ruleTag': 'AS13335', 'ip': ['203.0.113.0/24']},
-        {'ruleTag': 'legacy', 'ip': ['192.0.2.0/24', '2001:db8::/47']},
+        {'ruleTag': 'AS13335', 'ip': ['13.0.113.0/24']},
+        {'ruleTag': 'legacy', 'ip': ['11.0.2.0/24', '2001:db8::/47']},
     ]})
     write_json(args.domains_output, {'rules': [
         {'ruleTag': 'other.example', 'domain': ['domain:ipv6.other.example', 'domain:other.example']},
@@ -114,7 +114,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert sources['excluded_asns'] == sorted(policy.asns)
     assert sources['excluded_domains'] == ['cloud.example', 'ipv6.other.example', 'mixed.example']
     assert {r['ruleTag']:r['ip'] for r in sources['rules']} == {
-        'cloud.example': ['192.0.2.0/25', '198.51.100.0/24'],
+        'cloud.example': ['11.0.2.0/25', '12.51.100.0/24'],
         'legacy': ['2001:db8::/48'],
     }
     stats = json.loads((args.evidence / 'completeness.json').read_text())
@@ -146,7 +146,7 @@ with tempfile.TemporaryDirectory() as directory:
         path.write_bytes(content)
     args.output.unlink()
     args.evidence = tmp / 'changed-policy'
-    changed = ExclusionPolicy(origins, ['192.0.2.128/25', '203.0.113.0/24', '2001:db8::/47'])
+    changed = ExclusionPolicy(origins, ['11.0.2.128/25', '13.0.113.0/24', '2001:db8::/47'])
     with patch('update_routing.subprocess.run') as run, patch('exclusion_policy.lookup_addresses', return_value=set()):
         incremental_update(args, entries, explicit, lambda *_: ([], [], ''), changed)
         run.assert_not_called()
@@ -215,7 +215,7 @@ with tempfile.TemporaryDirectory() as directory:
     manual['rules'] = manual['rules'][1:]
     write_json(args.manual_rules, manual)
     args.manual_ips = tmp / 'ip.txt'
-    args.manual_ips.write_text('# Imported CIDRs\n192.0.2.0/25\n192.0.2.128/25 # sibling\n52.48.0.0/14\n')
+    args.manual_ips.write_text('# Imported CIDRs\n11.0.2.0/25\n11.0.2.128/25 # sibling\n52.48.0.0/14\n')
     def run_manual_ips():
         with patch('update_routing.subprocess.run', side_effect=[
             subprocess.CompletedProcess([], 0, json.dumps(discovery)),
@@ -224,12 +224,12 @@ with tempfile.TemporaryDirectory() as directory:
             incremental_update(args, entries, set(), lambda *_: ([], [], ''), policy)
     run_manual_ips()
     assert json.loads(args.output.read_bytes())['rules'] == [
-        {'ruleTag': 'legacy', 'ip': ['192.0.2.0/24']}, *manual['rules']]
+        {'ruleTag': 'legacy', 'ip': ['11.0.2.0/24']}, *manual['rules']]
     args.manual_ips.write_text('')
     run_manual_ips()
     assert json.loads(args.output.read_bytes()) == manual
     previous = args.output.read_bytes()
-    args.manual_ips.write_text('192.0.2.1/24')
+    args.manual_ips.write_text('11.0.2.1/24')
     try:
         run_manual_ips()
     except ValueError as error:

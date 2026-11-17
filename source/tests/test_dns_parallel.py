@@ -43,7 +43,7 @@ mock = mock.replace("  if mode=='result' and", """  if mode=='parallel':
 
 with tempfile.TemporaryDirectory() as directory:
     tmp = Path(directory)
-    for name in ('curl', 'nc'):
+    for name in ('curl', 'nc', 'dig'):
         path = tmp / name
         path.write_text(mock)
         path.chmod(0o755)

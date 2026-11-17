@@ -116,6 +116,7 @@ jobs:
           python3 source/tests/test_global_routing.py
           python3 source/tests/test_json_routing.py
           python3 source/tests/test_asn_routes.py
+          python3 source/tests/test_dns_fallback.py
           python3 source/tests/test_exclusion_routing.py
           python3 source/tests/test_incremental_routing.py
           python3 source/tests/test_publish_routing.py
