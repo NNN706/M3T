@@ -1,4 +1,5 @@
 """Scan services and atomically write deduplicated Xray rule fragments (Python stdlib)."""
+from service_tags import group_rules
 import argparse
 from bisect import bisect_right
 from collections import Counter
@@ -162,7 +163,7 @@ def global_rules(data):
     ordered = sorted(output, key=lambda n:(n.version,int(n.network_address)))
     if any(a.version==b.version and int(a.broadcast_address)>=int(b.network_address) for a,b in zip(ordered,ordered[1:])):
         raise ValueError('Duplicate or overlapping output prefixes')
-    return result
+    return group_rules(result, "ip")
 
 
 def domain_rules(data, expected, *, include_seed=True, allow_keywords=False):
@@ -305,6 +306,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
                                           for network in exclusion.ranges[family]]]
         manifest['exclusion_policy'] = sha256(json.dumps(policy).encode()).hexdigest()
     implementation = routing_fingerprint({
+        'service_tags': Path(__file__).with_name('service_tags.py'),
+        'public_suffix_list': Path(__file__).parent.parent / 'config/public_suffix_list.dat',
         'generator': Path(__file__), 'asn_routes': Path(__file__).with_name('asn_routes.py'),
         'exclusion_policy': Path(__file__).with_name('exclusion_policy.py'),
         'prefix_limits': Path(__file__).with_name('prefix_limits.py'),
@@ -597,7 +600,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     if not complete and not args.allow_partial:
         raise RuntimeError('Инкрементальный сбор неполный. Подробности в журнале.')
     write_json(args.output, result)
-    write_json(args.domains_output, domains)
+    write_json(args.domains_output, group_rules(domains, "domain"))
     write_json(args.sources_output, sources)
     if manual_ips is not None:
         if limits is not None:
@@ -762,7 +765,7 @@ def main():
         print('WARNING: неполный сбор; сохранены доступные и прежние подсети. Подробности в артефактах запуска.', file=sys.stderr)
 
     write_json(args.output, result)
-    write_json(args.domains_output, domains)
+    write_json(args.domains_output, group_rules(domains, "domain"))
     write_json(args.sources_output, sources)
 
 

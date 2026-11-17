@@ -1,6 +1,12 @@
 {
   "rules": [
     {
+      "ruleTag": "2gis.com",
+      "domain": [
+        "domain:ams2-cdn.2gis.com"
+      ]
+    },
+    {
       "ruleTag": "2gis.ru",
       "domain": [
         "domain:2gis.ru"
@@ -24,12 +30,6 @@
       "ruleTag": "alfabank.ru",
       "domain": [
         "domain:alfabank.ru"
-      ]
-    },
-    {
-      "ruleTag": "ams2-cdn.2gis.com",
-      "domain": [
-        "domain:ams2-cdn.2gis.com"
       ]
     },
     {
@@ -149,28 +149,11 @@
       ]
     },
     {
-      "ruleTag": "cloud.vk.com",
-      "domain": [
-        "domain:apptracer.ru",
-        "domain:mrgcdn.ru",
-        "domain:vk.team",
-        "domain:vkcloud-static.ru",
-        "domain:vktech-static.ru"
-      ]
-    },
-    {
       "ruleTag": "contell.ru",
       "domain": [
         "domain:contell.ru",
         "domain:me-talk.ru",
         "domain:verbox.ru"
-      ]
-    },
-    {
-      "ruleTag": "corp.mail.ru",
-      "domain": [
-        "domain:corp.vkcdn.ru",
-        "domain:vk.company"
       ]
     },
     {
@@ -215,19 +198,16 @@
     {
       "ruleTag": "gov.ru",
       "domain": [
-        "domain:gov.ru"
+        "domain:gov.ru",
+        "domain:nalog.ru",
+        "domain:sputnik.ru",
+        "domain:vashkontrol.ru"
       ]
     },
     {
       "ruleTag": "government.ru",
       "domain": [
         "domain:government.ru"
-      ]
-    },
-    {
-      "ruleTag": "goya.rutube.ru",
-      "domain": [
-        "domain:goya.rutube.ru"
       ]
     },
     {
@@ -270,14 +250,6 @@
       ]
     },
     {
-      "ruleTag": "kz.mcs.mail.ru",
-      "domain": [
-        "domain:cdn.vkcloud-static.kz",
-        "domain:kz.cloud.vk.kz",
-        "domain:prod-kz.vkcloud-static.kz"
-      ]
-    },
-    {
       "ruleTag": "landvps.ru",
       "domain": [
         "domain:landvps.ru"
@@ -286,13 +258,18 @@
     {
       "ruleTag": "mail.ru",
       "domain": [
+        "domain:cdn.vkcloud-static.kz",
+        "domain:corp.vkcdn.ru",
         "domain:dzen.ru",
         "domain:dzeninfra.ru",
         "domain:imgsmail.ru",
+        "domain:kz.cloud.vk.kz",
         "domain:mail.ru",
         "domain:mradx.net",
         "domain:okcdn.ru",
+        "domain:prod-kz.vkcloud-static.kz",
         "domain:userapi.com",
+        "domain:vk.company",
         "domain:vkuserphoto.ru",
         "domain:vkvideo.ru",
         "domain:yadro.ru"
@@ -329,9 +306,23 @@
       ]
     },
     {
+      "ruleTag": "megafon.ru",
+      "domain": [
+        "domain:popmechanic.ru"
+      ]
+    },
+    {
       "ruleTag": "memstech.ru",
       "domain": [
         "domain:b2b-mems.ru"
+      ]
+    },
+    {
+      "ruleTag": "mts.ru",
+      "domain": [
+        "domain:hicloud.com",
+        "domain:mtscdn.ru",
+        "domain:serving-sys.ru"
       ]
     },
     {
@@ -361,17 +352,15 @@
       ]
     },
     {
-      "ruleTag": "nalog.gov.ru",
-      "domain": [
-        "domain:nalog.ru",
-        "domain:sputnik.ru",
-        "domain:vashkontrol.ru"
-      ]
-    },
-    {
       "ruleTag": "ok.ru",
       "domain": [
         "domain:cdn-vk.ru"
+      ]
+    },
+    {
+      "ruleTag": "oneme.ru",
+      "domain": [
+        "domain:ws-api.oneme.ru"
       ]
     },
     {
@@ -388,6 +377,12 @@
       ]
     },
     {
+      "ruleTag": "rutube.ru",
+      "domain": [
+        "domain:goya.rutube.ru"
+      ]
+    },
+    {
       "ruleTag": "rzd.ru",
       "domain": [
         "domain:rzd.ru"
@@ -397,20 +392,6 @@
       "ruleTag": "selectel.ru",
       "domain": [
         "domain:selcdn.net"
-      ]
-    },
-    {
-      "ruleTag": "spb.megafon.ru",
-      "domain": [
-        "domain:popmechanic.ru"
-      ]
-    },
-    {
-      "ruleTag": "spb.mts.ru",
-      "domain": [
-        "domain:hicloud.com",
-        "domain:mtscdn.ru",
-        "domain:serving-sys.ru"
       ]
     },
     {
@@ -438,20 +419,19 @@
     {
       "ruleTag": "vk.com",
       "domain": [
+        "domain:apptracer.ru",
+        "domain:mrgcdn.ru",
         "domain:tns-counter.ru",
-        "domain:vk-portal.net"
+        "domain:vk-portal.net",
+        "domain:vk.team",
+        "domain:vkcloud-static.ru",
+        "domain:vktech-static.ru"
       ]
     },
     {
       "ruleTag": "vkusnoitochka.ru",
       "domain": [
         "domain:qsrapp.ru"
-      ]
-    },
-    {
-      "ruleTag": "ws-api.oneme.ru",
-      "domain": [
-        "domain:ws-api.oneme.ru"
       ]
     },
     {
