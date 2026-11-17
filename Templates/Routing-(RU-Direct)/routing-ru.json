@@ -47,10 +47,10 @@
       },
       {
         "address": "https://common.dot.dns.yandex.net/dns-query",
-        "timeoutMs": 2000,
-        "disableFallbackIfMatch": true
+        "timeoutMs": 2000
       }
     ],
+    "disableFallbackIfMatch": true,
     "serveStale": true,
     "queryStrategy": "UseIPv4",
     "serveExpiredTTL": 43200,
