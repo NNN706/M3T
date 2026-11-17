@@ -54,7 +54,7 @@ if [ -n "$resume_bgp" ]; then parse=0; fi
 # Install only missing tools. Package-manager output must not contaminate JSON.
 ensure_dependencies() {
   local dependency manager package seen existing
-  local missing=() packages=() elevate=() required=(curl jq nc mktemp mkdir cat cp mv rm sleep wc tr date)
+  local missing=() packages=() elevate=() required=(curl jq nc dig mktemp mkdir cat cp mv rm sleep wc tr date)
   if [ "$parse" -eq 1 ]; then required+=(node npm); fi
   for dependency in "${required[@]}"; do
     if ! command -v "$dependency" >/dev/null 2>&1; then
@@ -87,6 +87,14 @@ ensure_dependencies() {
         if [ "$manager" = brew ]; then package=node
         elif [ "$dependency" = node ]; then package=nodejs
         else package=npm; fi ;;
+      dig)
+        case "$manager" in
+          apt-get) package=dnsutils ;;
+          dnf|yum) package=bind-utils ;;
+          pacman) package=bind ;;
+          apk) package=bind-tools ;;
+          brew) package=bind ;;
+        esac ;;
       nc)
         case "$manager" in
           apt-get|apk) package=netcat-openbsd ;;
@@ -456,8 +464,10 @@ get_json() { fetch_http object -H 'Accept: application/json' "$@"; }
 check_service() {
   local previous_stage=$stage previous_reason=${http_reason:-} previous_transport=${http_transport_failed:-0}
   stage='проверка доступности API Check-Host (3 узла)'
-  if ! fetch_http check -H 'Accept: application/json' -G --data-urlencode 'host=https://check-host.net' --data-urlencode 'max_nodes=3' https://check-host.net/check-dns > "${http_dir:-$batch}/service-check.json"; then
-    die 'API Check-Host недоступен. DNS-проверки доменов и запросы BGP.tools не запускаются.'
+  if ! fetch_http check -H 'Accept: application/json' -G --data-urlencode 'host=https://check-host.net' --data-urlencode 'max_nodes=3' ${dns_node_args[@]+"${dns_node_args[@]}"} https://check-host.net/check-dns > "${http_dir:-$batch}/service-check.json"; then
+    progress 'API Check-Host недоступен; DNS-проверки продолжатся через Яндекс DNS'
+    stage=$previous_stage
+    return 1
   fi
   stage=$previous_stage
   http_reason=$previous_reason; http_transport_failed=$previous_transport
@@ -805,7 +815,38 @@ if [ -n "$resume_bgp" ]; then
 fi
 filter_ipv4=0
 if [ -n "$ipv4_index" ] || jq -e '. != null' "$batch/excluded-ips.json" >/dev/null; then filter_ipv4=1; fi
-if [ -z "$resume_bgp" ]; then check_service; fi
+cat > "$batch/public-ipv4.jq" <<'JQ'
+def public_ipv4:
+  if type != "string" or (test("^([0-9]{1,3}\\.){3}[0-9]{1,3}$") | not) then false else
+    (split(".") | map(tonumber)) as $p |
+    if any($p[]; . > 255) then false else
+      (reduce $p[] as $v (0; . * 256 + $v)) as $ip |
+      [[0,8],[167772160,8],[1681915904,10],[2130706432,8],
+       [2851995648,16],[2886729728,12],[3221225472,24],[3221225984,24],
+       [3232235520,16],[3323068416,15],[3325256704,24],[3405803776,24],
+       [3758096384,3]] | all(.[]; pow(2;32-.[1]) as $size | ($ip / $size | floor) != (.[0] / $size | floor))
+    end
+  end;
+JQ
+dns_node_args=()
+check_host_available=1
+if [ -z "$resume_bgp" ]; then
+  stage='получение списка узлов Check-Host без Ирана'
+  if get_json https://check-host.net/nodes/hosts > "$batch/node-catalog.json" &&
+     jq -e '.nodes | type == "object" and length > 0 and all(.[]; (.location[0] | type == "string"))' "$batch/node-catalog.json" >/dev/null; then
+    while IFS= read -r selected_node; do
+      dns_node_args+=(--data-urlencode "node=$selected_node")
+    done < <(jq -r '.nodes | to_entries[] | select((.value.location[0]|ascii_downcase) != "ir") | .key' "$batch/node-catalog.json")
+    if [ "${#dns_node_args[@]}" -eq 0 ]; then
+      check_host_available=0
+      progress 'Нет доступных узлов Check-Host вне Ирана; используем Яндекс DNS'
+    fi
+  else
+    check_host_available=0
+    progress 'Не удалось получить список узлов Check-Host; используем Яндекс DNS'
+  fi
+  if [ "$check_host_available" -eq 1 ] && ! check_service; then check_host_available=0; fi
+fi
 if [ "$filter_ipv4" -eq 0 ]; then check_bgp_service; fi
 stage_name='Этап 3/4: DNS'
 if [ -n "$resume_bgp" ]; then
@@ -820,22 +861,65 @@ if [ -n "$resume_bgp" ]; then
     for field in check nodes observations; do
       jq --argjson i "$index" --arg field "$field" '.dns[$i][$field]' "$resume_bgp" > "$tmp/$field.json"
     done
+    jq --slurpfile c "$tmp/check.json" "$(cat "$batch/public-ipv4.jq")"' map(select(($c[0].nodes[.node][0] // "" | ascii_downcase) != "ir") | .ips |= map(select(public_ipv4)))' "$tmp/nodes.json" > "$tmp/nodes-next.json"
+    mv "$tmp/nodes-next.json" "$tmp/nodes.json"
+    jq '[.[] | .node as $node | .ips[] | {ip:.,node:$node}] | unique' "$tmp/nodes.json" > "$tmp/observations.json"
     observation_files+=("$tmp/observations.json")
     index=$((index + 1))
   done
 else
+yandex_dns_fallback() {
+  local domain=$1 tmp=$2 trigger=$3 resolver rc attempt
+  local fallback_node='yandex-dns'
+  progress "$domain — резервный DNS Яндекса: $trigger"
+  printf '[]\n' > "$tmp/fallback-ips.json"
+  for resolver in 77.88.8.8 77.88.8.1; do
+    rc=0
+    dig "@$resolver" "$domain." A +time=2 +tries=1 +noall +comments +answer > "$tmp/yandex-answer.txt" 2> "$tmp/yandex-error.txt" || rc=$?
+    if [ "$rc" -eq 0 ] && jq -Rse 'test("status: NOERROR,")' "$tmp/yandex-answer.txt" >/dev/null; then
+      jq -Rsc 'split("\n") | map(split(" ") | map(split("\t")[]) | map(select(length>0)) | select(length>=5 and .[3]=="A") | .[4]) | unique' "$tmp/yandex-answer.txt" > "$tmp/fallback-raw.json"
+      jq "$(cat "$batch/public-ipv4.jq") map(select(public_ipv4))" "$tmp/fallback-raw.json" > "$tmp/fallback-ips.json"
+      if jq -e 'length>0' "$tmp/fallback-ips.json" >/dev/null; then
+        jq --arg reason "$trigger" --arg resolver "$resolver" '.dns_fallback={provider:"yandex",resolver:$resolver,reason:$reason} | .check_host_error=(.request_error // .poll_error // null) | del(.request_error,.poll_error)' "$tmp/check.json" > "$tmp/check-next.json"
+        mv "$tmp/check-next.json" "$tmp/check.json"
+        jq -n --arg node "$fallback_node" --slurpfile ips "$tmp/fallback-ips.json" --rawfile raw "$tmp/yandex-answer.txt" '[{node:$node,ips:$ips[0],response:{provider:"yandex",raw:$raw}}]' > "$tmp/fallback-node.json"
+        jq -s '.[0]+.[1]' "$tmp/nodes.json" "$tmp/fallback-node.json" > "$tmp/nodes-next.json"
+        mv "$tmp/nodes-next.json" "$tmp/nodes.json"
+        jq '[.[] | .node as $node | .ips[] | {ip:.,node:$node}] | unique' "$tmp/nodes.json" > "$tmp/observations.json"
+        progress "$domain — Яндекс DNS вернул публичные IPv4; продолжаем DNS → BGP"
+        return 0
+      fi
+      # NXDOMAIN/empty answer is a DNS result, not a transport retry.
+      break
+    fi
+    if jq -Rse 'test("status: NXDOMAIN,")' "$tmp/yandex-answer.txt" >/dev/null; then break; fi
+  done
+  jq --arg message 'Яндекс DNS не вернул публичных IPv4 A-записей или не ответил' '.fallback_error=$message' "$tmp/check.json" > "$tmp/check-next.json"
+  mv "$tmp/check-next.json" "$tmp/check.json"
+  progress "$domain — резервный DNS не вернул публичных IPv4; результат сохранён как неполный"
+  return 0
+}
+
 check_dns_domain() {
   local domain=$1 index=$2 tmp=$3 http_dir=$3
   local request_id dns_started node_total answered attempt remaining pause_before
   local http_wait_seconds=0
   stage="Домен $index/${#domains[@]}: $domain — отправка задания DNS в Check-Host"
   progress "Запрашиваем DNS A для $domain..."
-  if ! fetch_http check -H 'Accept: application/json' -G --data-urlencode "host=$domain" https://check-host.net/check-dns > "$tmp/check.json" ||
+  if [ "$check_host_available" -eq 0 ] || ! fetch_http check -H 'Accept: application/json' -G --data-urlencode "host=$domain" ${dns_node_args[@]+"${dns_node_args[@]}"} https://check-host.net/check-dns > "$tmp/check.json" ||
      ! jq -e '.ok == 1 and (.request_id | type == "string" and test("^[A-Za-z0-9]+$")) and (.nodes | type == "object" and length > 0) and (.permanent_link | type == "string" and startswith("https://check-host.net/check-report/"))' "$tmp/check.json" >/dev/null; then
-    if [ "$http_transport_failed" -eq 1 ]; then check_service; fi
     jq -n --arg message "$http_reason" '{nodes:{},permanent_link:null,request_error:("Check-Host: не удалось отправить задание DNS; " + $message)}' > "$tmp/check.json"
     printf '[]\n' > "$tmp/nodes.json"
     printf '[]\n' > "$tmp/observations.json"
+    yandex_dns_fallback "$domain" "$tmp" "${http_reason:-API Check-Host недоступен}"
+    return 0
+  fi
+  jq '.nodes |= with_entries(select((.value[0] | ascii_downcase) != "ir"))' "$tmp/check.json" > "$tmp/check-next.json"
+  mv "$tmp/check-next.json" "$tmp/check.json"
+  if ! jq -e '.nodes | length > 0' "$tmp/check.json" >/dev/null; then
+    printf '[]\n' > "$tmp/nodes.json"
+    printf '[]\n' > "$tmp/observations.json"
+    yandex_dns_fallback "$domain" "$tmp" 'Check-Host не назначил узлов вне Ирана'
     return 0
   fi
   request_id=$(jq -r .request_id "$tmp/check.json")
@@ -866,7 +950,7 @@ check_dns_domain() {
       progress "Домен $index/${#domains[@]}: $domain — ответили $answered/$node_total узлов; уникальных A-адресов: $found"
       [ "$answered" -lt "$node_total" ] || break
     else
-      if [ "$http_transport_failed" -eq 1 ]; then check_service; fi
+      if [ "$http_transport_failed" -eq 1 ]; then check_service || :; fi
       jq --arg reason "$http_reason" '.poll_error = ($reason + "; не удалось получить отчёт Check-Host")' "$tmp/check.json" > "$tmp/check-next.json"
       mv "$tmp/check-next.json" "$tmp/check.json"
       progress 'Не удалось получить DNS-результат; переходим к следующему домену'
@@ -884,7 +968,12 @@ check_dns_domain() {
       {node: $node, ips: ([$answer | .. | objects | .A? | arrays | .[] | select(ipv4)] | unique),
        response: $answer}]
   ' > "$tmp/nodes.json"
+  jq "$(cat "$batch/public-ipv4.jq") map(. + {ignored_non_public_ipv4: [.ips[] | select(public_ipv4|not)]} | .ips |= map(select(public_ipv4)))" "$tmp/nodes.json" > "$tmp/nodes-next.json"
+  mv "$tmp/nodes-next.json" "$tmp/nodes.json"
   jq '[.[] | .node as $node | .ips[] | {ip: ., node: $node}] | unique' "$tmp/nodes.json" > "$tmp/observations.json"
+  if jq -e '.poll_error != null' "$tmp/check.json" >/dev/null; then
+    yandex_dns_fallback "$domain" "$tmp" 'не удалось получить отчёт API Check-Host'
+  fi
 }
 
 index=0
@@ -1001,20 +1090,23 @@ jq -n --arg domain "$domain" --argjson verbose "$verbose" \
      {ips: ([$group[].ip] | unique), check_host: ([$group[].node] | unique),
       resolutions: ($group | group_by(.ip) | map({ip: .[0].ip, check_host: ([.[].node] | unique)}))} +
      (if $verbose == 1 then {check_host_details: ([$group[].node] | unique | map(. as $node | {key: $node, value: $c[0].nodes[$node]}) | from_entries)} else {} end))),
-   errors: ((if $c[0].request_error then [{error: "Не удалось запустить DNS-проверку", message: $c[0].request_error}] else [] end) +
+   errors: ((if $c[0].fallback_error then [{error:"Ошибка резервного DNS",message:$c[0].fallback_error}] else [] end) + (if $c[0].request_error then [{error: "Не удалось запустить DNS-проверку", message: $c[0].request_error}] else [] end) +
      (if $c[0].poll_error then [{error: "Не удалось получить DNS-отчёт", message: $c[0].poll_error}] else [] end) +
      [$n[0][] | select(.ips | length == 0) |
        . as $n | ($c[0].nodes[.node]) as $details |
        ([.response | .. | objects | (.message?, .error?) | strings] | unique) as $messages |
        {check_host: .node, country: $details[1], city: $details[2],
-        error: (if .response == null then "Узел не предоставил DNS-результат"
+        error: (if ((.ignored_non_public_ipv4 // []) | length > 0) then "Узел вернул только непубличные IPv4-адреса"
+                elif .response == null then "Узел не предоставил DNS-результат"
                 elif ($messages | join(" ") | test("timeout|timed out"; "i")) then "Узел сообщил о превышении времени ожидания"
                 elif ($messages | length > 0) then "Узел сообщил об ошибке DNS" else "Узел ответил без IPv4-адресов" end),
-        message: (if .response == null then ($c[0].poll_error // "Узел не предоставил результат до завершения опроса")
+        message: (if ((.ignored_non_public_ipv4 // []) | length > 0) then ("Не отправлены в BGP.tools: " + (.ignored_non_public_ipv4 | join(", ")))
+                  elif .response == null then ($c[0].poll_error // "Узел не предоставил результат до завершения опроса")
                   elif ($messages | length > 0) then ($messages | join("; "))
                   else "Узел ответил, но не вернул IPv4 A-записи" end), response: .response}] +
      ($queried | map(. as $ip | select(all($routes[]; .ip != $ip)) | ([$be[0][] | select(.ip==$ip)] | first // {ip:$ip,error:"Не получены BGP-префикс и ASN",message:"BGP.tools не прислал данные для этого IP"})))),
    permanent_link: $c[0].permanent_link} |
+  (if $c[0].dns_fallback then . + {dns_fallback:$c[0].dns_fallback} else . end) |
   . + {complete: (($observed | length > 0) and all(.errors[]; .check_host != null))} +
   (if $x[0] == null then {} else {excluded_ips: ($observed - $queried)} end)
 ' > "$tmp/full.json"

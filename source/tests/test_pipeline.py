@@ -17,6 +17,8 @@ if name=='curl':
  timeout='2' if '-o' in args else '1.5'
  assert args[args.index('--max-time')+1]==timeout and args[args.index('--connect-timeout')+1]==timeout
  url=args[-1]
+ if 'check-host.net/nodes/hosts' in url:
+  print(json.dumps({'nodes':{'n':{'location':['xx','Country','City']},'ir1.node.check-host.net':{'location':['ir','Iran','Tehran']}}}));sys.exit(0)
  if 'check-host.net/check-dns' in url:
   host=next(a[5:] for a in args if a.startswith('host='));phase='health' if host=='https://check-host.net' else 'dns';log(phase,host)
   if phase=='health':
@@ -40,6 +42,8 @@ if name=='curl':
   pathlib.Path(args[args.index('-o')+1]).write_text('ok')
   pathlib.Path(args[args.index('-D')+1]).write_text('HTTP/1.1 200 OK\r\n\r\n')
   print('200\t'+url+'\t0\t0.01\t0.02\t0.03')
+elif name=='dig':
+ print(';; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 1');sys.exit(0)
 elif name=='nc':
  ips=[]
  for line in sys.stdin:
@@ -57,7 +61,7 @@ elif name=='nc':
 '''
 with tempfile.TemporaryDirectory(prefix='subnet-pipeline-') as directory:
  root=pathlib.Path(directory);bin=root/'bin';bin.mkdir()
- for name in ('curl','nc','node'):
+ for name in ('curl','nc','node','dig'):
   f=bin/name;f.write_text(MOCK);f.chmod(0o755)
  evidence=[]
  def run(mode,hosts,parse=False,rules=False):
@@ -113,9 +117,10 @@ with tempfile.TemporaryDirectory(prefix='subnet-pipeline-') as directory:
  print('PASS service domain yields a routing rule despite HTTPS certificate failure',flush=True)
  for mode in ('health','bgp-health'):
   result,events,phases=run(mode,combinations[0])
-  assert result.returncode==1 and not result.stdout,(mode,result.stderr)
+  assert result.returncode==(3 if mode=='health' else 1),(mode,result.stderr)
+  if mode=='bgp-health':assert not result.stdout
   assert phases.count(mode)==(4 if mode=='bgp-health' else 2)
-  if mode=='health':assert phases==['health','health'] and 'HTTP-ошибку' in result.stderr
+  if mode=='health':assert phases[:2]==['health','health'] and 'dns' not in phases and 'Яндекс DNS' in result.stderr
   else:assert 'dns' not in phases and 'bulk' not in phases
   print('PASS shared service unavailable:',mode,flush=True)
  result,events,phases=run('retry',combinations[0]);assert result.returncode==0 and phases.count('health')==2,result.stderr
