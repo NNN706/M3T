@@ -88,6 +88,7 @@ real_curl=shutil.which('curl')
 (bin/'curl').write_text('''#!/bin/bash
 case "$*" in *check-host.net*) ;; *) exec REAL_CURL "$@" ;; esac
 case "$*" in
+ *nodes/hosts*) printf '%s\\n' '{"nodes":{"n":{"location":["xx","Country","City"],"ip":"9.9.9.9","asn":"AS9"}}}';;
  *check-dns*) printf '%s\\n' '{"ok":1,"request_id":"abc","permanent_link":"https://check-host.net/check-report/abc","nodes":{"n":["xx","Country","City","9.9.9.9","AS9"]}}';;
  *) printf '%s\\n' '{"n":[{"A":["1.1.1.1"]}]}';;
 esac
@@ -96,6 +97,7 @@ esac
 while IFS= read -r line; do printf '%s\\n' "$line" >> "$SENT"; [ "$line" = end ] && break; done
 printf '%s\\n' '13335 | 1.1.1.1 | 1.1.1.0/24 | US | ARIN | 2020-01-01 | Cloudflare'
 ''')
+(bin/'dig').write_text('#!/bin/bash\necho "Unexpected external DNS fallback in local browser fixture" >&2\nexit 1\n')
 for file in bin.iterdir():file.chmod(0o755)
 env.update(PATH=str(bin)+':'+env['PATH'],SENT=str(root/'parse-sent'))
 (root/'parse-sent').write_text('')
