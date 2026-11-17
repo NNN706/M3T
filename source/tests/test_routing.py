@@ -4,6 +4,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import sys
 import subprocess
 import tempfile
 
@@ -14,6 +15,7 @@ if not source.exists():
 generator = root.parent / 'routing/scripts' / 'update_routing.py'
 if not generator.exists():
     generator = root / 'update_routing.py'
+sys.path.insert(0, str(generator.parent))
 spec = importlib.util.spec_from_file_location('routing', generator)
 routing = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(routing)

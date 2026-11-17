@@ -7,7 +7,7 @@ import subprocess
 import tempfile
 
 LISTS = ['source/routing/sites.txt', 'source/routing/asn.txt', 'source/routing/domains.txt']
-INPUTS = ['source/routing/scripts/domain_coverage.cjs', 'source/routing/config/prefix-limits.txt', 'source/routing/scripts/prefix_limits.py', 'source/routing/state/dns-provenance.json', 'source/routing/scripts/build_routing.cjs', 'source/routing/config/manual.txt', 'source/routing/ip.txt', 'source/routing/scripts/exclusion_policy.py', 'source/routing/exclude.txt', 'source/routing/scripts/asn_routes.py', 'source/SubnetResolve.sh',
+INPUTS = ['source/routing/scripts/service_tags.py', 'source/routing/config/public_suffix_list.dat', 'source/routing/scripts/domain_coverage.cjs', 'source/routing/config/prefix-limits.txt', 'source/routing/scripts/prefix_limits.py', 'source/routing/state/dns-provenance.json', 'source/routing/scripts/build_routing.cjs', 'source/routing/config/manual.txt', 'source/routing/ip.txt', 'source/routing/scripts/exclusion_policy.py', 'source/routing/exclude.txt', 'source/routing/scripts/asn_routes.py', 'source/SubnetResolve.sh',
           'source/routing/scripts/update_routing.py', 'source/routing/generated/domains.json', 'source/routing/state/sources.json', 'source/routing/generated/IP.json']
 OUTPUT = 'source/routing/generated/IP.json'
 TEMPLATE = 'Templates/Routing-(RU-Direct)/routing-ru.json'
