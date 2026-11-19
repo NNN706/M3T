@@ -1,12 +1,6 @@
 {
   "rules": [
     {
-      "ruleTag": "2gis.com",
-      "domain": [
-        "domain:ams2-cdn.2gis.com"
-      ]
-    },
-    {
       "ruleTag": "2gis.ru",
       "domain": [
         "domain:2gis.ru"
@@ -27,9 +21,27 @@
       ]
     },
     {
+      "ruleTag": "aeroflot.ru",
+      "domain": [
+        "domain:aeroflot.ru"
+      ]
+    },
+    {
+      "ruleTag": "afisha.mail.ru",
+      "domain": [
+        "domain:vk9-1.vkuser.net"
+      ]
+    },
+    {
       "ruleTag": "alfabank.ru",
       "domain": [
         "domain:alfabank.ru"
+      ]
+    },
+    {
+      "ruleTag": "ams2-cdn.2gis.com",
+      "domain": [
+        "domain:ams2-cdn.2gis.com"
       ]
     },
     {
@@ -43,6 +55,12 @@
       "domain": [
         "domain:beget.com",
         "domain:vk.com"
+      ]
+    },
+    {
+      "ruleTag": "blablacar.ru",
+      "domain": [
+        "domain:blablacar.ru"
       ]
     },
     {
@@ -86,6 +104,7 @@
         "domain:cloud.ru",
         "domain:const.uno",
         "domain:criteo.com",
+        "domain:crm.bigtehshop.ru",
         "domain:crm.elama-partner.ru",
         "domain:crm.lead-fixer.ru",
         "domain:crm.sigmatraffic.ru",
@@ -149,11 +168,28 @@
       ]
     },
     {
+      "ruleTag": "cloud.vk.com",
+      "domain": [
+        "domain:apptracer.ru",
+        "domain:mrgcdn.ru",
+        "domain:vk.team",
+        "domain:vkcloud-static.ru",
+        "domain:vktech-static.ru"
+      ]
+    },
+    {
       "ruleTag": "contell.ru",
       "domain": [
         "domain:contell.ru",
         "domain:me-talk.ru",
         "domain:verbox.ru"
+      ]
+    },
+    {
+      "ruleTag": "corp.mail.ru",
+      "domain": [
+        "domain:corp.vkcdn.ru",
+        "domain:vk.company"
       ]
     },
     {
@@ -177,9 +213,42 @@
       ]
     },
     {
+      "ruleTag": "detmir.ru",
+      "domain": [
+        "domain:catalog-cdn.detmir.st",
+        "domain:detmir.ru",
+        "domain:go.detmir.st",
+        "domain:telegraf.detmir-stats.ru"
+      ]
+    },
+    {
+      "ruleTag": "dixy.ru",
+      "domain": [
+        "domain:dixy.ru"
+      ]
+    },
+    {
       "ruleTag": "dns-shop.ru",
       "domain": [
         "domain:dns-shop.ru"
+      ]
+    },
+    {
+      "ruleTag": "dodopizza.ru",
+      "domain": [
+        "domain:dodopizza.ru"
+      ]
+    },
+    {
+      "ruleTag": "dom.ru",
+      "domain": [
+        "domain:dom.ru"
+      ]
+    },
+    {
+      "ruleTag": "finance.wb.ru",
+      "domain": [
+        "domain:finance.wb.ru"
       ]
     },
     {
@@ -198,10 +267,7 @@
     {
       "ruleTag": "gov.ru",
       "domain": [
-        "domain:gov.ru",
-        "domain:nalog.ru",
-        "domain:sputnik.ru",
-        "domain:vashkontrol.ru"
+        "domain:gov.ru"
       ]
     },
     {
@@ -227,7 +293,6 @@
     {
       "ruleTag": "kinopoisk.ru",
       "domain": [
-        "domain:ads-media.wildberries.ru",
         "domain:banners.adfox.ru",
         "domain:cs.ifedata.ru",
         "domain:dsp.mpartner.digital",
@@ -250,6 +315,14 @@
       ]
     },
     {
+      "ruleTag": "kz.mcs.mail.ru",
+      "domain": [
+        "domain:cdn.vkcloud-static.kz",
+        "domain:kz.cloud.vk.kz",
+        "domain:prod-kz.vkcloud-static.kz"
+      ]
+    },
+    {
       "ruleTag": "landvps.ru",
       "domain": [
         "domain:landvps.ru"
@@ -258,18 +331,13 @@
     {
       "ruleTag": "mail.ru",
       "domain": [
-        "domain:cdn.vkcloud-static.kz",
-        "domain:corp.vkcdn.ru",
         "domain:dzen.ru",
         "domain:dzeninfra.ru",
         "domain:imgsmail.ru",
-        "domain:kz.cloud.vk.kz",
         "domain:mail.ru",
         "domain:mradx.net",
         "domain:okcdn.ru",
-        "domain:prod-kz.vkcloud-static.kz",
         "domain:userapi.com",
-        "domain:vk.company",
         "domain:vkuserphoto.ru",
         "domain:vkvideo.ru",
         "domain:yadro.ru"
@@ -306,23 +374,17 @@
       ]
     },
     {
-      "ruleTag": "megafon.ru",
-      "domain": [
-        "domain:popmechanic.ru"
-      ]
-    },
-    {
       "ruleTag": "memstech.ru",
       "domain": [
         "domain:b2b-mems.ru"
       ]
     },
     {
-      "ruleTag": "mts.ru",
+      "ruleTag": "mosmetro.ru",
       "domain": [
-        "domain:hicloud.com",
-        "domain:mtscdn.ru",
-        "domain:serving-sys.ru"
+        "domain:apps3proxy.mosmetro.tech",
+        "domain:mosmetro.ru",
+        "domain:static.mosmetro.tech"
       ]
     },
     {
@@ -352,6 +414,20 @@
       ]
     },
     {
+      "ruleTag": "mymts.ru",
+      "domain": [
+        "domain:mymts.ru"
+      ]
+    },
+    {
+      "ruleTag": "nalog.gov.ru",
+      "domain": [
+        "domain:nalog.ru",
+        "domain:sputnik.ru",
+        "domain:vashkontrol.ru"
+      ]
+    },
+    {
       "ruleTag": "ok.ru",
       "domain": [
         "domain:cdn-vk.ru"
@@ -360,7 +436,7 @@
     {
       "ruleTag": "oneme.ru",
       "domain": [
-        "domain:ws-api.oneme.ru"
+        "domain:oneme.ru"
       ]
     },
     {
@@ -377,9 +453,43 @@
       ]
     },
     {
+      "ruleTag": "rostelecom.ru",
+      "domain": [
+        "domain:rostelecom.ru"
+      ]
+    },
+    {
+      "ruleTag": "rt.ru",
+      "domain": [
+        "domain:rt.ru"
+      ]
+    },
+    {
+      "ruleTag": "rustore.ru",
+      "domain": [
+        "domain:rustore.ru"
+      ]
+    },
+    {
       "ruleTag": "rutube.ru",
       "domain": [
-        "domain:goya.rutube.ru"
+        "domain:api.expf.ru",
+        "domain:cdn.uxfeedback.ru",
+        "domain:rutube.ru",
+        "domain:widget-api.uxfeedback.ru"
+      ]
+    },
+    {
+      "ruleTag": "rutube.sport",
+      "domain": [
+        "domain:rutube.sport"
+      ]
+    },
+    {
+      "ruleTag": "rzd-bonus.ru",
+      "domain": [
+        "domain:bitrix.info",
+        "domain:rzd-bonus.ru"
       ]
     },
     {
@@ -389,9 +499,55 @@
       ]
     },
     {
+      "ruleTag": "sber.ru",
+      "domain": [
+        "domain:sber.ru"
+      ]
+    },
+    {
+      "ruleTag": "sberpay.ru",
+      "domain": [
+        "domain:sberpay.ru"
+      ]
+    },
+    {
       "ruleTag": "selectel.ru",
       "domain": [
         "domain:selcdn.net"
+      ]
+    },
+    {
+      "ruleTag": "spb.megafon.ru",
+      "domain": [
+        "domain:popmechanic.ru"
+      ]
+    },
+    {
+      "ruleTag": "spb.mts.ru",
+      "domain": [
+        "domain:hicloud.com",
+        "domain:mtscdn.ru",
+        "domain:serving-sys.ru"
+      ]
+    },
+    {
+      "ruleTag": "t-bank-app.ru",
+      "domain": [
+        "domain:t-bank-app.ru"
+      ]
+    },
+    {
+      "ruleTag": "t-j.ru",
+      "domain": [
+        "domain:opis-cdn.tinkoffjournal.ru",
+        "domain:static2.tinkoffjournal.ru",
+        "domain:t-j.ru"
+      ]
+    },
+    {
+      "ruleTag": "taximaxim.ru",
+      "domain": [
+        "domain:taximaxim.ru"
       ]
     },
     {
@@ -409,6 +565,12 @@
       ]
     },
     {
+      "ruleTag": "tele2.ru",
+      "domain": [
+        "domain:tele2.ru"
+      ]
+    },
+    {
       "ruleTag": "timeweb.cloud",
       "domain": [
         "domain:cloud.roistat.com",
@@ -417,15 +579,16 @@
       ]
     },
     {
+      "ruleTag": "tu-tu.ru",
+      "domain": [
+        "domain:tu-tu.ru"
+      ]
+    },
+    {
       "ruleTag": "vk.com",
       "domain": [
-        "domain:apptracer.ru",
-        "domain:mrgcdn.ru",
         "domain:tns-counter.ru",
-        "domain:vk-portal.net",
-        "domain:vk.team",
-        "domain:vkcloud-static.ru",
-        "domain:vktech-static.ru"
+        "domain:vk-portal.net"
       ]
     },
     {
@@ -435,9 +598,44 @@
       ]
     },
     {
+      "ruleTag": "wildberries.ru",
+      "domain": [
+        "domain:wildberries.ru"
+      ]
+    },
+    {
       "ruleTag": "ya.ru",
       "domain": [
         "domain:ya.ru"
+      ]
+    },
+    {
+      "ruleTag": "yandex.ru",
+      "domain": [
+        "domain:ok9-12.vkuser.net",
+        "domain:ok9-5.vkuser.net"
+      ]
+    },
+    {
+      "ruleTag": "yango.com",
+      "domain": [
+        "domain:mc.yango.com"
+      ]
+    },
+    {
+      "ruleTag": "yota.ru",
+      "domain": [
+        "domain:yota.ru"
+      ]
+    },
+    {
+      "ruleTag": "youla.ru",
+      "domain": [
+        "domain:api.youla.io",
+        "domain:cache3.youla.io",
+        "domain:cdn0.youla.io",
+        "domain:cdn1.youla.io",
+        "domain:youla.ru"
       ]
     }
   ]
