@@ -26,7 +26,8 @@
     {
       "ruleTag": "avito.ru",
       "domain": [
-        "domain:avito.ru"
+        "domain:avito.ru",
+        "domain:www.avito.st"
       ]
     },
     {
@@ -282,6 +283,7 @@
       "domain": [
         "domain:abdm.ru",
         "domain:admon.pro",
+        "domain:ads-media.wildberries.ru",
         "domain:afp.ai",
         "domain:beeline.ru",
         "domain:bidderstack.com",
