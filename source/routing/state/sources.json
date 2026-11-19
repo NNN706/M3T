@@ -5,6 +5,7 @@
       "ip": [
         "87.240.128.0/18",
         "88.212.192.0/20",
+        "89.221.236.0/22",
         "90.156.232.0/21",
         "93.186.224.0/20",
         "95.163.32.0/19",
@@ -1001,6 +1002,7 @@
         "185.5.160.0/22",
         "185.71.67.0/24",
         "186.2.163.0/24",
+        "188.186.144.0/20",
         "190.115.16.0/24",
         "195.234.80.0/24",
         "213.180.192.0/19"
@@ -1069,10 +1071,12 @@
         "89.221.236.0/22",
         "93.158.128.0/18",
         "93.186.224.0/20",
+        "95.163.32.0/19",
         "95.163.216.0/22",
         "95.213.0.0/17",
         "155.212.192.0/20",
         "176.112.168.0/21",
+        "178.237.16.0/20",
         "185.180.200.0/22",
         "217.20.144.0/20"
       ]
@@ -1217,6 +1221,8 @@
     {
       "ruleTag": "ipinfo.io",
       "ip": [
+        "85.132.112.0/24",
+        "188.186.144.0/20",
         "195.234.80.0/24"
       ]
     },
@@ -1227,11 +1233,13 @@
         "2.58.66.0/24",
         "5.45.192.0/18",
         "37.9.64.0/18",
+        "62.212.253.0/24",
         "77.88.0.0/18",
         "80.78.249.0/24",
         "81.163.16.0/20",
         "82.145.213.0/24",
         "84.38.176.0/20",
+        "85.132.112.0/24",
         "87.228.0.0/17",
         "87.242.88.0/21",
         "87.250.224.0/19",
@@ -1295,7 +1303,6 @@
         "5.188.160.0/19",
         "5.188.192.0/18",
         "5.189.192.0/19",
-        "8.211.0.0/18",
         "10.0.0.0/8",
         "31.28.0.0/19",
         "31.31.196.0/24",
@@ -1330,10 +1337,6 @@
         "46.42.190.0/24",
         "46.243.209.0/24",
         "46.243.210.0/23",
-        "47.88.0.0/18",
-        "47.245.128.0/18",
-        "47.246.132.0/23",
-        "47.254.128.0/19",
         "62.64.16.0/20",
         "62.84.112.0/20",
         "62.122.168.0/21",
@@ -1738,6 +1741,7 @@
       "ruleTag": "mosmetro.ru",
       "ip": [
         "37.230.192.0/21",
+        "91.221.165.0/24",
         "178.176.0.0/14"
       ]
     },
@@ -1962,10 +1966,13 @@
     {
       "ruleTag": "rutube.ru",
       "ip": [
+        "5.59.128.0/19",
         "37.17.0.0/17",
+        "46.16.228.0/24",
         "46.42.188.0/24",
         "46.42.191.0/24",
         "51.250.0.0/17",
+        "77.220.220.0/23",
         "80.64.96.0/20",
         "81.9.0.0/17",
         "81.222.127.0/24",
@@ -2002,7 +2009,9 @@
     {
       "ruleTag": "rutube.sport",
       "ip": [
+        "5.59.128.0/19",
         "37.17.0.0/17",
+        "46.16.228.0/24",
         "77.220.220.0/23",
         "80.64.96.0/20",
         "82.196.128.0/19",
@@ -2311,6 +2320,7 @@
         "87.240.128.0/18",
         "89.221.236.0/22",
         "93.186.224.0/21",
+        "188.186.144.0/20",
         "195.234.80.0/24"
       ]
     },
@@ -2570,9 +2580,11 @@
         "95.163.216.0/22",
         "95.213.0.0/17",
         "155.212.192.0/20",
+        "176.112.168.0/21",
         "178.237.16.0/20",
         "185.32.248.0/22",
         "185.180.200.0/22",
+        "185.226.52.0/22",
         "217.20.144.0/20"
       ]
     },
@@ -2617,7 +2629,6 @@
         "5.188.160.0/19",
         "5.188.192.0/18",
         "5.189.192.0/19",
-        "8.211.0.0/18",
         "10.0.0.0/8",
         "31.28.0.0/19",
         "31.31.196.0/24",
@@ -2652,10 +2663,6 @@
         "46.42.190.0/24",
         "46.243.209.0/24",
         "46.243.210.0/23",
-        "47.88.0.0/18",
-        "47.245.128.0/18",
-        "47.246.132.0/23",
-        "47.254.128.0/19",
         "62.64.16.0/20",
         "62.84.112.0/20",
         "62.122.168.0/21",
@@ -2946,17 +2953,21 @@
         "ruleTag": "1l-s2s.mail.ru",
         "domain": [
           "domain:1l-s2s.mail.ru",
+          "domain:35432.ms.vk.ru",
+          "domain:static.pulse.mail.ru",
           "domain:sun9-15.vkuserphoto.ru",
           "domain:sun9-16.vkuserphoto.ru",
           "domain:sun9-54.vkuserphoto.ru",
           "domain:sun9-55.vkuserphoto.ru",
+          "domain:sun9-65.vkuserphoto.ru",
           "domain:sun9-69.vkuserphoto.ru",
           "domain:sun9-72.vkuserphoto.ru",
           "domain:sun9-83.vkuserphoto.ru",
           "domain:vd514.okcdn.ru",
           "domain:vd641.okcdn.ru",
           "domain:vd717.okcdn.ru",
-          "domain:vd734.okcdn.ru"
+          "domain:vd734.okcdn.ru",
+          "domain:vkvd718.okcdn.ru"
         ]
       },
       {
@@ -3210,6 +3221,7 @@
           "domain:dsp.nrich.ai",
           "domain:e6ae6a4a-f665-4480-aabf-4c838165834d.dsp.mts.ru",
           "domain:eac9628e-8819-4514-9cda-02203eb05a79.dsp.mts.ru",
+          "domain:ed950735-16cc-4550-8ba8-73250d8d578d.dsp.mts.ru",
           "domain:ev.adriver.ru",
           "domain:exchange.buzzoola.com",
           "domain:f4c97d91-3463-4cfe-b468-d786b9eedda8.dsp.mts.ru",
@@ -3364,6 +3376,7 @@
           "domain:mc.yandex.ru",
           "domain:mdd.yandex.net",
           "domain:node-sber1-az1-23.jivosite.com",
+          "domain:px.ads.linkedin.com",
           "domain:tcd.mng.tl",
           "domain:uaas.yandex.ru",
           "domain:vi-sber1-25.jivosite.com",
@@ -3382,6 +3395,7 @@
           "domain:catalog-cdn.detmir.st",
           "domain:detmir.ru",
           "domain:go.detmir.st",
+          "domain:img.detmir.st",
           "domain:telegraf.detmir-stats.ru",
           "domain:www.detmir.ru"
         ]
@@ -3443,7 +3457,9 @@
           "domain:strm-mar-187.strm.yandex.net",
           "domain:strm.yandex.ru",
           "domain:suggest.sso.dzen.ru",
-          "domain:vd292.okcdn.ru"
+          "domain:vd237.okcdn.ru",
+          "domain:vd292.okcdn.ru",
+          "domain:vd568.okcdn.ru"
         ]
       },
       {
@@ -3528,6 +3544,12 @@
         ]
       },
       {
+        "ruleTag": "ifconfig.me",
+        "domain": [
+          "domain:platform.twitter.com"
+        ]
+      },
+      {
         "ruleTag": "ihc.ru",
         "domain": [
           "domain:code.jivosite.com",
@@ -3555,9 +3577,16 @@
         ]
       },
       {
+        "ruleTag": "ipinfo.io",
+        "domain": [
+          "domain:px.ads.linkedin.com"
+        ]
+      },
+      {
         "ruleTag": "kinopoisk.ru",
         "domain": [
           "domain:3802135471794868809583.cm.a.mts.ru",
+          "domain:5638362281795117561408.cm.a.mts.ru",
           "domain:8780636781795114984123.cm.a.mts.ru",
           "domain:ads-media.wildberries.ru",
           "domain:api.acquisition-gwe.plus.kinopoisk.ru",
@@ -3662,6 +3691,7 @@
           "domain:mail.ru",
           "domain:media-trend.mail.ru",
           "domain:o2.mail.ru",
+          "domain:ok9-8.vkuser.net",
           "domain:pogoda.imgsmail.ru",
           "domain:portal.mail.ru",
           "domain:r.mradx.net",
@@ -3718,6 +3748,7 @@
           "domain:vd641.okcdn.ru",
           "domain:vd643.okcdn.ru",
           "domain:vd645.okcdn.ru",
+          "domain:vd665.okcdn.ru",
           "domain:vd676.okcdn.ru",
           "domain:vd678.okcdn.ru",
           "domain:vd680.okcdn.ru",
@@ -3796,6 +3827,7 @@
         "ruleTag": "mosmetro.ru",
         "domain": [
           "domain:apps3proxy.mosmetro.tech",
+          "domain:mosmetro.edna.io",
           "domain:mosmetro.ru",
           "domain:prodapp.mosmetro.ru",
           "domain:static.mosmetro.ru",
@@ -3825,6 +3857,7 @@
           "domain:1cd5c3c7d5a445d59c7f73b38cf6da12.ops.beeline.ru",
           "domain:2359741341794393788476.cm.a.mts.ru",
           "domain:2974159131794477850254.cm.a.mts.ru",
+          "domain:3298092861795117569484.cm.a.mts.ru",
           "domain:3565207081794340010766.cm.a.mts.ru",
           "domain:4129606181794437662354.cm.a.mts.ru",
           "domain:4135084311794335388817.cm.a.mts.ru",
@@ -4027,6 +4060,7 @@
         "domain": [
           "domain:b2c.passport.rt.ru",
           "domain:blogcdn.rt.ru",
+          "domain:rt-api.rt.ru",
           "domain:rt-static-cdn.rt.ru",
           "domain:rt-static.rt.ru",
           "domain:rt.ru",
@@ -4046,6 +4080,7 @@
       {
         "ruleTag": "rutube.ru",
         "domain": [
+          "domain:ac.rutube.ru",
           "domain:api.expf.ru",
           "domain:cdn.uxfeedback.ru",
           "domain:rutube.ru",
@@ -4216,6 +4251,7 @@
           "domain:4394285141794261891524.cm.a.mts.ru",
           "domain:4975811741794393809345.cm.a.mts.ru",
           "domain:5409217191794335397399.cm.a.mts.ru",
+          "domain:5681452771795117589406.cm.a.mts.ru",
           "domain:6340847681794390093975.cm.a.mts.ru",
           "domain:7154246661794868832229.cm.a.mts.ru",
           "domain:7259796161795115012945.cm.a.mts.ru",
@@ -4298,6 +4334,7 @@
       {
         "ruleTag": "target.vk.ru",
         "domain": [
+          "domain:px.ads.linkedin.com",
           "domain:sentry.adtech.vk.team",
           "domain:target.vk.ru"
         ]
@@ -4321,6 +4358,7 @@
           "domain:5263165521794467294407.cm.a.mts.ru",
           "domain:5275941411794477869556.cm.a.mts.ru",
           "domain:6655435111794306084179.cm.a.mts.ru",
+          "domain:6690927101795117599376.cm.a.mts.ru",
           "domain:7061394141794437684678.cm.a.mts.ru",
           "domain:7621231031794402596495.cm.a.mts.ru",
           "domain:7706680171795115028004.cm.a.mts.ru",
@@ -4522,7 +4560,10 @@
           "domain:strm-mar-210.strm.yandex.net",
           "domain:strm.yandex.ru",
           "domain:suggest.sso.dzen.ru",
-          "domain:vd669.okcdn.ru"
+          "domain:vd334.okcdn.ru",
+          "domain:vd582.okcdn.ru",
+          "domain:vd669.okcdn.ru",
+          "domain:vd711.okcdn.ru"
         ]
       },
       {
@@ -4563,14 +4604,12 @@
     "le.tbank.ru",
     "oneme.ru",
     "pixel.ipinfo.io",
-    "q.quora.com",
     "rtb-eu-warsaw.intent.ai",
     "sberpay.ru",
     "sentry.adtech.vk.team",
     "static.popmechanic.ru",
     "tms.dmp.wi-fi.ru",
-    "v6.ipinfo.io",
-    "www.googleadservices.com"
+    "v6.ipinfo.io"
   ],
   "excluded_asns": [
     "AS10124",
@@ -4755,6 +4794,7 @@
     "AS41264",
     "AS43515",
     "AS43639",
+    "AS45102",
     "AS45566",
     "AS46182",
     "AS46489",
@@ -4807,12 +4847,15 @@
     "AS9121"
   ],
   "excluded_domains": [
+    "a.ipinfo.io",
     "a.quora.com",
     "accounts.google.com",
     "ad.doubleclick.net",
     "adx.bid",
     "alb.reddit.com",
+    "analytics-ipv6.tiktokw.us",
     "analytics.google.com",
+    "analytics.tiktok.com",
     "api.iconify.design",
     "api.simplesvg.com",
     "api.unisvg.com",
@@ -4822,25 +4865,35 @@
     "aviasales.ru",
     "bat.bing.com",
     "bzrcdn.openai.com",
+    "c.bing.com",
+    "c.clarity.ms",
     "cdn.jsdelivr.net",
     "cllctr.roistat.com",
     "code.jquery.com",
     "connect.facebook.net",
     "cs.alfasense.com",
+    "cta-service-cms2.hubspot.com",
     "d-ipv6.mmapiws.com",
     "device.maxmind.com",
     "dpm.demdex.net",
     "euw-ice.360yield.com",
     "explore-api.aviasales.com",
+    "f.clarity.ms",
     "flagr.aviasales.com",
     "fonts.googleapis.com",
     "fonts.gstatic.com",
+    "forms.hscollectedforms.net",
     "fornex.com",
-    "g.clarity.ms",
     "googleads.g.doubleclick.net",
+    "i.clarity.ms",
     "ifconfig.me",
     "ipinfo.io",
+    "js.hs-analytics.net",
+    "js.hs-banner.com",
     "js.hs-scripts.com",
+    "js.hsadspixel.net",
+    "js.hscollectedforms.net",
+    "js.hubspot.com",
     "match.360yield.com",
     "my.g2.com",
     "otclick-adv.ru",
@@ -4848,12 +4901,10 @@
     "pic.rtbcdn.ru",
     "pixel-config.reddit.com",
     "pixel.ipinfo.io",
-    "platform.twitter.com",
     "pool.liftdsp.com",
     "prebid.admatic.com.tr",
-    "px.ads.linkedin.com",
     "px.arcspire.io",
-    "q.clarity.ms",
+    "q.quora.com",
     "recaptcha.net",
     "reviews-badge.capterra.com",
     "s-cs.rmp.rakuten.com",
@@ -4879,6 +4930,7 @@
     "tickets-api.aviasales.com",
     "tickets-api.aviasales.ru",
     "tr.capterra.com",
+    "track.hubspot.com",
     "tracking.g2crowd.com",
     "use.typekit.net",
     "v.ipinfo.io",
@@ -4890,6 +4942,7 @@
     "www.google-analytics.com",
     "www.google.com",
     "www.google.ru",
+    "www.googleadservices.com",
     "www.googletagmanager.com",
     "www.gstatic.com",
     "www.redditstatic.com",

@@ -209,6 +209,7 @@
         "domain:ddos-guard.net",
         "domain:mango-office.ru",
         "domain:mng.tl",
+        "domain:px.ads.linkedin.com",
         "full:licdn.com"
       ]
     },
@@ -218,6 +219,7 @@
         "domain:catalog-cdn.detmir.st",
         "domain:detmir.ru",
         "domain:go.detmir.st",
+        "domain:img.detmir.st",
         "domain:telegraf.detmir-stats.ru"
       ]
     },
@@ -274,6 +276,12 @@
       "ruleTag": "government.ru",
       "domain": [
         "domain:government.ru"
+      ]
+    },
+    {
+      "ruleTag": "ifconfig.me",
+      "domain": [
+        "domain:platform.twitter.com"
       ]
     },
     {
@@ -336,6 +344,7 @@
         "domain:imgsmail.ru",
         "domain:mail.ru",
         "domain:mradx.net",
+        "domain:ok9-8.vkuser.net",
         "domain:okcdn.ru",
         "domain:userapi.com",
         "domain:vkuserphoto.ru",
@@ -383,6 +392,7 @@
       "ruleTag": "mosmetro.ru",
       "domain": [
         "domain:apps3proxy.mosmetro.tech",
+        "domain:mosmetro.edna.io",
         "domain:mosmetro.ru",
         "domain:static.mosmetro.tech"
       ]
