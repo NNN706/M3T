@@ -225,6 +225,7 @@ with tempfile.TemporaryDirectory() as directory:
     run_manual_ips()
     assert json.loads(args.output.read_bytes())['rules'] == [
         {'ruleTag': 'legacy', 'ip': ['11.0.2.0/24']}, *manual['rules']]
+    assert '52.48.0.0/14' not in args.manual_ips.read_text(), 'Excluded ASN range survived in persisted manual IP list'
     args.manual_ips.write_text('')
     run_manual_ips()
     assert json.loads(args.output.read_bytes()) == manual

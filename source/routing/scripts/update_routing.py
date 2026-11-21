@@ -603,6 +603,9 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     write_json(args.domains_output, group_rules(domains, "domain"))
     write_json(args.sources_output, sources)
     if manual_ips is not None:
+        if exclusion is not None:
+            filtered = exclusion.filter_ip_rules({'rules': [{'ruleTag': 'legacy', 'ip': raw_manual_ips}]})
+            raw_manual_ips = [prefix for rule in filtered['rules'] for prefix in rule['ip']]
         if limits is not None:
             narrowed = limits.filter_rules({'rules': [{'ruleTag': 'legacy', 'ip': raw_manual_ips}]}, domains, provenance)
             raw_manual_ips = [value for rule in narrowed['rules'] for value in rule['ip']]
