@@ -428,8 +428,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     remaining = [host for host in pending if host not in responses]
     if args.evidence:
         write_json(args.evidence / 'dns-checkpoint.json', responses)
-    for start in range(0, len(remaining), 40):
-        batch = remaining[start:start + 40]
+    for start in range(0, len(remaining), 30):
+        batch = remaining[start:start + 30]
         budget = deadline - time.monotonic()
         if budget <= 0:
             print('Истёк общий лимит DNS/BGP. Сохраняем завершённые пакеты.', file=sys.stderr)

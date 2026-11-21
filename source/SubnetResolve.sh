@@ -14,7 +14,7 @@ Usage: SubnetResolve.sh [-parse] [-rules] [-v] [-4] [-s] [domain-or-URL ...]
   -s  Never ask to save and never save resolved.json.
   -h  Show help.
 Default: DNS A records; group by (ASN, prefix), ask to save (default no).
-Set SUBNET_DNS_CONCURRENCY to 1–40 to limit simultaneous Check-Host DNS checks (default 40).
+Set SUBNET_DNS_CONCURRENCY to 1–30 to limit simultaneous Check-Host DNS checks (default 30).
 JSON goes to stdout; prompts, diagnostics and report URL go to stderr.
 Failures are explained on stderr; incomplete results return a non-zero exit status for automation.
 HELP
@@ -196,10 +196,10 @@ ncpid=''
 http_pid=''
 parse_pid=''
 dns_pids=()
-dns_concurrency=${SUBNET_DNS_CONCURRENCY:-40}
-if ! [[ "$dns_concurrency" =~ ^([1-9]|[1-3][0-9]|40)$ ]]; then
+dns_concurrency=${SUBNET_DNS_CONCURRENCY:-30}
+if ! [[ "$dns_concurrency" =~ ^([1-9]|[12][0-9]|30)$ ]]; then
   rm -rf "$batch"
-  die 'SUBNET_DNS_CONCURRENCY должен быть от 1 до 40.'
+  die 'SUBNET_DNS_CONCURRENCY должен быть от 1 до 30.'
 fi
 mkdir "$batch/check-host-cooldown"
 started=$SECONDS

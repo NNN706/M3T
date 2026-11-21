@@ -266,16 +266,16 @@ with tempfile.TemporaryDirectory() as directory:
     tmp=Path(directory)
     args=argparse.Namespace(scanner=root/'SubnetResolve.sh',verbose=False,allow_partial=True,
         domains_output=tmp/'domains.json',sources_output=tmp/'sources.json',output=tmp/'IP.json',evidence=tmp/'evidence')
-    hosts=[f'h{i:02}.example' for i in range(41)]
+    hosts=[f'h{i:02}.example' for i in range(31)]
     discovery={'pages':[{'site':host,'domains':[],'errors':[]} for host in hosts]}
     def response(batch):
         return {'domains':[{'domain':host,'complete':True,'results':[{'prefix':'192.0.2.0/24'}]} for host in batch]}
     with patch('update_routing.subprocess.run',side_effect=[
         subprocess.CompletedProcess([],0,json.dumps(discovery)),
-        subprocess.CompletedProcess([],0,json.dumps(response(hosts[:40]))),
-        subprocess.CompletedProcess([],0,json.dumps(response(hosts[40:]))),
+        subprocess.CompletedProcess([],0,json.dumps(response(hosts[:30]))),
+        subprocess.CompletedProcess([],0,json.dumps(response(hosts[30:]))),
     ]) as run:
         incremental_update(args,[(host,host) for host in hosts],set(),lambda *_:([],[],''))
         batches=[call.args[0][call.args[0].index('--')+1:] for call in run.call_args_list[1:]]
-        assert batches==[hosts[:40],hosts[40:]],batches
-print('PASS workflow DNS packet capacity: forty workers plus final partial packet')
+        assert batches==[hosts[:30],hosts[30:]],batches
+print('PASS workflow DNS packet capacity: thirty workers plus final partial packet')
