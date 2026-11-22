@@ -50,6 +50,26 @@
       ]
     },
     {
+      "ruleTag": "AS13238",
+      "ip": [
+        "5.45.192.0/18",
+        "5.255.192.0/18",
+        "37.9.64.0/18",
+        "37.140.128.0/18",
+        "77.88.0.0/18",
+        "84.252.160.0/19",
+        "87.250.224.0/19",
+        "92.255.112.0/20",
+        "93.158.128.0/18",
+        "95.108.128.0/17",
+        "141.8.128.0/18",
+        "178.154.128.0/18",
+        "185.32.187.0/24",
+        "213.180.192.0/19",
+        "2a02:6b8::/29"
+      ]
+    },
+    {
       "ruleTag": "AS15632",
       "ip": [
         "185.154.124.0/24",
@@ -88,6 +108,13 @@
       ]
     },
     {
+      "ruleTag": "AS197482",
+      "ip": [
+        "91.221.198.0/23",
+        "91.236.48.0/22"
+      ]
+    },
+    {
       "ruleTag": "AS201012",
       "ip": [
         "176.109.112.0/23",
@@ -112,6 +139,13 @@
         "194.190.0.0/24",
         "212.67.24.0/22",
         "2a0a:4d00::/29"
+      ]
+    },
+    {
+      "ruleTag": "AS207304",
+      "ip": [
+        "45.138.0.0/24",
+        "2a14:48c5::/48"
       ]
     },
     {
@@ -745,6 +779,7 @@
         "46.243.172.0/24",
         "51.68.0.0/16",
         "51.254.0.0/15",
+        "62.84.112.0/20",
         "62.105.128.0/19",
         "62.109.24.0/22",
         "74.119.117.0/24",
@@ -1314,7 +1349,6 @@
         "31.177.64.0/19",
         "31.184.204.0/22",
         "37.9.0.0/18",
-        "37.140.128.0/18",
         "37.230.128.0/23",
         "37.230.130.0/24",
         "37.230.132.0/22",
@@ -1340,7 +1374,6 @@
         "46.243.209.0/24",
         "46.243.210.0/23",
         "62.64.16.0/20",
-        "62.84.112.0/20",
         "62.122.168.0/21",
         "64.190.62.0/23",
         "77.105.176.0/20",
@@ -1358,7 +1391,6 @@
         "81.200.126.0/23",
         "82.202.160.0/19",
         "84.252.144.0/20",
-        "84.252.160.0/19",
         "85.118.181.0/24",
         "85.119.144.0/21",
         "85.143.101.0/24",
@@ -1384,7 +1416,6 @@
         "91.214.119.0/24",
         "91.217.21.0/24",
         "91.218.132.0/22",
-        "91.221.199.0/24",
         "91.223.63.0/24",
         "91.227.34.0/24",
         "91.230.107.0/24",
@@ -1408,7 +1439,6 @@
         "94.139.240.0/21",
         "94.140.204.0/23",
         "94.159.95.0/24",
-        "95.108.128.0/17",
         "95.129.232.0/21",
         "95.142.192.0/20",
         "95.163.0.0/19",
@@ -1421,6 +1451,7 @@
         "100.43.64.0/19",
         "100.64.0.0/10",
         "103.76.52.0/22",
+        "108.181.58.199/32",
         "109.70.26.0/23",
         "109.126.3.0/24",
         "109.195.80.0/20",
@@ -1470,7 +1501,6 @@
         "172.16.0.0/12",
         "176.101.88.0/21",
         "176.211.0.0/16",
-        "178.154.128.0/18",
         "178.170.192.0/22",
         "178.170.208.0/24",
         "178.172.160.0/22",
@@ -1480,7 +1510,6 @@
         "185.22.180.0/22",
         "185.31.112.0/24",
         "185.31.115.0/24",
-        "185.32.187.0/24",
         "185.35.4.0/22",
         "185.38.87.0/24",
         "185.62.200.0/22",
@@ -1585,7 +1614,6 @@
         "2a00:5da0:8010::/48",
         "2a00:65e0::/32",
         "2a00:bdc0::/29",
-        "2a02:6b8::/29",
         "2a03:720::/32",
         "2a06:a180:20::/46",
         "2a0b:1447:20::/44",
@@ -2640,7 +2668,6 @@
         "31.177.64.0/19",
         "31.184.204.0/22",
         "37.9.0.0/18",
-        "37.140.128.0/18",
         "37.230.128.0/23",
         "37.230.130.0/24",
         "37.230.132.0/22",
@@ -2666,7 +2693,6 @@
         "46.243.209.0/24",
         "46.243.210.0/23",
         "62.64.16.0/20",
-        "62.84.112.0/20",
         "62.122.168.0/21",
         "64.190.62.0/23",
         "77.105.176.0/20",
@@ -2684,7 +2710,6 @@
         "81.200.126.0/23",
         "82.202.160.0/19",
         "84.252.144.0/20",
-        "84.252.160.0/19",
         "85.118.181.0/24",
         "85.119.144.0/21",
         "85.143.101.0/24",
@@ -2710,7 +2735,6 @@
         "91.214.119.0/24",
         "91.217.21.0/24",
         "91.218.132.0/22",
-        "91.221.199.0/24",
         "91.223.63.0/24",
         "91.227.34.0/24",
         "91.230.107.0/24",
@@ -2734,7 +2758,6 @@
         "94.139.240.0/21",
         "94.140.204.0/23",
         "94.159.95.0/24",
-        "95.108.128.0/17",
         "95.129.232.0/21",
         "95.142.192.0/20",
         "95.163.0.0/19",
@@ -2747,6 +2770,7 @@
         "100.43.64.0/19",
         "100.64.0.0/10",
         "103.76.52.0/22",
+        "108.181.58.199/32",
         "109.70.26.0/23",
         "109.126.3.0/24",
         "109.195.80.0/20",
@@ -2796,7 +2820,6 @@
         "172.16.0.0/12",
         "176.101.88.0/21",
         "176.211.0.0/16",
-        "178.154.128.0/18",
         "178.170.192.0/22",
         "178.170.208.0/24",
         "178.172.160.0/22",
@@ -2806,7 +2829,6 @@
         "185.22.180.0/22",
         "185.31.112.0/24",
         "185.31.115.0/24",
-        "185.32.187.0/24",
         "185.35.4.0/22",
         "185.38.87.0/24",
         "185.62.200.0/22",
@@ -2911,7 +2933,6 @@
         "2a00:5da0:8010::/48",
         "2a00:65e0::/32",
         "2a00:bdc0::/29",
-        "2a02:6b8::/29",
         "2a03:720::/32",
         "2a06:a180:20::/46",
         "2a0b:1447:20::/44",
@@ -2956,21 +2977,28 @@
         "domain": [
           "domain:1l-s2s.mail.ru",
           "domain:35432.ms.vk.ru",
+          "domain:a-211811-9-260-0nm12d-000.pms.mail.ru",
+          "domain:a-604055-5-595-0nm12d-000.pms.mail.ru",
           "domain:static.pulse.mail.ru",
           "domain:sun9-15.vkuserphoto.ru",
           "domain:sun9-16.vkuserphoto.ru",
           "domain:sun9-4.vkuserphoto.ru",
+          "domain:sun9-45.userapi.com",
           "domain:sun9-54.vkuserphoto.ru",
           "domain:sun9-55.vkuserphoto.ru",
           "domain:sun9-65.vkuserphoto.ru",
           "domain:sun9-69.vkuserphoto.ru",
           "domain:sun9-72.vkuserphoto.ru",
           "domain:sun9-83.vkuserphoto.ru",
+          "domain:sun9-84.vkuserphoto.ru",
+          "domain:vd408.okcdn.ru",
+          "domain:vd435.okcdn.ru",
           "domain:vd514.okcdn.ru",
           "domain:vd641.okcdn.ru",
           "domain:vd668.okcdn.ru",
           "domain:vd717.okcdn.ru",
           "domain:vd734.okcdn.ru",
+          "domain:vd740.okcdn.ru",
           "domain:vkvd718.okcdn.ru"
         ]
       },
@@ -3029,6 +3057,7 @@
           "domain:vk9-1.vkuser.net",
           "domain:vkvd252.okcdn.ru",
           "domain:vkvd357.okcdn.ru",
+          "domain:vkvd478.okcdn.ru",
           "domain:vkvd504.okcdn.ru",
           "domain:vkvd625.okcdn.ru"
         ]
@@ -3238,6 +3267,7 @@
           "domain:kraken-mdt.rambler.ru",
           "domain:kraken.rambler.ru",
           "domain:lead.justagent.ru",
+          "domain:lk.wr-tech.ru",
           "domain:m.kombinat.digital",
           "domain:marketplace.cloud.ru",
           "domain:match.ohmy.bid",
@@ -3265,6 +3295,7 @@
           "domain:smi2.ru",
           "domain:sp.linkssp.ru",
           "domain:ssp-rtb.sape.ru",
+          "domain:ssp-statistics.ntsistema.ru",
           "domain:ssp.adriver.ru",
           "domain:ssp.al-adtech.com",
           "domain:ssp.bidster.net",
@@ -3400,6 +3431,7 @@
         "domain": [
           "domain:catalog-cdn.detmir.st",
           "domain:detmir.ru",
+          "domain:elk-rum.detmir.ru",
           "domain:go.detmir.st",
           "domain:img.detmir.st",
           "domain:telegraf.detmir-stats.ru",
@@ -3662,6 +3694,8 @@
       {
         "ruleTag": "lk.gosuslugi.ru",
         "domain": [
+          "domain:bot.gosuslugi.ru",
+          "domain:ip.gosuslugi.ru",
           "domain:lk.gosuslugi.ru"
         ]
       },
@@ -3716,6 +3750,7 @@
           "domain:sun9-38.vkuserphoto.ru",
           "domain:sun9-39.vkuserphoto.ru",
           "domain:sun9-40.vkuserphoto.ru",
+          "domain:sun9-45.userapi.com",
           "domain:sun9-47.userapi.com",
           "domain:sun9-47.vkuserphoto.ru",
           "domain:sun9-48.vkuserphoto.ru",
@@ -3730,6 +3765,7 @@
           "domain:sun9-77.vkuserphoto.ru",
           "domain:sun9-81.vkuserphoto.ru",
           "domain:sun9-82.vkuserphoto.ru",
+          "domain:sun9-84.vkuserphoto.ru",
           "domain:sun9-85.vkuserphoto.ru",
           "domain:sun9-87.vkuserphoto.ru",
           "domain:telemetry.dzen.ru",
@@ -3861,6 +3897,7 @@
       {
         "ruleTag": "mws.ru",
         "domain": [
+          "domain:1112933341795318685914.cm.a.mts.ru",
           "domain:1325848681794439906951.cm.a.mts.ru",
           "domain:1634606881794868820781.cm.a.mts.ru",
           "domain:1686587501794300151369.cm.a.mts.ru",
@@ -4097,6 +4134,7 @@
           "domain:api.expf.ru",
           "domain:cdn.uxfeedback.ru",
           "domain:rutube.ru",
+          "domain:static.rutubelist.ru",
           "domain:test.rutube.ru",
           "domain:wcm.weborama-tech.ru",
           "domain:widget-api.uxfeedback.ru"
@@ -4273,6 +4311,7 @@
           "domain:7933857881794477866963.cm.a.mts.ru",
           "domain:7937829981794420137567.cm.a.mts.ru",
           "domain:8230726771794400191606.cm.a.mts.ru",
+          "domain:8731599421795318702216.cm.a.mts.ru",
           "domain:9071633211794437681600.cm.a.mts.ru",
           "domain:9847219361794446014709.cm.a.mts.ru",
           "domain:ac.avito.ru",
@@ -4366,6 +4405,7 @@
           "domain:2449164981795268266294.cm.a.mts.ru",
           "domain:2w.ru",
           "domain:3036551891794377430378.cm.a.mts.ru",
+          "domain:3576088611795318714248.cm.a.mts.ru",
           "domain:3930159131794340027045.cm.a.mts.ru",
           "domain:4059203031794551988172.cm.a.mts.ru",
           "domain:4830143981794300251190.cm.a.mts.ru",
@@ -4576,6 +4616,7 @@
           "domain:strm.yandex.ru",
           "domain:suggest.sso.dzen.ru",
           "domain:vd334.okcdn.ru",
+          "domain:vd340.okcdn.ru",
           "domain:vd447.okcdn.ru",
           "domain:vd545.okcdn.ru",
           "domain:vd582.okcdn.ru",
@@ -4873,6 +4914,7 @@
     "analytics-ipv6.tiktokw.us",
     "analytics.google.com",
     "analytics.tiktok.com",
+    "api.hubapi.com",
     "api.iconify.design",
     "api.simplesvg.com",
     "api.unisvg.com",
@@ -4901,6 +4943,7 @@
     "fonts.googleapis.com",
     "fonts.gstatic.com",
     "forms.hscollectedforms.net",
+    "forms.hsforms.com",
     "fornex.com",
     "googleads.g.doubleclick.net",
     "i.clarity.ms",
