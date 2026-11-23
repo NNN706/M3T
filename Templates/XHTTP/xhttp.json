@@ -1,0 +1,178 @@
+/// Входная конфигурация на стороне зарубежного сервера для клиента
+/// Она же может использоваться как входная конфигурация на стороне моста
+"inbounds": [
+    {
+        "tag": "XHTTP_PACKET_REALITY",
+        "listen": "/dev/shm/xray.sock,0666", /// Или внутренний порт // Или 443 порт
+        "protocol": "vless",
+        "settings": {
+            "clients": [],
+            "decryption": "none"
+        },
+        "sniffing": {
+            "enabled": true,
+            "routeOnly": true,
+            "destOverride": [
+                "http",
+                "tls",
+                "quic"
+            ]
+        },
+        "streamSettings": {
+            "network": "xhttp",
+            "sockopt": {
+                "acceptProxyProtocol": true
+            },
+            "security": "reality",
+            "xhttpSettings": {
+                "mode": "packet-up",
+                "path": "/static/app/profile/device3a1a366b.js/",
+                "extra": {
+                    /// "h2Params" введен недавно, по заявлению контрибьютора уменьшает RSS
+                    "h2Params": {
+                        "MaxReadFrameSize": 16384
+                    },
+                    "noSSEHeader": true,
+                    "xPaddingKey": "_deviceID",
+                    "xPaddingBytes": "50-350",
+                    "xPaddingHeader": "Referer",
+                    "xPaddingMethod": "tokenish",
+                    "xPaddingObfsMode": true,
+                    "xPaddingPlacement": "queryInHeader",
+                    "scMaxBufferedPosts": 64,
+                    "scMaxEachPostBytes": 524288
+                }
+            },
+            /// Тут селфстил, все как обычно
+            "realitySettings": {
+                "xver": 1,
+                "target": "/dev/shm/nginx.sock",
+                "shortIds": [
+                    ""
+                ],
+                "privateKey": "",
+                "fingerprint": "firefox",
+                "serverNames": [
+                    "domain"
+                ]
+            }
+        }
+    },
+    /// Входная конфигурация на стороне зарубежного сервера для моста (можно и для клиентов, но stream-up потребляет много RAM)
+    /// Если сервер не вывозит, можно оставить и XHTTP packet-up из пункта выше
+    {
+        "tag": "XHTTP_STREAM_REALITY",
+        "listen": "/dev/shm/xray-bridge.sock,0666", /// Или внутренний порт // Или 443 порт
+        "protocol": "vless",
+        "settings": {
+            "clients": [],
+            "decryption": "none"
+        },
+        "sniffing": {
+            "enabled": true,
+            "destOverride": [
+                "http",
+                "tls",
+                "quic"
+            ]
+        },
+        "streamSettings": {
+            "network": "xhttp",
+            "sockopt": {
+                "acceptProxyProtocol": true
+            },
+            "security": "reality",
+            "xhttpSettings": {
+                "mode": "stream-up",
+                "path": "/static/app/profile/id5ba9c7b.js/",
+                "extra": {
+                    /// "h2Params" введен недавно, по заявлению контрибьютора уменьшает RSS
+                    "h2Params": {
+                        "MaxReadFrameSize": 16384
+                    },
+                    "noSSEHeader": true,
+                    "xPaddingKey": "_deviceID",
+                    "xPaddingBytes": "50-350",
+                    "xPaddingHeader": "Referer",
+                    "xPaddingMethod": "tokenish",
+                    "xPaddingObfsMode": true,
+                    "xPaddingPlacement": "queryInHeader",
+                    "scMaxBufferedPosts": 64,
+                    "scStreamUpServerSecs": "20-80"
+                }
+            },
+            /// Тут селфстил, все как обычно
+            "realitySettings": {
+                "xver": 1,
+                "target": "/dev/shm/nginx.sock",
+                "shortIds": [
+                    ""
+                ],
+                "privateKey": "",
+                "fingerprint": "firefox",
+                "serverNames": [
+                    "domain1" // Если настраиваете ноду одновременно и под мост, и под прямое подключение, то домены лучше брать разные и разводить по SNI встроенными способами proxy_pass в nginx по разным внутренним портам или по разным сокетам
+                ]
+            }
+        }
+    }
+]
+/// Выходная конфигурация из моста в сторону зарубежного сервера
+"outbounds": [
+    {
+        "tag": "XHTTP_VLESS_OUTBOUND",
+        "protocol": "vless",
+        "settings": {
+            "id": "",
+            "flow": "",
+            "port": 443,
+            "address": "",
+            "encryption": "none"
+        },
+        "streamSettings": {
+            "network": "xhttp",
+            "security": "reality",
+            "xhttpSettings": {
+                "host": "",
+                "mode": "stream-up",
+                "path": "/static/app/profile/id5ba9c7b.js/",
+                "extra": {
+                    /// Ключевая история - XMUX
+                    "xmux": {
+                        "maxConnections": "1-4",
+                        "hMaxRequestTimes": "600-900",
+                        "hMaxReusableSecs": "600-1200"
+                    },
+                    "xPaddingKey": "_deviceID",
+                    "xPaddingBytes": "50-350",
+                    "xPaddingHeader": "Referer",
+                    "xPaddingMethod": "tokenish",
+                    "xPaddingObfsMode": true,
+                    "xPaddingPlacement": "queryInHeader"
+                }
+            },
+            /// Тут селфстил, все как обычно
+            "realitySettings": {
+                "password": "",
+                "serverName": "domain2",
+                "fingerprint": "firefox"
+            }
+        }
+    }
+]
+/// Настройки  XHTTP extra parameters в хосте Remnawave
+/// Ключевая история - XMUX
+{
+    "xmux": {
+        "maxConnections": "1-4",
+        "hMaxRequestTimes": "600-900",
+        "hMaxReusableSecs": "600-1200"
+    },
+    "xPaddingKey": "_deviceID",
+    "xPaddingBytes": "50-350",
+    "xPaddingHeader": "Referer",
+    "xPaddingMethod": "tokenish",
+    "xPaddingObfsMode": true,
+    "xPaddingPlacement": "queryInHeader",
+    "scMaxEachPostBytes": 131072
+}
