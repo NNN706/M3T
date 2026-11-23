@@ -137,6 +137,7 @@
         "domain:nrich.ai",
         "domain:ohmy.bid",
         "domain:opendsp.ru",
+        "domain:otclick-adv.ru",
         "domain:otm-r.com",
         "domain:prodmp.ru",
         "domain:programmatica.com",
@@ -251,6 +252,12 @@
       ]
     },
     {
+      "ruleTag": "dzen.ru",
+      "domain": [
+        "domain:ok9-9.vkuser.net"
+      ]
+    },
+    {
       "ruleTag": "finance.wb.ru",
       "domain": [
         "domain:finance.wb.ru"
@@ -313,6 +320,7 @@
         "domain:mitdmp.whiteboxdigital.ru",
         "domain:rtb-eu-warsaw.intent.ai",
         "domain:sync.gonet-ads.com",
+        "domain:sync1.adlook.online",
         "domain:t.adx.opera.com",
         "domain:t.rtbwave.com",
         "domain:tracker.smartcallback.ru",
@@ -626,6 +634,7 @@
     {
       "ruleTag": "yandex.ru",
       "domain": [
+        "domain:ok9-1.vkuser.net",
         "domain:ok9-12.vkuser.net",
         "domain:ok9-5.vkuser.net"
       ]

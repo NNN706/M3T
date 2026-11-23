@@ -768,7 +768,6 @@
       {
         "ruleTag": "datahouse.ru",
         "ip": [
-          "5.252.32.0/24",
           "31.184.232.0/24",
           "37.18.100.0/23",
           "77.87.214.0/23",
@@ -983,7 +982,6 @@
           "185.38.87.0/24",
           "185.72.228.0/22",
           "185.99.9.0/24",
-          "185.121.243.0/24",
           "185.138.252.0/22",
           "185.148.37.0/24",
           "185.154.54.0/24",
@@ -1515,6 +1513,7 @@
       //     "domain:nrich.ai",
       //     "domain:ohmy.bid",
       //     "domain:opendsp.ru",
+      //     "domain:otclick-adv.ru",
       //     "domain:otm-r.com",
       //     "domain:prodmp.ru",
       //     "domain:programmatica.com",
@@ -1640,6 +1639,13 @@
       //   "outboundTag": "direct"
       // },
       // {
+      //   "ruleTag": "dzen.ru",
+      //   "domain": [
+      //     "domain:ok9-9.vkuser.net"
+      //   ],
+      //   "outboundTag": "direct"
+      // },
+      // {
       //   "ruleTag": "finance.wb.ru",
       //   "domain": [
       //     "domain:finance.wb.ru"
@@ -1710,6 +1716,7 @@
       //     "domain:mitdmp.whiteboxdigital.ru",
       //     "domain:rtb-eu-warsaw.intent.ai",
       //     "domain:sync.gonet-ads.com",
+      //     "domain:sync1.adlook.online",
       //     "domain:t.adx.opera.com",
       //     "domain:t.rtbwave.com",
       //     "domain:tracker.smartcallback.ru",
@@ -2061,6 +2068,7 @@
       // {
       //   "ruleTag": "yandex.ru",
       //   "domain": [
+      //     "domain:ok9-1.vkuser.net",
       //     "domain:ok9-12.vkuser.net",
       //     "domain:ok9-5.vkuser.net"
       //   ],
