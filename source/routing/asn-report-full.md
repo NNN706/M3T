@@ -1,17 +1,17 @@
 # Подробный отчёт ASN
 
-Опубликовано **833** уникальных подсетей (IPv4: **781**, IPv6: **52**). С ними пересекаются анонсы **628** ASN.
+Опубликовано **834** уникальных подсетей (IPv4: **782**, IPv6: **52**). С ними пересекаются анонсы **627** ASN.
 
 Источник правил — [IP.json](https://github.com/NNN706/M3T/blob/test/source/routing/generated/IP.json). Анонсы сверены со снимком [BGP.tools](https://bgp.tools/kb/api).
 
-SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab828215ab2facb1fd1`.
+SHA-256 файла IP.json: `f5fff31acab68f9d09e61f075eb464c5cf2330d8096ab24153d02516dc663ff4`.
 
 «Затронуто» — анонсы ASN, которые хотя бы частично пересекаются с правилами. «Всего» — все анонсы этого ASN в снимке. Один префикс может учитываться у нескольких ASN, если они его анонсируют.
 
 | ASN | Название | Затронуто / всего |
 | --- | --- | ---: |
-| AS174 | Cogent Communications, LLC | 1 / 4385 |
-| AS1299 | Arelion (fka. Telia Carrier) | 2 / 123 |
+| AS174 | Cogent Communications, LLC | 1 / 4398 |
+| AS1299 | Arelion (fka. Telia Carrier) | 2 / 138 |
 | AS2854 | LLC Orange Business Services | 1 / 44 |
 | AS3175 | Citytelecom LLC | 5 / 45 |
 | AS3216 | PJSC Vimpelcom | 21 / 599 |
@@ -22,7 +22,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS3267 | National Research Computer Network of Russia | 10 / 100 |
 | AS3316 | Internet Exchange MSK-IX JSC | 10 / 33 |
 | AS3320 | Deutsche Telekom AG | 1 / 977 |
-| AS3356 | Lumen (Level 3) | 2 / 1198 |
+| AS3356 | Lumen (Level 3) | 2 / 1200 |
 | AS4787 | PT Cyberindo Aditama | 77 / 458 |
 | AS4788 | TM Technology Services Sdn. Bhd. | 3 / 423 |
 | AS5429 | Telecommunications center UMOS, LLC | 1 / 7 |
@@ -33,15 +33,15 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS6697 | Beltelecom | 2 / 241 |
 | AS6878 | T-Systems International GmbH | 1 / 51 |
 | AS7377 | University of California, San Diego | 1 / 20 |
-| AS7979 | Servers.com, Inc. | 10 / 1940 |
+| AS7979 | Servers.com, Inc. | 10 / 1939 |
 | AS8193 | "Uzbektelekom" Joint Stock Company | 1 / 105 |
 | AS8291 | The Federal Guard Service of the Russian Federation | 15 / 15 |
 | AS8342 | JSC RTComm.RU | 4 / 100 |
 | AS8359 | MTS PJSC | 14 / 523 |
 | AS8456 | Bogazici University | 15 / 27 |
 | AS8492 | "OBIT" Ltd. | 7 / 149 |
-| AS8517 | National Academic Network and Information Center | 18 / 169 |
-| AS8551 | Bezeq International Ltd. | 25 / 862 |
+| AS8517 | National Academic Network and Information Center | 4 / 39 |
+| AS8551 | Bezeq International Ltd. | 25 / 856 |
 | AS8595 | OOO WestCall Ltd. | 3 / 57 |
 | AS8641 | LLC "Nauka-Svyaz" | 1 / 62 |
 | AS8717 | A1 Bulgaria EAD | 2 / 109 |
@@ -56,10 +56,10 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS8985 | Join-stock company "Internet Exchange"MSK-IX" | 9 / 21 |
 | AS9049 | JSC "ER-Telecom Holding" | 1 / 43 |
 | AS9068 | JSC Comcor | 1 / 1 |
-| AS9121 | Turk Telekom | 104 / 1354 |
-| AS9123 | JSC "TIMEWEB" | 69 / 970 |
-| AS9198 | JSC Kazakhtelecom | 23 / 1114 |
-| AS12389 | PJSC Rostelecom | 116 / 3547 |
+| AS9121 | Turk Telekom | 104 / 1355 |
+| AS9123 | JSC "TIMEWEB" | 69 / 971 |
+| AS9198 | JSC Kazakhtelecom | 23 / 1113 |
+| AS12389 | PJSC Rostelecom | 116 / 3540 |
 | AS12400 | Partner Communications Ltd. | 13 / 326 |
 | AS12516 | WEBORAMA SA | 2 / 2 |
 | AS12555 | Data-center IMAQLIQ Ltd. | 1 / 28 |
@@ -76,13 +76,13 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS15754 | OOO Taxtelecom | 1 / 1 |
 | AS15943 | wilhelm.tel GmbH | 1 / 67 |
 | AS16249 | Open Joint Stock Company HLEBPROM | 1 / 1 |
-| AS16276 | OVH SAS | 6 / 769 |
+| AS16276 | OVH SAS | 6 / 776 |
 | AS16321 | Petersburg Internet Network ltd. | 1 / 8 |
 | AS16345 | PJSC "Vimpelcom" | 22 / 201 |
-| AS16509 | Amazon.com, Inc. | 3 / 23544 |
-| AS18403 | FPT Telecom Company | 788 / 8442 |
+| AS16509 | Amazon.com, Inc. | 3 / 23543 |
+| AS18403 | FPT Telecom Company | 788 / 8447 |
 | AS19750 | Criteo Corp. | 2 / 20 |
-| AS20454 | SECURED SERVERS LLC | 2 / 162 |
+| AS20454 | SECURED SERVERS LLC | 2 / 163 |
 | AS20485 | JSC TransTeleCom | 2 / 87 |
 | AS20597 | PJSC "Vimpelcom" | 3 / 11 |
 | AS20764 | CJSC RASCOM | 1 / 8 |
@@ -113,7 +113,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS25820 | IT7 Networks Inc | 1 / 281 |
 | AS27257 | Webair Internet Development Company Inc. | 10 / 85 |
 | AS28709 | LLC VK | 19 / 19 |
-| AS28753 | Leaseweb Deutschland GmbH | 1 / 187 |
+| AS28753 | Leaseweb Deutschland GmbH | 1 / 188 |
 | AS28762 | Citytelecom LLC | 1 / 8 |
 | AS28804 | National University Kievo-Mohylanska Academia | 1 / 1 |
 | AS28917 | Fiord Networks, UAB | 1 / 9 |
@@ -121,7 +121,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS29076 | Citytelecom LLC | 14 / 80 |
 | AS29182 | JSC IOT | 27 / 201 |
 | AS29209 | MTS PJSC | 1 / 1 |
-| AS29226 | MasterTel | 3 / 57 |
+| AS29226 | MasterTel | 3 / 55 |
 | AS29375 | Technics for Business Ltd | 1 / 1 |
 | AS29528 | ERC - Financial Logistics Ltd. | 1 / 1 |
 | AS29580 | A1 Bulgaria EAD | 5 / 633 |
@@ -143,9 +143,9 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS34478 | TUBITAK Ulusal Elektronik ve Kriptoloji Arastirrma Enstitusu | 1 / 2 |
 | AS34545 | Webinar Tehnologii OOO | 8 / 8 |
 | AS34597 | LLC "SUNLIGHT" | 2 / 4 |
-| AS34665 | Petersburg Internet Network ltd. | 23 / 178 |
+| AS34665 | Petersburg Internet Network ltd. | 23 / 179 |
 | AS34779 | T-2, d.o.o. | 1 / 34 |
-| AS34858 | Telezon-Seti LLC | 6 / 22 |
+| AS34858 | Telezon-Seti LLC | 6 / 23 |
 | AS34879 | OOO "Sovremennye setevye tekhnologii" | 101 / 101 |
 | AS34959 | KVIKTEL LLC | 1 / 6 |
 | AS35000 | JSC "Severen-Telecom" | 2 / 46 |
@@ -154,7 +154,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS35297 | Dataline LLC | 1 / 22 |
 | AS35566 | Kar-Tel LLC | 1 / 45 |
 | AS35608 | R-LINE 1 LLC | 2 / 17 |
-| AS35645 | Limited Liability Company "VLADINFO" | 1 / 36 |
+| AS35645 | Limited Liability Company "VLADINFO" | 1 / 37 |
 | AS36057 | Webair Internet Development Company Inc. | 8 / 13 |
 | AS37963 | Hangzhou Alibaba Advertising Co.,Ltd. | 3 / 972 |
 | AS38928 | JSC GLONASS | 2 / 4 |
@@ -181,7 +181,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS41719 | SKTV Spektr LLC | 1 / 10 |
 | AS41722 | Miran Ltd. | 2 / 44 |
 | AS41740 | Join-stock company "Internet Exchange"MSK-IX" | 4 / 14 |
-| AS41745 | Ilia Baikov | 1 / 252 |
+| AS41745 | Ilia Baikov | 1 / 254 |
 | AS41798 | JSC Transtelecom | 2 / 210 |
 | AS41895 | "INFORM-Svyaz" LTD | 1 / 2 |
 | AS42038 | Krivets Sergey Sergeevich | 2 / 33 |
@@ -195,7 +195,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS42561 | OOO "NTS GRADIENT" | 2 / 2 |
 | AS42632 | MnogoByte LLC | 3 / 39 |
 | AS42745 | Safe Value Limited | 1 / 3 |
-| AS42831 | UK Dedicated Servers Limited | 1 / 258 |
+| AS42831 | UK Dedicated Servers Limited | 1 / 257 |
 | AS42842 | PJSC "Vimpelcom" | 1 / 12 |
 | AS42938 | LLC Gudauta-net | 1 / 1 |
 | AS43048 | MITIGATOR CLOUD LLC | 1 / 8 |
@@ -226,7 +226,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS44704 | Perekrestok-2000 LLC | 3 / 3 |
 | AS44788 | Criteo Technology SAS | 2 / 20 |
 | AS44812 | IP Server LLC | 1 / 56 |
-| AS45102 | Alibaba (US) Technology Co., Ltd. | 13 / 1378 |
+| AS45102 | Alibaba (US) Technology Co., Ltd. | 13 / 1380 |
 | AS47104 | Prolink MO.ru Ltd. | 1 / 3 |
 | AS47122 | CYBERFIRST LLC | 1 / 4 |
 | AS47168 | LLC "Lenvendo-Soft" | 4 / 5 |
@@ -235,7 +235,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS47478 | MSTN CJSC | 1 / 5 |
 | AS47541 | LLC VK | 29 / 29 |
 | AS47542 | LLC VK | 8 / 8 |
-| AS47583 | Hostinger Operations UAB | 98 / 4746 |
+| AS47583 | Hostinger Operations UAB | 98 / 4804 |
 | AS47723 | SOFTLINE PJSC | 3 / 48 |
 | AS47724 | Limited Liability Company HeadHunter | 3 / 6 |
 | AS47764 | LLC VK (Mail.ru) | 107 / 107 |
@@ -251,7 +251,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS48287 | JSC "RU-CENTER" | 18 / 42 |
 | AS48347 | JSC Mediasoft ekspert | 3 / 91 |
 | AS48399 | Svyaz VSD LLC | 1 / 15 |
-| AS48503 | Mobile Telecom-Service LLP | 10 / 645 |
+| AS48503 | Mobile Telecom-Service LLP | 10 / 649 |
 | AS48558 | M-Line Ltd. | 1 / 4 |
 | AS48614 | ITSOFT LLC | 8 / 24 |
 | AS48716 | PS Internet Company LLP | 4 / 133 |
@@ -269,7 +269,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS49742 | LLC "Iwt" | 1 / 1 |
 | AS49797 | LLC VK | 1 / 1 |
 | AS49925 | LLC South Networks | 2 / 7 |
-| AS49981 | WorldStream B.V. | 1 / 261 |
+| AS49981 | WorldStream B.V. | 1 / 263 |
 | AS49988 | LLC VK | 1 / 2 |
 | AS50098 | Melbikomas UAB | 3 / 23 |
 | AS50166 | RTCloud, LLC | 1 / 5 |
@@ -295,7 +295,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS50677 | SUPEROX LLC | 1 / 1 |
 | AS50701 | Komatsu CIS, LLC | 1 / 1 |
 | AS50703 | Federal State Budgetary Institution of Science Federal Research Center "Geophysical Survey of the Russian Academy of Sciences" | 1 / 1 |
-| AS51115 | HLL LLC | 20 / 20 |
+| AS51115 | HLL LLC | 21 / 21 |
 | AS51200 | LLC Digital Dialogue-Nets | 3 / 45 |
 | AS51334 | PJSC Corporation VSMPO-AVISMA | 1 / 1 |
 | AS51369 | LLC "TRC FIORD" | 3 / 30 |
@@ -326,7 +326,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS56864 | Xeon LLC | 7 / 16 |
 | AS57008 | ITGLOBAL.COM KZ LLP | 3 / 23 |
 | AS57038 | LLC "Amurtelekom" | 1 / 1 |
-| AS57043 | HOSTKEY B.V. | 1 / 712 |
+| AS57043 | HOSTKEY B.V. | 1 / 675 |
 | AS57073 | LLC Wildberries | 23 / 23 |
 | AS57139 | SYBEST LLC | 2 / 2 |
 | AS57251 | LLC Intelcom | 1 / 14 |
@@ -402,14 +402,14 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS62272 | OblTelecomService LLC | 1 / 1 |
 | AS62422 | Federal Antimonopoly Service | 1 / 1 |
 | AS62713 | PubMatic, Inc. | 6 / 31 |
-| AS63023 | GTHost | 3 / 390 |
+| AS63023 | GTHost | 3 / 389 |
 | AS64419 | Ecotel, Ltd. | 5 / 17 |
 | AS64432 | Variti+ LLC | 1 / 6 |
-| AS64999 | — | 3 / 3 |
+| AS64999 | — | 3 / 10 |
 | AS134351 | Leaseweb Japan K.K. | 1 / 55 |
-| AS134963 | Alibaba Cloud (Singapore) Private Limited | 4 / 270 |
+| AS134963 | Alibaba Cloud (Singapore) Private Limited | 4 / 271 |
 | AS142113 | eServer | 1 / 5 |
-| AS196695 | NetOne Rus JSC | 3 / 50 |
+| AS196695 | NetOne Rus JSC | 3 / 49 |
 | AS196747 | PJSC Rostelecom | 8 / 8 |
 | AS196796 | JSC "AB ROSSIYA" | 1 / 1 |
 | AS197068 | High Load Lab (Qrator) | 16 / 16 |
@@ -427,7 +427,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS198068 | CLOUD.DOG OU | 9 / 107 |
 | AS198226 | JSC "Publishing House "Komsomolskaya Pravda" | 1 / 1 |
 | AS198576 | Bulgarin National Radio | 1 / 2 |
-| AS198610 | Beget LLC | 79 / 531 |
+| AS198610 | Beget LLC | 79 / 532 |
 | AS198770 | Virtual infrastructures Ltd. | 5 / 24 |
 | AS198947 | RETN Saint Petersburg | 3 / 3 |
 | AS199089 | Joint Stock Company "INVESTTORGBANK" | 1 / 1 |
@@ -471,7 +471,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS201632 | Anadolu University AS | 2 / 2 |
 | AS201706 | SERVICEPIPE LLC | 26 / 26 |
 | AS201738 | UFO TECHNOLOGIES LIMITED | 1 / 8 |
-| AS201776 | Miranda-Media Ltd | 1 / 120 |
+| AS201776 | Miranda-Media Ltd | 1 / 119 |
 | AS201778 | FSBE Institution of HE "I.S. TURGENEV Orlovsky STATE UNIVERSITY" | 1 / 1 |
 | AS201804 | National Insurance Information System JSC | 2 / 2 |
 | AS201817 | VK Tech Kazakhstan LLP | 1 / 5 |
@@ -608,7 +608,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS213309 | Marmara University | 1 / 3 |
 | AS213506 | VKUSVILL JSC | 2 / 3 |
 | AS213780 | Individual Entrepreneur Suvorov Maxim Sergeevich | 1 / 4 |
-| AS214036 | Ultahost, Inc. | 3 / 91 |
+| AS214036 | Ultahost, Inc. | 3 / 92 |
 | AS214069 | Limited Liability Company "Tele-Service" | 1 / 1 |
 | AS214077 | Limited Liability Company "Sumtel" | 1 / 2 |
 | AS214149 | CJSC "Center for Digital Certificates" | 1 / 2 |
@@ -633,7 +633,6 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | AS216368 | Petersburg Internet Network ltd. | 4 / 13 |
 | AS216379 | Joint Stock Company "CifraBeat" | 1 / 1 |
 | AS218342 | LTD "GOODNET" | 1 / 1 |
-| AS218397 | Gebze Technical University | 1 / 1 |
 | AS218626 | Ahmad Bayat | 1 / 3 |
 | AS219061 | "Fritato Group" Limited Liability Company | 1 / 3 |
 | AS219407 | German Khanin | 1 / 4 |
@@ -1245,23 +1244,9 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
 | --- | --- | --- |
 | `193.140.0.0/16` | `193.140.0.0/16` | `snap.licdn.com` (`193.140.13.72`), `snap.licdn.com` (`193.140.13.75`) |
-| `193.140.16.0/21` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.24.0/22` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.35.0/24` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.56.0/22` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.62.0/24` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.68.0/23` | `193.140.0.0/16` | Нет наблюдений |
 | `193.140.83.0/24` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.88.0/24` | `193.140.0.0/16` | Нет наблюдений |
 | `193.140.99.0/24` | `193.140.0.0/16` | Нет наблюдений |
 | `193.140.140.0/24` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.148.0/22` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.152.0/22` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.159.0/24` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.183.0/24` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.184.0/21` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.244.0/22` | `193.140.0.0/16` | Нет наблюдений |
-| `193.140.248.0/22` | `193.140.0.0/16` | Нет наблюдений |
 
 ## AS8551 — Bezeq International Ltd.
 
@@ -3142,7 +3127,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | `178.237.24.0/24` | `178.237.16.0/20` | Входной ASN `AS47764` |
 | `178.237.28.0/24` | `178.237.16.0/20` | Входной ASN `AS47764` |
 | `185.32.249.0/24` | `185.32.248.0/22` | `st-ok-pts.cdn-vk.ru` (`185.32.249.224`), `st-ok-pts.cdn-vk.ru` (`185.32.249.231`), `st-ok-pts.cdn-vk.ru` (`185.32.249.232`), `st-ok-pts.cdn-vk.ru` (`185.32.249.233`), `st-ok-pts.cdn-vk.ru` (`185.32.249.234`), `st-ok-pts.cdn-vk.ru` (`185.32.249.235`), `st-ok-pts.cdn-vk.ru` (`185.32.249.236`), `st-ok-pts.cdn-vk.ru` (`185.32.249.238`), `st-ok-pts.cdn-vk.ru` (`185.32.249.48`), `st-ok-pts.cdn-vk.ru` (`185.32.249.49`), `st-ok-pts.cdn-vk.ru` (`185.32.249.50`), `st-ok-pts.cdn-vk.ru` (`185.32.249.51`), `st-ok-pts.cdn-vk.ru` (`185.32.249.52`), `st-ok-pts.cdn-vk.ru` (`185.32.249.53`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.224`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.231`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.232`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.233`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.234`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.235`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.236`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.238`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.48`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.49`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.50`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.51`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.52`), `vkcs-scripts.mrgcdn.ru` (`185.32.249.53`) |
-| `185.32.251.0/24` | `185.32.248.0/22` | `vkcs-scripts.mrgcdn.ru` (`185.32.251.231`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.232`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.233`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.235`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.236`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.238`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.239`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.48`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.49`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.54`) |
+| `185.32.251.0/24` | `185.32.248.0/22` | `stest-ok.cdn-vk.ru` (`185.32.251.224`), `stest-ok.cdn-vk.ru` (`185.32.251.232`), `stest-ok.cdn-vk.ru` (`185.32.251.233`), `stest-ok.cdn-vk.ru` (`185.32.251.234`), `stest-ok.cdn-vk.ru` (`185.32.251.235`), `stest-ok.cdn-vk.ru` (`185.32.251.236`), `stest-ok.cdn-vk.ru` (`185.32.251.237`), `stest-ok.cdn-vk.ru` (`185.32.251.238`), `stest-ok.cdn-vk.ru` (`185.32.251.48`), `stest-ok.cdn-vk.ru` (`185.32.251.49`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.231`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.232`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.233`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.235`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.236`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.238`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.239`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.48`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.49`), `vkcs-scripts.mrgcdn.ru` (`185.32.251.54`) |
 | `2a00:bdc0:e002::/48` | `2a00:bdc0::/29` | Ручной импорт |
 | `2a00:bdc0:e003::/48` | `2a00:bdc0::/29` | Ручной импорт |
 | `2a00:bdc0:e004::/48` | `2a00:bdc0::/29` | Ручной импорт |
@@ -3193,8 +3178,8 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | `31.28.20.0/24` | `31.28.0.0/19` | Ручной импорт |
 | `31.28.21.0/24` | `31.28.0.0/19` | Ручной импорт |
 | `31.28.30.0/24` | `31.28.0.0/19` | Ручной импорт |
-| `62.152.40.0/21` | `62.152.40.0/21` | `p.typekit.net` (`62.152.42.138`), `p.typekit.net` (`62.152.42.144`), `use.typekit.net` (`62.152.42.136`), `use.typekit.net` (`62.152.42.138`) |
-| `62.152.42.0/24` | `62.152.40.0/21` | `p.typekit.net` (`62.152.42.138`), `p.typekit.net` (`62.152.42.144`), `use.typekit.net` (`62.152.42.136`), `use.typekit.net` (`62.152.42.138`) |
+| `62.152.40.0/21` | `62.152.40.0/21` | `p.typekit.net` (`62.152.42.138`), `p.typekit.net` (`62.152.42.144`), `snap.licdn.com` (`62.152.42.138`), `snap.licdn.com` (`62.152.42.144`), `use.typekit.net` (`62.152.42.136`), `use.typekit.net` (`62.152.42.138`) |
+| `62.152.42.0/24` | `62.152.40.0/21` | `p.typekit.net` (`62.152.42.138`), `p.typekit.net` (`62.152.42.144`), `snap.licdn.com` (`62.152.42.138`), `snap.licdn.com` (`62.152.42.144`), `use.typekit.net` (`62.152.42.136`), `use.typekit.net` (`62.152.42.138`) |
 | `213.184.152.0/23` | `213.184.152.0/21` | Ручной импорт |
 | `217.65.0.0/20` | `217.65.2.0/24` | Нет наблюдений |
 
@@ -3209,7 +3194,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | `77.246.156.0/22` | `77.246.156.0/22` | `sync.programmatica.com` (`77.246.157.204`), `sync.programmatica.com` (`77.246.157.45`) |
 | `77.246.156.0/23` | `77.246.156.0/22` | `sync.programmatica.com` (`77.246.157.204`), `sync.programmatica.com` (`77.246.157.45`) |
 | `77.246.158.0/23` | `77.246.156.0/22` | Нет наблюдений |
-| `78.24.216.0/21` | `78.24.216.0/21` | `2002--slt.stbid.ru` (`78.24.216.191`), `2002--slt.stbid.ru` (`78.24.216.194`), `2002--slt.stbid.ru` (`78.24.221.171`) |
+| `78.24.216.0/21` | `78.24.216.0/21` | `1025--ifgtcn2fivutgtbunfldcmsqkrugkoktj5xgo---1.stbid.ru` (`78.24.216.194`), `2002--slt.stbid.ru` (`78.24.216.191`), `2002--slt.stbid.ru` (`78.24.216.194`), `2002--slt.stbid.ru` (`78.24.221.171`) |
 | `80.87.192.0/23` | `80.87.192.0/22` | `1025--ifgtcn2fivutgtbunfldcmsqkrugkoktj5xgo---1.stbid.ru` (`80.87.192.36`), `2002--slt.stbid.ru` (`80.87.192.36`) |
 | `80.87.194.0/23` | `80.87.192.0/22` | `1025--ifgtcn2fivutgtbunfldcmsqkrugkoktj5xgo---1.stbid.ru` (`80.87.194.210`), `2002--slt.stbid.ru` (`80.87.194.210`) |
 | `80.87.198.0/23` | `80.87.198.0/23` | `1025--ifgtcn2fivutgtbunfldcmsqkrugkoktj5xgo---1.stbid.ru` (`80.87.198.111`), `1025--ifgtcn2fivutgtbunfldcmsqkrugkoktj5xgo---1.stbid.ru` (`80.87.198.24`), `2002--slt.stbid.ru` (`80.87.198.111`), `2002--slt.stbid.ru` (`80.87.198.24`) |
@@ -4469,7 +4454,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | `79.137.164.0/24` | `79.137.128.0/18` | Ручной импорт |
 | `79.137.180.0/24` | `79.137.128.0/18` | Ручной импорт |
 | `79.137.183.0/24` | `79.137.128.0/18` | Ручной импорт |
-| `87.240.128.0/18` | `87.240.128.0/18` | `api.vk.ru` (`87.240.129.140`), `api.vk.ru` (`87.240.137.130`), `api.vk.ru` (`87.240.137.206`), `api.vk.ru` (`87.240.137.207`), `api.vk.ru` (`87.240.137.208`), `api.vk.ru` (`87.240.139.193`), `api.vk.ru` (`87.240.190.70`), `api.vk.ru` (`87.240.190.75`), `api.vkvideo.ru` (`87.240.129.140`), `api.vkvideo.ru` (`87.240.137.130`), `api.vkvideo.ru` (`87.240.137.206`), `api.vkvideo.ru` (`87.240.137.207`), `api.vkvideo.ru` (`87.240.137.208`), `api.vkvideo.ru` (`87.240.139.193`), `api.vkvideo.ru` (`87.240.190.70`), `api.vkvideo.ru` (`87.240.190.75`), `mincifry-cert.vk.ru` (`87.240.129.133`), `mincifry-cert.vk.ru` (`87.240.132.67`), `mincifry-cert.vk.ru` (`87.240.132.72`), `mincifry-cert.vk.ru` (`87.240.132.78`), `mincifry-cert.vk.ru` (`87.240.137.164`), `r3-test.vk.ru` (`87.240.129.133`), `r3-test.vk.ru` (`87.240.132.67`), `r3-test.vk.ru` (`87.240.132.72`), `r3-test.vk.ru` (`87.240.132.78`), `r3-test.vk.ru` (`87.240.137.164`), `st.vk.ru` (`87.240.129.133`), `st.vk.ru` (`87.240.132.67`), `st.vk.ru` (`87.240.132.72`), `st.vk.ru` (`87.240.132.78`), `st.vk.ru` (`87.240.137.164`), `st.vkvideo.ru` (`87.240.129.133`), `st.vkvideo.ru` (`87.240.132.67`), `st.vkvideo.ru` (`87.240.132.72`), `st.vkvideo.ru` (`87.240.132.78`), `st.vkvideo.ru` (`87.240.137.164`), `stats.vk-portal.net` (`87.240.129.132`), `sun9-15.vkuserphoto.ru` (`87.240.185.142`), `sun9-16.vkuserphoto.ru` (`87.240.185.143`), `sun9-2.vkuserphoto.ru` (`87.240.185.136`), `sun9-38.vkuserphoto.ru` (`87.240.185.145`), `sun9-39.vkuserphoto.ru` (`87.240.185.146`), `sun9-4.vkuserphoto.ru` (`87.240.185.137`), `sun9-40.vkuserphoto.ru` (`87.240.185.147`), `sun9-45.userapi.com` (`87.240.185.148`), `sun9-45.vkuserphoto.ru` (`87.240.185.148`), `sun9-47.userapi.com` (`87.240.185.150`), `sun9-47.vkuserphoto.ru` (`87.240.185.150`), `sun9-48.vkuserphoto.ru` (`87.240.185.151`), `sun9-49.vkuserphoto.ru` (`87.240.185.152`), `sun9-50.vkuserphoto.ru` (`87.240.185.153`), `sun9-51.vkuserphoto.ru` (`87.240.185.154`), `sun9-53.vkuserphoto.ru` (`87.240.185.156`), `sun9-54.vkuserphoto.ru` (`87.240.185.157`), `sun9-55.vkuserphoto.ru` (`87.240.185.158`), `sun9-56.vkuserphoto.ru` (`87.240.185.159`), `sun9-6.vkuserphoto.ru` (`87.240.185.138`), `sun9-61.vkuserphoto.ru` (`87.240.185.160`), `sun9-62.vkuserphoto.ru` (`87.240.185.161`), `sun9-63.vkuserphoto.ru` (`87.240.185.162`), `sun9-65.vkuserphoto.ru` (`87.240.185.164`), `sun9-67.vkuserphoto.ru` (`87.240.185.166`), `sun9-68.vkuserphoto.ru` (`87.240.185.167`), `sun9-69.vkuserphoto.ru` (`87.240.185.168`), `sun9-70.vkuserphoto.ru` (`87.240.185.169`), `sun9-71.vkuserphoto.ru` (`87.240.185.170`), `sun9-72.vkuserphoto.ru` (`87.240.185.171`), `sun9-77.vkuserphoto.ru` (`87.240.185.131`), `sun9-80.vkuserphoto.ru` (`87.240.185.140`), `sun9-81.vkuserphoto.ru` (`87.240.185.141`), `sun9-82.vkuserphoto.ru` (`87.240.185.132`), `sun9-83.userapi.com` (`87.240.185.133`), `sun9-84.vkuserphoto.ru` (`87.240.185.134`), `sun9-85.vkuserphoto.ru` (`87.240.185.172`), `sun9-87.vkuserphoto.ru` (`87.240.185.135`), `sun9-9.vkuserphoto.ru` (`87.240.185.130`), `vk.com` (`87.240.129.133`), `vk.com` (`87.240.132.67`), `vk.com` (`87.240.132.72`), `vk.com` (`87.240.132.78`), `vk.com` (`87.240.137.164`), `vk.ru` (`87.240.129.133`), `vk.ru` (`87.240.132.67`), `vk.ru` (`87.240.132.72`), `vk.ru` (`87.240.132.78`), `vk.ru` (`87.240.137.164`), `vkvideo.ru` (`87.240.129.133`), `vkvideo.ru` (`87.240.132.67`), `vkvideo.ru` (`87.240.132.72`), `vkvideo.ru` (`87.240.132.78`), `vkvideo.ru` (`87.240.137.164`), `web.api.vk.ru` (`87.240.129.140`), `web.api.vk.ru` (`87.240.137.130`), `web.api.vk.ru` (`87.240.137.206`), `web.api.vk.ru` (`87.240.137.207`), `web.api.vk.ru` (`87.240.137.208`), `web.api.vk.ru` (`87.240.139.193`), `web.api.vk.ru` (`87.240.190.70`), `web.api.vk.ru` (`87.240.190.75`) |
+| `87.240.128.0/18` | `87.240.128.0/18` | `api.vk.ru` (`87.240.129.140`), `api.vk.ru` (`87.240.137.130`), `api.vk.ru` (`87.240.137.206`), `api.vk.ru` (`87.240.137.207`), `api.vk.ru` (`87.240.137.208`), `api.vk.ru` (`87.240.139.193`), `api.vk.ru` (`87.240.190.70`), `api.vk.ru` (`87.240.190.75`), `api.vkvideo.ru` (`87.240.129.140`), `api.vkvideo.ru` (`87.240.137.130`), `api.vkvideo.ru` (`87.240.137.206`), `api.vkvideo.ru` (`87.240.137.207`), `api.vkvideo.ru` (`87.240.137.208`), `api.vkvideo.ru` (`87.240.139.193`), `api.vkvideo.ru` (`87.240.190.70`), `api.vkvideo.ru` (`87.240.190.75`), `mincifry-cert.vk.ru` (`87.240.129.133`), `mincifry-cert.vk.ru` (`87.240.132.67`), `mincifry-cert.vk.ru` (`87.240.132.72`), `mincifry-cert.vk.ru` (`87.240.132.78`), `mincifry-cert.vk.ru` (`87.240.137.164`), `r3-test.vk.ru` (`87.240.129.133`), `r3-test.vk.ru` (`87.240.132.67`), `r3-test.vk.ru` (`87.240.132.72`), `r3-test.vk.ru` (`87.240.132.78`), `r3-test.vk.ru` (`87.240.137.164`), `st.vk.ru` (`87.240.129.133`), `st.vk.ru` (`87.240.132.67`), `st.vk.ru` (`87.240.132.72`), `st.vk.ru` (`87.240.132.78`), `st.vk.ru` (`87.240.137.164`), `st.vkvideo.ru` (`87.240.129.133`), `st.vkvideo.ru` (`87.240.132.67`), `st.vkvideo.ru` (`87.240.132.72`), `st.vkvideo.ru` (`87.240.132.78`), `st.vkvideo.ru` (`87.240.137.164`), `stats.vk-portal.net` (`87.240.129.132`), `sun9-15.vkuserphoto.ru` (`87.240.185.142`), `sun9-16.vkuserphoto.ru` (`87.240.185.143`), `sun9-2.vkuserphoto.ru` (`87.240.185.136`), `sun9-38.vkuserphoto.ru` (`87.240.185.145`), `sun9-39.vkuserphoto.ru` (`87.240.185.146`), `sun9-4.vkuserphoto.ru` (`87.240.185.137`), `sun9-40.vkuserphoto.ru` (`87.240.185.147`), `sun9-45.userapi.com` (`87.240.185.148`), `sun9-45.vkuserphoto.ru` (`87.240.185.148`), `sun9-47.userapi.com` (`87.240.185.150`), `sun9-47.vkuserphoto.ru` (`87.240.185.150`), `sun9-48.vkuserphoto.ru` (`87.240.185.151`), `sun9-49.vkuserphoto.ru` (`87.240.185.152`), `sun9-50.vkuserphoto.ru` (`87.240.185.153`), `sun9-51.vkuserphoto.ru` (`87.240.185.154`), `sun9-53.vkuserphoto.ru` (`87.240.185.156`), `sun9-54.vkuserphoto.ru` (`87.240.185.157`), `sun9-55.vkuserphoto.ru` (`87.240.185.158`), `sun9-56.vkuserphoto.ru` (`87.240.185.159`), `sun9-6.vkuserphoto.ru` (`87.240.185.138`), `sun9-61.vkuserphoto.ru` (`87.240.185.160`), `sun9-62.vkuserphoto.ru` (`87.240.185.161`), `sun9-63.vkuserphoto.ru` (`87.240.185.162`), `sun9-65.vkuserphoto.ru` (`87.240.185.164`), `sun9-67.vkuserphoto.ru` (`87.240.185.166`), `sun9-68.vkuserphoto.ru` (`87.240.185.167`), `sun9-69.vkuserphoto.ru` (`87.240.185.168`), `sun9-70.vkuserphoto.ru` (`87.240.185.169`), `sun9-71.vkuserphoto.ru` (`87.240.185.170`), `sun9-72.vkuserphoto.ru` (`87.240.185.171`), `sun9-77.vkuserphoto.ru` (`87.240.185.131`), `sun9-80.vkuserphoto.ru` (`87.240.185.140`), `sun9-81.vkuserphoto.ru` (`87.240.185.141`), `sun9-82.vkuserphoto.ru` (`87.240.185.132`), `sun9-83.userapi.com` (`87.240.185.133`), `sun9-83.vkuserphoto.ru` (`87.240.185.133`), `sun9-84.vkuserphoto.ru` (`87.240.185.134`), `sun9-85.vkuserphoto.ru` (`87.240.185.172`), `sun9-87.vkuserphoto.ru` (`87.240.185.135`), `sun9-9.vkuserphoto.ru` (`87.240.185.130`), `vk.com` (`87.240.129.133`), `vk.com` (`87.240.132.67`), `vk.com` (`87.240.132.72`), `vk.com` (`87.240.132.78`), `vk.com` (`87.240.137.164`), `vk.ru` (`87.240.129.133`), `vk.ru` (`87.240.132.67`), `vk.ru` (`87.240.132.72`), `vk.ru` (`87.240.132.78`), `vk.ru` (`87.240.137.164`), `vkvideo.ru` (`87.240.129.133`), `vkvideo.ru` (`87.240.132.67`), `vkvideo.ru` (`87.240.132.72`), `vkvideo.ru` (`87.240.132.78`), `vkvideo.ru` (`87.240.137.164`), `web.api.vk.ru` (`87.240.129.140`), `web.api.vk.ru` (`87.240.137.130`), `web.api.vk.ru` (`87.240.137.206`), `web.api.vk.ru` (`87.240.137.207`), `web.api.vk.ru` (`87.240.137.208`), `web.api.vk.ru` (`87.240.139.193`), `web.api.vk.ru` (`87.240.190.70`), `web.api.vk.ru` (`87.240.190.75`) |
 | `87.240.166.0/24` | `87.240.128.0/18` | Нет наблюдений |
 | `87.240.167.0/24` | `87.240.128.0/18` | Нет наблюдений |
 | `91.231.132.0/24` | `91.231.132.0/22` | Входной ASN `AS47764` |
@@ -5066,9 +5051,9 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | `89.248.204.0/23` | `89.248.192.0/20` | Нет наблюдений |
 | `89.248.206.0/23` | `89.248.192.0/20` | Нет наблюдений |
 | `92.42.14.0/23` | `92.42.15.0/24` | Нет наблюдений |
-| `92.53.64.0/19` | `92.53.64.0/18` | `am8.bigdata-it.ru` (`92.53.65.242`), `am9.bigdata-it.ru` (`92.53.65.242`), `balance-leads.ru` (`92.53.65.242`), `crm.allbdata.ru` (`92.53.65.242`), `crm.bigtehshop.ru` (`92.53.65.242`), `crm.bizupprogress.ru` (`92.53.65.242`), `crm.board-traff.ru` (`92.53.65.242`), `crm.deepcall.ru` (`92.53.65.242`), `crm.direct-client.ru` (`92.53.65.242`), `crm.elama-partner.ru` (`92.53.65.242`), `crm.info-it-data.ru` (`92.53.65.242`), `crm.kupileadbdata.ru` (`92.53.65.242`), `crm.lead-fixer.ru` (`92.53.65.242`), `crm.megabdatait.ru` (`92.53.65.242`), `crm.megabigteh.ru` (`92.53.65.242`), `crm.newbigtech.ru` (`92.53.65.242`), `crm.r3ka.ru` (`92.53.65.242`), `crm.sertmarket.shop` (`92.53.65.242`), `crm.sigmatraffic.ru` (`92.53.65.242`), `crm.techbigdata.ru` (`92.53.65.242`), `crm.viva-lead.ru` (`92.53.65.242`), `gck.needcallbuy.ru` (`92.53.65.242`), `lead.justagent.ru` (`92.53.65.242`), `qoopler.ru` (`92.53.65.242`), `sales.bigdata-it.ru` (`92.53.65.242`) |
+| `92.53.64.0/19` | `92.53.64.0/18` | `am8.bigdata-it.ru` (`92.53.65.242`), `am9.bigdata-it.ru` (`92.53.65.242`), `balance-leads.ru` (`92.53.65.242`), `crm.allbdata.ru` (`92.53.65.242`), `crm.bigtehshop.ru` (`92.53.65.242`), `crm.bizupprogress.ru` (`92.53.65.242`), `crm.board-traff.ru` (`92.53.65.242`), `crm.deepcall.ru` (`92.53.65.242`), `crm.direct-client.ru` (`92.53.65.242`), `crm.dsleadsplus.ru` (`92.53.65.242`), `crm.elama-partner.ru` (`92.53.65.242`), `crm.info-it-data.ru` (`92.53.65.242`), `crm.kupileadbdata.ru` (`92.53.65.242`), `crm.lead-fixer.ru` (`92.53.65.242`), `crm.megabdatait.ru` (`92.53.65.242`), `crm.megabigteh.ru` (`92.53.65.242`), `crm.newbigtech.ru` (`92.53.65.242`), `crm.r3ka.ru` (`92.53.65.242`), `crm.sertmarket.shop` (`92.53.65.242`), `crm.sigmatraffic.ru` (`92.53.65.242`), `crm.techbigdata.ru` (`92.53.65.242`), `crm.viva-lead.ru` (`92.53.65.242`), `gck.needcallbuy.ru` (`92.53.65.242`), `lead.justagent.ru` (`92.53.65.242`), `qoopler.ru` (`92.53.65.242`), `sales.bigdata-it.ru` (`92.53.65.242`) |
 | `92.53.64.0/24` | `92.53.64.0/18` | Нет наблюдений |
-| `92.53.65.0/24` | `92.53.64.0/18` | `am8.bigdata-it.ru` (`92.53.65.242`), `am9.bigdata-it.ru` (`92.53.65.242`), `balance-leads.ru` (`92.53.65.242`), `crm.allbdata.ru` (`92.53.65.242`), `crm.bigtehshop.ru` (`92.53.65.242`), `crm.bizupprogress.ru` (`92.53.65.242`), `crm.board-traff.ru` (`92.53.65.242`), `crm.deepcall.ru` (`92.53.65.242`), `crm.direct-client.ru` (`92.53.65.242`), `crm.elama-partner.ru` (`92.53.65.242`), `crm.info-it-data.ru` (`92.53.65.242`), `crm.kupileadbdata.ru` (`92.53.65.242`), `crm.lead-fixer.ru` (`92.53.65.242`), `crm.megabdatait.ru` (`92.53.65.242`), `crm.megabigteh.ru` (`92.53.65.242`), `crm.newbigtech.ru` (`92.53.65.242`), `crm.r3ka.ru` (`92.53.65.242`), `crm.sertmarket.shop` (`92.53.65.242`), `crm.sigmatraffic.ru` (`92.53.65.242`), `crm.techbigdata.ru` (`92.53.65.242`), `crm.viva-lead.ru` (`92.53.65.242`), `gck.needcallbuy.ru` (`92.53.65.242`), `lead.justagent.ru` (`92.53.65.242`), `qoopler.ru` (`92.53.65.242`), `sales.bigdata-it.ru` (`92.53.65.242`) |
+| `92.53.65.0/24` | `92.53.64.0/18` | `am8.bigdata-it.ru` (`92.53.65.242`), `am9.bigdata-it.ru` (`92.53.65.242`), `balance-leads.ru` (`92.53.65.242`), `crm.allbdata.ru` (`92.53.65.242`), `crm.bigtehshop.ru` (`92.53.65.242`), `crm.bizupprogress.ru` (`92.53.65.242`), `crm.board-traff.ru` (`92.53.65.242`), `crm.deepcall.ru` (`92.53.65.242`), `crm.direct-client.ru` (`92.53.65.242`), `crm.dsleadsplus.ru` (`92.53.65.242`), `crm.elama-partner.ru` (`92.53.65.242`), `crm.info-it-data.ru` (`92.53.65.242`), `crm.kupileadbdata.ru` (`92.53.65.242`), `crm.lead-fixer.ru` (`92.53.65.242`), `crm.megabdatait.ru` (`92.53.65.242`), `crm.megabigteh.ru` (`92.53.65.242`), `crm.newbigtech.ru` (`92.53.65.242`), `crm.r3ka.ru` (`92.53.65.242`), `crm.sertmarket.shop` (`92.53.65.242`), `crm.sigmatraffic.ru` (`92.53.65.242`), `crm.techbigdata.ru` (`92.53.65.242`), `crm.viva-lead.ru` (`92.53.65.242`), `gck.needcallbuy.ru` (`92.53.65.242`), `lead.justagent.ru` (`92.53.65.242`), `qoopler.ru` (`92.53.65.242`), `sales.bigdata-it.ru` (`92.53.65.242`) |
 | `92.53.66.0/24` | `92.53.64.0/18` | Нет наблюдений |
 | `92.53.71.0/24` | `92.53.64.0/18` | Нет наблюдений |
 | `92.53.72.0/24` | `92.53.64.0/18` | Нет наблюдений |
@@ -5335,7 +5320,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | --- | --- | --- |
 | `88.218.240.0/22` | `88.218.240.0/22` | `content.adriver.ru` (`88.218.242.219`), `content.adriver.ru` (`88.218.243.74`) |
 | `91.192.80.0/24` | `91.192.80.0/24` | `content.adriver.ru` (`91.192.80.104`), `content.adriver.ru` (`91.192.80.105`), `content.adriver.ru` (`91.192.80.106`), `content.adriver.ru` (`91.192.80.14`), `content.adriver.ru` (`91.192.80.15`) |
-| `93.189.58.0/24` | `93.189.58.0/24` | `sync.upravel.com` (`93.189.58.186`), `sync.upravel.com` (`93.189.58.218`), `sync.upravel.com` (`93.189.58.226`) |
+| `93.189.58.0/24` | `93.189.58.0/24` | `content.adriver.ru` (`93.189.58.202`), `sync.upravel.com` (`93.189.58.186`), `sync.upravel.com` (`93.189.58.218`), `sync.upravel.com` (`93.189.58.226`) |
 
 ## AS50166 — RTCloud, LLC
 
@@ -5752,17 +5737,18 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | --- | --- | --- |
 | `78.155.198.0/24` | `78.155.198.0/24` | Входной ASN `AS51115` |
 | `81.161.98.0/23` | `81.161.98.0/23` | `img.beget.com` (`81.161.99.75`) |
-| `132.243.176.0/22` | `132.243.176.0/22` | Входной ASN `AS51115` |
+| `132.243.176.0/22` | `132.243.176.0/22` | `freessl.tbank.ru` (`132.243.177.54`) |
 | `132.243.180.0/24` | `132.243.180.0/24` | Входной ASN `AS51115` |
 | `177.122.6.0/24` | `177.122.6.0/24` | Входной ASN `AS51115` |
+| `177.122.96.0/24` | `177.122.96.0/24` | Входной ASN `AS51115` |
 | `178.248.232.0/21` | `178.248.232.0/21` | `assets-site.beget.com` (`178.248.234.119`), `login.mts.ru` (`178.248.238.28`), `mts.ru` (`178.248.238.27`), `mws.ru` (`178.248.237.192`), `spb.mts.ru` (`178.248.238.27`), `static.mts.ru` (`178.248.238.27`), `timeweb.cloud` (`178.248.239.157`), `vkusvill.ru` (`178.248.232.221`) |
 | `178.248.232.0/23` | `178.248.232.0/21` | `vkusvill.ru` (`178.248.232.221`) |
 | `178.248.234.0/23` | `178.248.232.0/21` | `assets-site.beget.com` (`178.248.234.119`) |
 | `178.248.236.0/23` | `178.248.232.0/21` | `mws.ru` (`178.248.237.192`) |
 | `178.248.237.0/24` | `178.248.232.0/21` | `mws.ru` (`178.248.237.192`) |
 | `178.248.238.0/23` | `178.248.232.0/21` | `login.mts.ru` (`178.248.238.28`), `mts.ru` (`178.248.238.27`), `spb.mts.ru` (`178.248.238.27`), `static.mts.ru` (`178.248.238.27`), `timeweb.cloud` (`178.248.239.157`) |
-| `185.65.148.0/22` | `185.65.148.0/22` | `1325848681794439906951.cm.a.mts.ru` (`185.65.149.228`), `1372948341795419122368.cm.a.mts.ru` (`185.65.149.228`), `1416232981794340017831.cm.a.mts.ru` (`185.65.149.228`), `1549738361795419100367.cm.a.mts.ru` (`185.65.149.228`), `1668173331794723849204.cm.a.mts.ru` (`185.65.149.228`), `1686587501794300151369.cm.a.mts.ru` (`185.65.149.228`), `2019022671794986628428.cm.a.mts.ru` (`185.65.149.228`), `2231884041794637006546.cm.a.mts.ru` (`185.65.149.228`), `2260358961794266483993.cm.a.mts.ru` (`185.65.149.228`), `2268603871795419125783.cm.a.mts.ru` (`185.65.149.228`), `2359741341794393788476.cm.a.mts.ru` (`185.65.149.228`), `2399342921794300238215.cm.a.mts.ru` (`185.65.149.228`), `2415138441794342153836.cm.a.mts.ru` (`185.65.149.228`), `2421602481794551983008.cm.a.mts.ru` (`185.65.149.228`), `2472168571794417604394.cm.a.mts.ru` (`185.65.149.228`), `2507129031794377425246.cm.a.mts.ru` (`185.65.149.228`), `2519457711795329802211.cm.a.mts.ru` (`185.65.149.228`), `2569500681794402591460.cm.a.mts.ru` (`185.65.149.228`), `2934199061794266471230.cm.a.mts.ru` (`185.65.149.228`), `2974159131794477850254.cm.a.mts.ru` (`185.65.149.228`), `2994809501794439922000.cm.a.mts.ru` (`185.65.149.228`), `3036551891794377430378.cm.a.mts.ru` (`185.65.149.228`), `3182419811793495384628.cm.a.mts.ru` (`185.65.149.228`), `3375800271795072865075.cm.a.mts.ru` (`185.65.149.228`), `3456006501795244497053.cm.a.mts.ru` (`185.65.149.228`), `3565207081794340010766.cm.a.mts.ru` (`185.65.149.228`), `3774413651794467288712.cm.a.mts.ru` (`185.65.149.228`), `3911202351794901937756.cm.a.mts.ru` (`185.65.149.228`), `3930159131794340027045.cm.a.mts.ru` (`185.65.149.228`), `4007390581794417585806.cm.a.mts.ru` (`185.65.149.228`), `4015344131795072863811.cm.a.mts.ru` (`185.65.149.228`), `4059203031794551988172.cm.a.mts.ru` (`185.65.149.228`), `4129606181794437662354.cm.a.mts.ru` (`185.65.149.228`), `4135084311794335388817.cm.a.mts.ru` (`185.65.149.228`), `4211347531794420125527.cm.a.mts.ru` (`185.65.149.228`), `4355654371794723869888.cm.a.mts.ru` (`185.65.149.228`), `4394285141794261891524.cm.a.mts.ru` (`185.65.149.228`), `4636494031794306066312.cm.a.mts.ru` (`185.65.149.228`), `4749279351794901966007.cm.a.mts.ru` (`185.65.149.228`), `4830143981794300251190.cm.a.mts.ru` (`185.65.149.228`), `4836438351794810183902.cm.a.mts.ru` (`185.65.149.228`), `4876386651794402572427.cm.a.mts.ru` (`185.65.149.228`), `4975811741794393809345.cm.a.mts.ru` (`185.65.149.228`), `5007509551794417610245.cm.a.mts.ru` (`185.65.149.228`), `5089274751794342141239.cm.a.mts.ru` (`185.65.149.228`), `5263165521794467294407.cm.a.mts.ru` (`185.65.149.228`), `5275941411794477869556.cm.a.mts.ru` (`185.65.149.228`), `5403933541794636984133.cm.a.mts.ru` (`185.65.149.228`), `5409217191794335397399.cm.a.mts.ru` (`185.65.149.228`), `5582802101794417585826.cm.a.mts.ru` (`185.65.149.228`), `5650439931794446002298.cm.a.mts.ru` (`185.65.149.228`), `5817185321794261790587.cm.a.mts.ru` (`185.65.149.228`), `5819685921794266382441.cm.a.mts.ru` (`185.65.149.228`), `5882964711793495484340.cm.a.mts.ru` (`185.65.149.228`), `5916233741794420117442.cm.a.mts.ru` (`185.65.149.228`), `5930063661795244519155.cm.a.mts.ru` (`185.65.149.228`), `6201485081794637002152.cm.a.mts.ru` (`185.65.149.228`), `6234051721794636980943.cm.a.mts.ru` (`185.65.149.228`), `6340847681794390093975.cm.a.mts.ru` (`185.65.149.228`), `6360949711794477846954.cm.a.mts.ru` (`185.65.149.228`), `6494599881795158613309.cm.a.mts.ru` (`185.65.149.228`), `6598175431795158640468.cm.a.mts.ru` (`185.65.149.228`), `6655435111794306084179.cm.a.mts.ru` (`185.65.149.228`), `6666034961794901953848.cm.a.mts.ru` (`185.65.149.228`), `6790708701793721784494.cm.a.mts.ru` (`185.65.149.228`), `6982539211794400180415.cm.a.mts.ru` (`185.65.149.228`), `7022691471795329778280.cm.a.mts.ru` (`185.65.149.228`), `7061394141794437684678.cm.a.mts.ru` (`185.65.149.228`), `7171557751794467275581.cm.a.mts.ru` (`185.65.149.228`), `7266144521795244523315.cm.a.mts.ru` (`185.65.149.228`), `7302874391794306076193.cm.a.mts.ru` (`185.65.149.228`), `7462766001794986634725.cm.a.mts.ru` (`185.65.149.228`), `7481166371794551964831.cm.a.mts.ru` (`185.65.149.228`), `7621231031794402596495.cm.a.mts.ru` (`185.65.149.228`), `7933857881794477866963.cm.a.mts.ru` (`185.65.149.228`), `7937829981794420137567.cm.a.mts.ru` (`185.65.149.228`), `8009731741794377404982.cm.a.mts.ru` (`185.65.149.228`), `8075867531795419097576.cm.a.mts.ru` (`185.65.149.228`), `8158327011794986615070.cm.a.mts.ru` (`185.65.149.228`), `8173850941794417593033.cm.a.mts.ru` (`185.65.149.228`), `8176802631794810206785.cm.a.mts.ru` (`185.65.149.228`), `8230726771794400191606.cm.a.mts.ru` (`185.65.149.228`), `8598688961794390072643.cm.a.mts.ru` (`185.65.149.228`), `8605997001794723874597.cm.a.mts.ru` (`185.65.149.228`), `8817950421795158640058.cm.a.mts.ru` (`185.65.149.228`), `8992254961794390097914.cm.a.mts.ru` (`185.65.149.228`), `9071633211794437681600.cm.a.mts.ru` (`185.65.149.228`), `9097615241795329807007.cm.a.mts.ru` (`185.65.149.228`), `9180338931795072848026.cm.a.mts.ru` (`185.65.149.228`), `9184320031794335405752.cm.a.mts.ru` (`185.65.149.228`), `9211615281794723850894.cm.a.mts.ru` (`185.65.149.228`), `9360834981794299986160.cm.a.mts.ru` (`185.65.149.228`), `9409812541794810212015.cm.a.mts.ru` (`185.65.149.228`), `9498848311794551970465.cm.a.mts.ru` (`185.65.149.228`), `9501822521794261904662.cm.a.mts.ru` (`185.65.149.228`), `9847219361794446014709.cm.a.mts.ru` (`185.65.149.228`), `9884912371794342162126.cm.a.mts.ru` (`185.65.149.228`), `api.a.mts.ru` (`185.65.149.228`), `cm.a.mts.ru` (`185.65.149.228`), `dns-shop.ru` (`185.65.148.196`), `serving.a.mts.ru` (`185.65.149.228`), `static.a.mts.ru` (`185.65.149.228`), `tag.a.mts.ru` (`185.65.149.228`), `vkusnoitochka.ru` (`185.65.148.127`), `vkusnoitochka.ru` (`185.65.149.127`) |
-| `185.65.148.0/23` | `185.65.148.0/22` | `1325848681794439906951.cm.a.mts.ru` (`185.65.149.228`), `1372948341795419122368.cm.a.mts.ru` (`185.65.149.228`), `1416232981794340017831.cm.a.mts.ru` (`185.65.149.228`), `1549738361795419100367.cm.a.mts.ru` (`185.65.149.228`), `1668173331794723849204.cm.a.mts.ru` (`185.65.149.228`), `1686587501794300151369.cm.a.mts.ru` (`185.65.149.228`), `2019022671794986628428.cm.a.mts.ru` (`185.65.149.228`), `2231884041794637006546.cm.a.mts.ru` (`185.65.149.228`), `2260358961794266483993.cm.a.mts.ru` (`185.65.149.228`), `2268603871795419125783.cm.a.mts.ru` (`185.65.149.228`), `2359741341794393788476.cm.a.mts.ru` (`185.65.149.228`), `2399342921794300238215.cm.a.mts.ru` (`185.65.149.228`), `2415138441794342153836.cm.a.mts.ru` (`185.65.149.228`), `2421602481794551983008.cm.a.mts.ru` (`185.65.149.228`), `2472168571794417604394.cm.a.mts.ru` (`185.65.149.228`), `2507129031794377425246.cm.a.mts.ru` (`185.65.149.228`), `2519457711795329802211.cm.a.mts.ru` (`185.65.149.228`), `2569500681794402591460.cm.a.mts.ru` (`185.65.149.228`), `2934199061794266471230.cm.a.mts.ru` (`185.65.149.228`), `2974159131794477850254.cm.a.mts.ru` (`185.65.149.228`), `2994809501794439922000.cm.a.mts.ru` (`185.65.149.228`), `3036551891794377430378.cm.a.mts.ru` (`185.65.149.228`), `3182419811793495384628.cm.a.mts.ru` (`185.65.149.228`), `3375800271795072865075.cm.a.mts.ru` (`185.65.149.228`), `3456006501795244497053.cm.a.mts.ru` (`185.65.149.228`), `3565207081794340010766.cm.a.mts.ru` (`185.65.149.228`), `3774413651794467288712.cm.a.mts.ru` (`185.65.149.228`), `3911202351794901937756.cm.a.mts.ru` (`185.65.149.228`), `3930159131794340027045.cm.a.mts.ru` (`185.65.149.228`), `4007390581794417585806.cm.a.mts.ru` (`185.65.149.228`), `4015344131795072863811.cm.a.mts.ru` (`185.65.149.228`), `4059203031794551988172.cm.a.mts.ru` (`185.65.149.228`), `4129606181794437662354.cm.a.mts.ru` (`185.65.149.228`), `4135084311794335388817.cm.a.mts.ru` (`185.65.149.228`), `4211347531794420125527.cm.a.mts.ru` (`185.65.149.228`), `4355654371794723869888.cm.a.mts.ru` (`185.65.149.228`), `4394285141794261891524.cm.a.mts.ru` (`185.65.149.228`), `4636494031794306066312.cm.a.mts.ru` (`185.65.149.228`), `4749279351794901966007.cm.a.mts.ru` (`185.65.149.228`), `4830143981794300251190.cm.a.mts.ru` (`185.65.149.228`), `4836438351794810183902.cm.a.mts.ru` (`185.65.149.228`), `4876386651794402572427.cm.a.mts.ru` (`185.65.149.228`), `4975811741794393809345.cm.a.mts.ru` (`185.65.149.228`), `5007509551794417610245.cm.a.mts.ru` (`185.65.149.228`), `5089274751794342141239.cm.a.mts.ru` (`185.65.149.228`), `5263165521794467294407.cm.a.mts.ru` (`185.65.149.228`), `5275941411794477869556.cm.a.mts.ru` (`185.65.149.228`), `5403933541794636984133.cm.a.mts.ru` (`185.65.149.228`), `5409217191794335397399.cm.a.mts.ru` (`185.65.149.228`), `5582802101794417585826.cm.a.mts.ru` (`185.65.149.228`), `5650439931794446002298.cm.a.mts.ru` (`185.65.149.228`), `5817185321794261790587.cm.a.mts.ru` (`185.65.149.228`), `5819685921794266382441.cm.a.mts.ru` (`185.65.149.228`), `5882964711793495484340.cm.a.mts.ru` (`185.65.149.228`), `5916233741794420117442.cm.a.mts.ru` (`185.65.149.228`), `5930063661795244519155.cm.a.mts.ru` (`185.65.149.228`), `6201485081794637002152.cm.a.mts.ru` (`185.65.149.228`), `6234051721794636980943.cm.a.mts.ru` (`185.65.149.228`), `6340847681794390093975.cm.a.mts.ru` (`185.65.149.228`), `6360949711794477846954.cm.a.mts.ru` (`185.65.149.228`), `6494599881795158613309.cm.a.mts.ru` (`185.65.149.228`), `6598175431795158640468.cm.a.mts.ru` (`185.65.149.228`), `6655435111794306084179.cm.a.mts.ru` (`185.65.149.228`), `6666034961794901953848.cm.a.mts.ru` (`185.65.149.228`), `6790708701793721784494.cm.a.mts.ru` (`185.65.149.228`), `6982539211794400180415.cm.a.mts.ru` (`185.65.149.228`), `7022691471795329778280.cm.a.mts.ru` (`185.65.149.228`), `7061394141794437684678.cm.a.mts.ru` (`185.65.149.228`), `7171557751794467275581.cm.a.mts.ru` (`185.65.149.228`), `7266144521795244523315.cm.a.mts.ru` (`185.65.149.228`), `7302874391794306076193.cm.a.mts.ru` (`185.65.149.228`), `7462766001794986634725.cm.a.mts.ru` (`185.65.149.228`), `7481166371794551964831.cm.a.mts.ru` (`185.65.149.228`), `7621231031794402596495.cm.a.mts.ru` (`185.65.149.228`), `7933857881794477866963.cm.a.mts.ru` (`185.65.149.228`), `7937829981794420137567.cm.a.mts.ru` (`185.65.149.228`), `8009731741794377404982.cm.a.mts.ru` (`185.65.149.228`), `8075867531795419097576.cm.a.mts.ru` (`185.65.149.228`), `8158327011794986615070.cm.a.mts.ru` (`185.65.149.228`), `8173850941794417593033.cm.a.mts.ru` (`185.65.149.228`), `8176802631794810206785.cm.a.mts.ru` (`185.65.149.228`), `8230726771794400191606.cm.a.mts.ru` (`185.65.149.228`), `8598688961794390072643.cm.a.mts.ru` (`185.65.149.228`), `8605997001794723874597.cm.a.mts.ru` (`185.65.149.228`), `8817950421795158640058.cm.a.mts.ru` (`185.65.149.228`), `8992254961794390097914.cm.a.mts.ru` (`185.65.149.228`), `9071633211794437681600.cm.a.mts.ru` (`185.65.149.228`), `9097615241795329807007.cm.a.mts.ru` (`185.65.149.228`), `9180338931795072848026.cm.a.mts.ru` (`185.65.149.228`), `9184320031794335405752.cm.a.mts.ru` (`185.65.149.228`), `9211615281794723850894.cm.a.mts.ru` (`185.65.149.228`), `9360834981794299986160.cm.a.mts.ru` (`185.65.149.228`), `9409812541794810212015.cm.a.mts.ru` (`185.65.149.228`), `9498848311794551970465.cm.a.mts.ru` (`185.65.149.228`), `9501822521794261904662.cm.a.mts.ru` (`185.65.149.228`), `9847219361794446014709.cm.a.mts.ru` (`185.65.149.228`), `9884912371794342162126.cm.a.mts.ru` (`185.65.149.228`), `api.a.mts.ru` (`185.65.149.228`), `cm.a.mts.ru` (`185.65.149.228`), `dns-shop.ru` (`185.65.148.196`), `serving.a.mts.ru` (`185.65.149.228`), `static.a.mts.ru` (`185.65.149.228`), `tag.a.mts.ru` (`185.65.149.228`), `vkusnoitochka.ru` (`185.65.148.127`), `vkusnoitochka.ru` (`185.65.149.127`) |
+| `185.65.148.0/22` | `185.65.148.0/22` | `1325848681794439906951.cm.a.mts.ru` (`185.65.149.228`), `1372948341795419122368.cm.a.mts.ru` (`185.65.149.228`), `1416232981794340017831.cm.a.mts.ru` (`185.65.149.228`), `1549738361795419100367.cm.a.mts.ru` (`185.65.149.228`), `1668173331794723849204.cm.a.mts.ru` (`185.65.149.228`), `1686587501794300151369.cm.a.mts.ru` (`185.65.149.228`), `2019022671794986628428.cm.a.mts.ru` (`185.65.149.228`), `2231884041794637006546.cm.a.mts.ru` (`185.65.149.228`), `2260358961794266483993.cm.a.mts.ru` (`185.65.149.228`), `2268603871795419125783.cm.a.mts.ru` (`185.65.149.228`), `2359741341794393788476.cm.a.mts.ru` (`185.65.149.228`), `2399342921794300238215.cm.a.mts.ru` (`185.65.149.228`), `2415138441794342153836.cm.a.mts.ru` (`185.65.149.228`), `2421602481794551983008.cm.a.mts.ru` (`185.65.149.228`), `2472168571794417604394.cm.a.mts.ru` (`185.65.149.228`), `2507129031794377425246.cm.a.mts.ru` (`185.65.149.228`), `2519457711795329802211.cm.a.mts.ru` (`185.65.149.228`), `2569500681794402591460.cm.a.mts.ru` (`185.65.149.228`), `2934199061794266471230.cm.a.mts.ru` (`185.65.149.228`), `2974159131794477850254.cm.a.mts.ru` (`185.65.149.228`), `2994809501794439922000.cm.a.mts.ru` (`185.65.149.228`), `3036551891794377430378.cm.a.mts.ru` (`185.65.149.228`), `3182419811793495384628.cm.a.mts.ru` (`185.65.149.228`), `3375800271795072865075.cm.a.mts.ru` (`185.65.149.228`), `3456006501795244497053.cm.a.mts.ru` (`185.65.149.228`), `3565207081794340010766.cm.a.mts.ru` (`185.65.149.228`), `3774413651794467288712.cm.a.mts.ru` (`185.65.149.228`), `3911202351794901937756.cm.a.mts.ru` (`185.65.149.228`), `3930159131794340027045.cm.a.mts.ru` (`185.65.149.228`), `4007390581794417585806.cm.a.mts.ru` (`185.65.149.228`), `4015344131795072863811.cm.a.mts.ru` (`185.65.149.228`), `4059203031794551988172.cm.a.mts.ru` (`185.65.149.228`), `4129606181794437662354.cm.a.mts.ru` (`185.65.149.228`), `4135084311794335388817.cm.a.mts.ru` (`185.65.149.228`), `4211347531794420125527.cm.a.mts.ru` (`185.65.149.228`), `4235180541795513836885.cm.a.mts.ru` (`185.65.149.228`), `4355654371794723869888.cm.a.mts.ru` (`185.65.149.228`), `4394285141794261891524.cm.a.mts.ru` (`185.65.149.228`), `4636494031794306066312.cm.a.mts.ru` (`185.65.149.228`), `4749279351794901966007.cm.a.mts.ru` (`185.65.149.228`), `4830143981794300251190.cm.a.mts.ru` (`185.65.149.228`), `4836438351794810183902.cm.a.mts.ru` (`185.65.149.228`), `4876386651794402572427.cm.a.mts.ru` (`185.65.149.228`), `4975811741794393809345.cm.a.mts.ru` (`185.65.149.228`), `5007509551794417610245.cm.a.mts.ru` (`185.65.149.228`), `5089274751794342141239.cm.a.mts.ru` (`185.65.149.228`), `5263165521794467294407.cm.a.mts.ru` (`185.65.149.228`), `5275941411794477869556.cm.a.mts.ru` (`185.65.149.228`), `5403933541794636984133.cm.a.mts.ru` (`185.65.149.228`), `5409217191794335397399.cm.a.mts.ru` (`185.65.149.228`), `5582802101794417585826.cm.a.mts.ru` (`185.65.149.228`), `5650439931794446002298.cm.a.mts.ru` (`185.65.149.228`), `5817185321794261790587.cm.a.mts.ru` (`185.65.149.228`), `5819685921794266382441.cm.a.mts.ru` (`185.65.149.228`), `5882964711793495484340.cm.a.mts.ru` (`185.65.149.228`), `5916233741794420117442.cm.a.mts.ru` (`185.65.149.228`), `5930063661795244519155.cm.a.mts.ru` (`185.65.149.228`), `6201485081794637002152.cm.a.mts.ru` (`185.65.149.228`), `6234051721794636980943.cm.a.mts.ru` (`185.65.149.228`), `6340847681794390093975.cm.a.mts.ru` (`185.65.149.228`), `6360949711794477846954.cm.a.mts.ru` (`185.65.149.228`), `6494599881795158613309.cm.a.mts.ru` (`185.65.149.228`), `6598175431795158640468.cm.a.mts.ru` (`185.65.149.228`), `6655435111794306084179.cm.a.mts.ru` (`185.65.149.228`), `6666034961794901953848.cm.a.mts.ru` (`185.65.149.228`), `6790708701793721784494.cm.a.mts.ru` (`185.65.149.228`), `6982539211794400180415.cm.a.mts.ru` (`185.65.149.228`), `7022691471795329778280.cm.a.mts.ru` (`185.65.149.228`), `7061394141794437684678.cm.a.mts.ru` (`185.65.149.228`), `7171557751794467275581.cm.a.mts.ru` (`185.65.149.228`), `7266144521795244523315.cm.a.mts.ru` (`185.65.149.228`), `7302874391794306076193.cm.a.mts.ru` (`185.65.149.228`), `7423487321795513862038.cm.a.mts.ru` (`185.65.149.228`), `7462766001794986634725.cm.a.mts.ru` (`185.65.149.228`), `7481166371794551964831.cm.a.mts.ru` (`185.65.149.228`), `7621231031794402596495.cm.a.mts.ru` (`185.65.149.228`), `7933857881794477866963.cm.a.mts.ru` (`185.65.149.228`), `7937829981794420137567.cm.a.mts.ru` (`185.65.149.228`), `8009731741794377404982.cm.a.mts.ru` (`185.65.149.228`), `8075867531795419097576.cm.a.mts.ru` (`185.65.149.228`), `8158327011794986615070.cm.a.mts.ru` (`185.65.149.228`), `8173850941794417593033.cm.a.mts.ru` (`185.65.149.228`), `8176802631794810206785.cm.a.mts.ru` (`185.65.149.228`), `8230726771794400191606.cm.a.mts.ru` (`185.65.149.228`), `8454457111795513856130.cm.a.mts.ru` (`185.65.149.228`), `8598688961794390072643.cm.a.mts.ru` (`185.65.149.228`), `8605997001794723874597.cm.a.mts.ru` (`185.65.149.228`), `8817950421795158640058.cm.a.mts.ru` (`185.65.149.228`), `8992254961794390097914.cm.a.mts.ru` (`185.65.149.228`), `9071633211794437681600.cm.a.mts.ru` (`185.65.149.228`), `9097615241795329807007.cm.a.mts.ru` (`185.65.149.228`), `9180338931795072848026.cm.a.mts.ru` (`185.65.149.228`), `9184320031794335405752.cm.a.mts.ru` (`185.65.149.228`), `9211615281794723850894.cm.a.mts.ru` (`185.65.149.228`), `9360834981794299986160.cm.a.mts.ru` (`185.65.149.228`), `9409812541794810212015.cm.a.mts.ru` (`185.65.149.228`), `9498848311794551970465.cm.a.mts.ru` (`185.65.149.228`), `9501822521794261904662.cm.a.mts.ru` (`185.65.149.228`), `9847219361794446014709.cm.a.mts.ru` (`185.65.149.228`), `9884912371794342162126.cm.a.mts.ru` (`185.65.149.228`), `api.a.mts.ru` (`185.65.149.228`), `cm.a.mts.ru` (`185.65.149.228`), `dns-shop.ru` (`185.65.148.196`), `serving.a.mts.ru` (`185.65.149.228`), `static.a.mts.ru` (`185.65.149.228`), `tag.a.mts.ru` (`185.65.149.228`), `vkusnoitochka.ru` (`185.65.148.127`), `vkusnoitochka.ru` (`185.65.149.127`) |
+| `185.65.148.0/23` | `185.65.148.0/22` | `1325848681794439906951.cm.a.mts.ru` (`185.65.149.228`), `1372948341795419122368.cm.a.mts.ru` (`185.65.149.228`), `1416232981794340017831.cm.a.mts.ru` (`185.65.149.228`), `1549738361795419100367.cm.a.mts.ru` (`185.65.149.228`), `1668173331794723849204.cm.a.mts.ru` (`185.65.149.228`), `1686587501794300151369.cm.a.mts.ru` (`185.65.149.228`), `2019022671794986628428.cm.a.mts.ru` (`185.65.149.228`), `2231884041794637006546.cm.a.mts.ru` (`185.65.149.228`), `2260358961794266483993.cm.a.mts.ru` (`185.65.149.228`), `2268603871795419125783.cm.a.mts.ru` (`185.65.149.228`), `2359741341794393788476.cm.a.mts.ru` (`185.65.149.228`), `2399342921794300238215.cm.a.mts.ru` (`185.65.149.228`), `2415138441794342153836.cm.a.mts.ru` (`185.65.149.228`), `2421602481794551983008.cm.a.mts.ru` (`185.65.149.228`), `2472168571794417604394.cm.a.mts.ru` (`185.65.149.228`), `2507129031794377425246.cm.a.mts.ru` (`185.65.149.228`), `2519457711795329802211.cm.a.mts.ru` (`185.65.149.228`), `2569500681794402591460.cm.a.mts.ru` (`185.65.149.228`), `2934199061794266471230.cm.a.mts.ru` (`185.65.149.228`), `2974159131794477850254.cm.a.mts.ru` (`185.65.149.228`), `2994809501794439922000.cm.a.mts.ru` (`185.65.149.228`), `3036551891794377430378.cm.a.mts.ru` (`185.65.149.228`), `3182419811793495384628.cm.a.mts.ru` (`185.65.149.228`), `3375800271795072865075.cm.a.mts.ru` (`185.65.149.228`), `3456006501795244497053.cm.a.mts.ru` (`185.65.149.228`), `3565207081794340010766.cm.a.mts.ru` (`185.65.149.228`), `3774413651794467288712.cm.a.mts.ru` (`185.65.149.228`), `3911202351794901937756.cm.a.mts.ru` (`185.65.149.228`), `3930159131794340027045.cm.a.mts.ru` (`185.65.149.228`), `4007390581794417585806.cm.a.mts.ru` (`185.65.149.228`), `4015344131795072863811.cm.a.mts.ru` (`185.65.149.228`), `4059203031794551988172.cm.a.mts.ru` (`185.65.149.228`), `4129606181794437662354.cm.a.mts.ru` (`185.65.149.228`), `4135084311794335388817.cm.a.mts.ru` (`185.65.149.228`), `4211347531794420125527.cm.a.mts.ru` (`185.65.149.228`), `4235180541795513836885.cm.a.mts.ru` (`185.65.149.228`), `4355654371794723869888.cm.a.mts.ru` (`185.65.149.228`), `4394285141794261891524.cm.a.mts.ru` (`185.65.149.228`), `4636494031794306066312.cm.a.mts.ru` (`185.65.149.228`), `4749279351794901966007.cm.a.mts.ru` (`185.65.149.228`), `4830143981794300251190.cm.a.mts.ru` (`185.65.149.228`), `4836438351794810183902.cm.a.mts.ru` (`185.65.149.228`), `4876386651794402572427.cm.a.mts.ru` (`185.65.149.228`), `4975811741794393809345.cm.a.mts.ru` (`185.65.149.228`), `5007509551794417610245.cm.a.mts.ru` (`185.65.149.228`), `5089274751794342141239.cm.a.mts.ru` (`185.65.149.228`), `5263165521794467294407.cm.a.mts.ru` (`185.65.149.228`), `5275941411794477869556.cm.a.mts.ru` (`185.65.149.228`), `5403933541794636984133.cm.a.mts.ru` (`185.65.149.228`), `5409217191794335397399.cm.a.mts.ru` (`185.65.149.228`), `5582802101794417585826.cm.a.mts.ru` (`185.65.149.228`), `5650439931794446002298.cm.a.mts.ru` (`185.65.149.228`), `5817185321794261790587.cm.a.mts.ru` (`185.65.149.228`), `5819685921794266382441.cm.a.mts.ru` (`185.65.149.228`), `5882964711793495484340.cm.a.mts.ru` (`185.65.149.228`), `5916233741794420117442.cm.a.mts.ru` (`185.65.149.228`), `5930063661795244519155.cm.a.mts.ru` (`185.65.149.228`), `6201485081794637002152.cm.a.mts.ru` (`185.65.149.228`), `6234051721794636980943.cm.a.mts.ru` (`185.65.149.228`), `6340847681794390093975.cm.a.mts.ru` (`185.65.149.228`), `6360949711794477846954.cm.a.mts.ru` (`185.65.149.228`), `6494599881795158613309.cm.a.mts.ru` (`185.65.149.228`), `6598175431795158640468.cm.a.mts.ru` (`185.65.149.228`), `6655435111794306084179.cm.a.mts.ru` (`185.65.149.228`), `6666034961794901953848.cm.a.mts.ru` (`185.65.149.228`), `6790708701793721784494.cm.a.mts.ru` (`185.65.149.228`), `6982539211794400180415.cm.a.mts.ru` (`185.65.149.228`), `7022691471795329778280.cm.a.mts.ru` (`185.65.149.228`), `7061394141794437684678.cm.a.mts.ru` (`185.65.149.228`), `7171557751794467275581.cm.a.mts.ru` (`185.65.149.228`), `7266144521795244523315.cm.a.mts.ru` (`185.65.149.228`), `7302874391794306076193.cm.a.mts.ru` (`185.65.149.228`), `7423487321795513862038.cm.a.mts.ru` (`185.65.149.228`), `7462766001794986634725.cm.a.mts.ru` (`185.65.149.228`), `7481166371794551964831.cm.a.mts.ru` (`185.65.149.228`), `7621231031794402596495.cm.a.mts.ru` (`185.65.149.228`), `7933857881794477866963.cm.a.mts.ru` (`185.65.149.228`), `7937829981794420137567.cm.a.mts.ru` (`185.65.149.228`), `8009731741794377404982.cm.a.mts.ru` (`185.65.149.228`), `8075867531795419097576.cm.a.mts.ru` (`185.65.149.228`), `8158327011794986615070.cm.a.mts.ru` (`185.65.149.228`), `8173850941794417593033.cm.a.mts.ru` (`185.65.149.228`), `8176802631794810206785.cm.a.mts.ru` (`185.65.149.228`), `8230726771794400191606.cm.a.mts.ru` (`185.65.149.228`), `8454457111795513856130.cm.a.mts.ru` (`185.65.149.228`), `8598688961794390072643.cm.a.mts.ru` (`185.65.149.228`), `8605997001794723874597.cm.a.mts.ru` (`185.65.149.228`), `8817950421795158640058.cm.a.mts.ru` (`185.65.149.228`), `8992254961794390097914.cm.a.mts.ru` (`185.65.149.228`), `9071633211794437681600.cm.a.mts.ru` (`185.65.149.228`), `9097615241795329807007.cm.a.mts.ru` (`185.65.149.228`), `9180338931795072848026.cm.a.mts.ru` (`185.65.149.228`), `9184320031794335405752.cm.a.mts.ru` (`185.65.149.228`), `9211615281794723850894.cm.a.mts.ru` (`185.65.149.228`), `9360834981794299986160.cm.a.mts.ru` (`185.65.149.228`), `9409812541794810212015.cm.a.mts.ru` (`185.65.149.228`), `9498848311794551970465.cm.a.mts.ru` (`185.65.149.228`), `9501822521794261904662.cm.a.mts.ru` (`185.65.149.228`), `9847219361794446014709.cm.a.mts.ru` (`185.65.149.228`), `9884912371794342162126.cm.a.mts.ru` (`185.65.149.228`), `api.a.mts.ru` (`185.65.149.228`), `cm.a.mts.ru` (`185.65.149.228`), `dns-shop.ru` (`185.65.148.196`), `serving.a.mts.ru` (`185.65.149.228`), `static.a.mts.ru` (`185.65.149.228`), `tag.a.mts.ru` (`185.65.149.228`), `vkusnoitochka.ru` (`185.65.148.127`), `vkusnoitochka.ru` (`185.65.149.127`) |
 | `185.65.150.0/23` | `185.65.148.0/22` | Входной ASN `AS51115` |
 | `185.94.108.0/22` | `185.94.108.0/22` | Входной ASN `AS51115` |
 | `185.94.108.0/23` | `185.94.108.0/22` | Входной ASN `AS51115` |
@@ -6656,7 +6642,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | --- | --- | --- |
 | `38.91.100.0/23` | `38.91.100.0/23` | `extreme-ip-lookup.com` (`38.91.101.186`) |
 | `216.106.188.0/24` | `216.106.188.0/24` | `extreme-ip-lookup.com` (`216.106.188.200`) |
-| `216.152.144.0/24` | `216.152.144.0/24` | Ручной импорт |
+| `216.152.144.0/24` | `216.152.144.0/24` | `cdn.cloud.ru` (`216.152.144.252`), `img.vkusvill.ru` (`216.152.144.252`) |
 
 ## AS64419 — Ecotel, Ltd.
 
@@ -6866,7 +6852,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | `194.67.66.0/24` | `194.67.64.0/20` | Ручной импорт |
 | `194.67.67.0/24` | `194.67.64.0/20` | Ручной импорт |
 | `194.67.68.0/24` | `194.67.64.0/20` | Ручной импорт |
-| `194.67.71.0/24` | `194.67.64.0/20` | `adriver-sync.rutarget.ru` (`194.67.71.125`), `adriver-sync.rutarget.ru` (`194.67.71.171`), `adriver-sync.rutarget.ru` (`194.67.71.185`), `adriver-sync.rutarget.ru` (`194.67.71.18`), `crm.deepcall.ru` (`194.67.71.194`), `crm.tehdataportal.ru` (`194.67.71.35`), `rutarget.ru` (`194.67.71.112`), `rutarget.ru` (`194.67.71.114`), `rutarget.ru` (`194.67.71.156`), `rutarget.ru` (`194.67.71.169`), `rutarget.ru` (`194.67.71.173`), `rutarget.ru` (`194.67.71.188`), `rutarget.ru` (`194.67.71.43`), `solta-sync.rutarget.ru` (`194.67.71.147`) |
+| `194.67.71.0/24` | `194.67.64.0/20` | `adriver-sync.rutarget.ru` (`194.67.71.125`), `adriver-sync.rutarget.ru` (`194.67.71.171`), `adriver-sync.rutarget.ru` (`194.67.71.185`), `adriver-sync.rutarget.ru` (`194.67.71.18`), `crm.deepcall.ru` (`194.67.71.194`), `crm.tehdataportal.ru` (`194.67.71.35`), `rutarget.ru` (`194.67.71.112`), `rutarget.ru` (`194.67.71.114`), `rutarget.ru` (`194.67.71.156`), `rutarget.ru` (`194.67.71.169`), `rutarget.ru` (`194.67.71.173`), `rutarget.ru` (`194.67.71.188`), `rutarget.ru` (`194.67.71.43`), `solta-sync.rutarget.ru` (`194.67.71.147`), `solta-sync.rutarget.ru` (`194.67.71.83`) |
 | `194.67.72.0/24` | `194.67.64.0/20` | `event-logger-bff.svc.reg.ru` (`194.67.72.33`), `external.login.reg.ru` (`194.67.72.32`), `header-bff.svc.reg.ru` (`194.67.72.33`), `login.reg.ru` (`194.67.72.32`), `reg.ru` (`194.67.72.31`), `showcase-static.reg.ru` (`194.67.72.36`), `sw.reg.ru` (`194.67.72.43`), `sw.reg.ru` (`194.67.72.44`), `www.reg.ru` (`194.67.72.31`) |
 | `194.67.74.0/24` | `194.67.64.0/20` | Ручной импорт |
 | `194.67.75.0/24` | `194.67.64.0/20` | Ручной импорт |
@@ -7933,7 +7919,7 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 
 | Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
 | --- | --- | --- |
-| `212.193.152.0/23` | `212.193.144.0/20` | `assets.flocktory.com` (`212.193.152.136`), `bs.serving-sys.ru` (`212.193.152.104`), `bs.serving-sys.ru` (`212.193.153.161`), `bs.serving-sys.ru` (`212.193.153.26`), `gu-st.ru` (`212.193.152.230`), `gu-st.ru` (`212.193.152.75`), `gu-st.ru` (`212.193.153.0`), `gu-st.ru` (`212.193.153.34`), `gu-st.ru` (`212.193.153.35`), `gu-st.ru` (`212.193.153.45`), `rostics.ru` (`212.193.152.243`) |
+| `212.193.152.0/23` | `212.193.144.0/20` | `assets.flocktory.com` (`212.193.152.136`), `bs.serving-sys.ru` (`212.193.152.104`), `bs.serving-sys.ru` (`212.193.153.161`), `bs.serving-sys.ru` (`212.193.153.26`), `gu-st.ru` (`212.193.152.183`), `gu-st.ru` (`212.193.152.230`), `gu-st.ru` (`212.193.152.75`), `gu-st.ru` (`212.193.153.0`), `gu-st.ru` (`212.193.153.34`), `gu-st.ru` (`212.193.153.35`), `gu-st.ru` (`212.193.153.45`), `rostics.ru` (`212.193.152.179`), `rostics.ru` (`212.193.152.243`) |
 | `212.193.154.0/24` | `212.193.144.0/20` | Ручной импорт |
 
 ## AS204980 — TDM TECH LLC
@@ -8986,12 +8972,6 @@ SHA-256 файла IP.json: `9db560178cd239e6909f499445899eadbf556c674b116ab8282
 | Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
 | --- | --- | --- |
 | `37.230.253.0/24` | `37.230.128.0/17` | Ручной импорт |
-
-## AS218397 — Gebze Technical University
-
-| Анонс ASN | Подсети в IP.json | Домен (полученный IP) |
-| --- | --- | --- |
-| `193.140.134.0/24` | `193.140.0.0/16` | Нет наблюдений |
 
 ## AS218626 — Ahmad Bayat
 
