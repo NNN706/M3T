@@ -21,8 +21,8 @@ def git(repo, *args, check=True):
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=check)
 
 def publish(repo, output, base, branch='test', domains=None, sources=None, *, build_routing=False, manual_ips=None):
-    if branch not in ('main', 'test'):
-        raise ValueError('Only main and test publication is enabled')
+    if branch not in ('main', 'test', 'test_400k'):
+        raise ValueError('Only main, test and test_400k publication is enabled')
     payloads = {OUTPUT:output.read_bytes()}
     if domains is not None:
         payloads['source/routing/generated/domains.json'] = domains.read_bytes()
@@ -37,8 +37,8 @@ def publish(repo, output, base, branch='test', domains=None, sources=None, *, bu
 
 
 def publish_payloads(repo, base, payloads, inputs, message, *, build_routing=False, branch='test'):
-    if branch not in ('main', 'test'):
-        raise ValueError('Only main and test publication is enabled')
+    if branch not in ('main', 'test', 'test_400k'):
+        raise ValueError('Only main, test and test_400k publication is enabled')
     if REPORT in payloads:
         payloads = {**payloads, REPORT_README: payloads[REPORT]}
     for attempt in range(3):
@@ -107,7 +107,7 @@ def main():
     parser.add_argument('--manual-ips', type=Path)
     parser.add_argument('--domains', type=Path)
     parser.add_argument('--base', required=True)
-    parser.add_argument('--branch', choices=('main', 'test'), default='test')
+    parser.add_argument('--branch', choices=('main', 'test', 'test_400k'), default='test')
     parser.add_argument('--build-routing', action='store_true')
     args = parser.parse_args()
     if args.provenance and not args.report:

@@ -172,20 +172,21 @@ with tempfile.TemporaryDirectory() as directory:
 print('PASS latest-parent publication, concurrent edit retained, unchanged no-op, newer lists retained and newer output protected, worktree cleaned')
 
 # Publish to main without changing test; both routing output and reports use the selected branch.
-with tempfile.TemporaryDirectory() as directory:
-    root=Path(directory); remote=root/'remote.git'; repo=root/'repo'
-    git(root,'init','--bare',str(remote))
-    git(root,'clone',str(remote),str(repo))
-    git(repo,'config','user.name','Test');git(repo,'config','user.email','test@example.invalid')
-    git(repo,'checkout','-b','main')
-    (repo/'seed').write_text('initial')
-    git(repo,'add','.');git(repo,'commit','-m','Initial');git(repo,'push','origin','main')
-    base=git(repo,'rev-parse','HEAD');git(repo,'push','origin','HEAD:refs/heads/test')
-    payload=root/'IP.json';payload.write_text('{"rules":[]}')
-    result=module.publish(repo,payload,base,branch='main')
-    assert git(repo,'ls-remote','origin','refs/heads/main').split()[0]==result
-    assert git(repo,'ls-remote','origin','refs/heads/test').split()[0]==base
-    report=module.publish_payloads(repo,result,{module.REPORT:b'# Report\n'},module.REPORT_INPUTS,'Report',branch='main')
-    assert git(repo,'ls-remote','origin','refs/heads/main').split()[0]==report
-    assert git(repo,'ls-remote','origin','refs/heads/test').split()[0]==base
-print('PASS main routing/report publication isolated from test')
+for target in ('main', 'test_400k'):
+ with tempfile.TemporaryDirectory() as directory:
+     root=Path(directory); remote=root/'remote.git'; repo=root/'repo'
+     git(root,'init','--bare',str(remote))
+     git(root,'clone',str(remote),str(repo))
+     git(repo,'config','user.name','Test');git(repo,'config','user.email','test@example.invalid')
+     git(repo,'checkout','-b',target)
+     (repo/'seed').write_text('initial')
+     git(repo,'add','.');git(repo,'commit','-m','Initial');git(repo,'push','origin',target)
+     base=git(repo,'rev-parse','HEAD');git(repo,'push','origin','HEAD:refs/heads/test')
+     payload=root/'IP.json';payload.write_text('{"rules":[]}')
+     result=module.publish(repo,payload,base,branch=target)
+     assert git(repo,'ls-remote','origin','refs/heads/'+target).split()[0]==result
+     assert git(repo,'ls-remote','origin','refs/heads/test').split()[0]==base
+     report=module.publish_payloads(repo,result,{module.REPORT:b'# Report\n'},module.REPORT_INPUTS,'Report',branch=target)
+     assert git(repo,'ls-remote','origin','refs/heads/'+target).split()[0]==report
+     assert git(repo,'ls-remote','origin','refs/heads/test').split()[0]==base
+print('PASS main/test_400k routing and report publication isolated from other branches')

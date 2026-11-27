@@ -1,7 +1,7 @@
 name: SubnetResolve local browser tests
 on:
   push:
-    branches: [test]
+    branches: [main, test, test_400k]
     paths:
       - 'source/SubnetResolve.sh'
       - 'source/tests/**'

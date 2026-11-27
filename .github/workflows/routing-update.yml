@@ -15,7 +15,7 @@ on:
         type: boolean
         default: false
   push:
-    branches: [main, test]
+    branches: [main, test, test_400k]
     paths:
       - 'source/routing/sites.txt'
       - 'source/routing/asn.txt'
@@ -32,7 +32,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   update:
-    if: (github.ref == 'refs/heads/test' || github.ref == 'refs/heads/main') && !inputs.report_only
+    if: (github.ref == 'refs/heads/test' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test_400k') && !inputs.report_only
     runs-on: [self-hosted, Linux, X64]
     timeout-minutes: ${{ inputs.full_refresh && 260 || 120 }}
     outputs:
@@ -190,7 +190,7 @@ jobs:
   routing-report:
     needs: [update, curl-diagnostic]
     if: >-
-      ${{ !cancelled() && (github.ref == 'refs/heads/test' || github.ref == 'refs/heads/main') &&
+      ${{ !cancelled() && (github.ref == 'refs/heads/test' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test_400k') &&
           (needs.update.result == 'success' || (inputs.report_only && needs.update.result == 'skipped')) }}
     runs-on: [self-hosted, Linux, X64]
     timeout-minutes: 15
