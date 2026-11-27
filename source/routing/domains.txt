@@ -1,0 +1,260 @@
+# Ручные общие доменные правила direct.
+# full: — точное имя; domain: — корень и поддомены; keyword: — подстрока.
+# В routing-ru.json все доменные правила остаются закомментированными.
+
+#### main
+keyword:selectel
+keyword:timeweb
+keyword:sberbank
+keyword:yandex
+domain:vk.com
+domain:vk.ru
+domain:mws.ru
+domain:ihc.ru
+domain:reg.ru
+domain:ruvds.com
+domain:beget.com
+domain:smartape.ru
+domain:ddos-guard.net
+domain:cdnvideo.com
+domain:cloud.ru
+domain:landvps.ru
+domain:fornex.com
+domain:contell.ru
+domain:datahouse.ru
+domain:majordomo.ru
+domain:f6.security
+domain:vtb.ru
+domain:gov.ru
+domain:gosuslugi.ru
+domain:raiffeisen.ru
+domain:tbank-online.com
+domain:alfabank.ru
+domain:vkusnoitochka.ru
+domain:rostics.ru
+domain:max.ru
+domain:mvideo.ru
+domain:megafon.ru
+domain:mts.ru
+domain:dns-shop.ru
+domain:ipinfo.io
+domain:ifconfig.me
+domain:2ip.io
+domain:2ip.ru
+domain:ok.ru
+domain:mail.ru
+domain:ozon.ru
+domain:iitrust.ru
+domain:memstech.ru
+domain:vkusvill.ru
+domain:cdek.ru
+domain:dzen.ru
+
+#### 2ip.io
+domain:luxcdn.com
+
+#### cdek.ru
+domain:servicepipe.tech
+
+#### cdnvideo.com
+domain:sypexgeo.net
+domain:yadrocrm.ru
+domain:extreme-ip-lookup.com
+
+#### cloud.ru
+domain:stbid.ru
+domain:adiam.tech
+domain:adspector.io
+domain:ussp.io
+domain:utraff.com
+domain:videohead.tech
+domain:acint.net
+domain:adriver.ru
+domain:adtec.ru
+domain:betweendigital.com
+domain:gpm-ssp.ru
+domain:tds.bid
+domain:bigdata-it.ru
+domain:mindbox.ru
+domain:sspnet.tech
+domain:al-adtech.com
+domain:silvermob.com
+domain:voxexchange.io
+domain:moviead55.ru
+domain:const.uno
+domain:allbdata.ru
+domain:board-traff.ru
+domain:deepcall.ru
+domain:direct-client.ru
+domain:info-it-data.ru
+domain:megabdatait.ru
+domain:megabigteh.ru
+domain:newbigtech.ru
+domain:r3ka.ru
+domain:sertmarket.shop
+domain:techbigdata.ru
+domain:viva-lead.ru
+domain:criteo.com
+domain:hybrid.ai
+domain:digitaltarget.ru
+domain:sbermarketing.ru
+domain:nrich.ai
+domain:buzzoola.com
+domain:needcallbuy.ru
+domain:uma.media
+domain:kimberlite.io
+domain:rambler.ru
+domain:justagent.ru
+domain:kombinat.digital
+domain:ohmy.bid
+domain:mobilebanner.ru
+domain:otclick-adv.ru
+domain:konnektu.ru
+domain:prodmp.ru
+domain:adhigh.net
+domain:segmel.com
+domain:qoopler.ru
+domain:gnezdo.ru
+domain:otm-r.com
+domain:hhkld.com
+domain:moe.video
+domain:rutarget.ru
+domain:suprion.ru
+domain:uuidksinc.net
+domain:sbercloud.tech
+domain:smi2.ru
+domain:linkssp.ru
+domain:sape.ru
+domain:bidster.net
+domain:top100.ru
+domain:adkernel.com
+domain:adsp.io
+domain:adspend.space
+domain:bumlam.com
+domain:dvgroup.com
+domain:opendsp.ru
+domain:programmatica.com
+domain:videonow.ru
+domain:punchmedia.ru
+domain:wi-fi.ru
+domain:gpmdata.ru
+domain:datadrivenpromotion.com
+domain:aidata.io
+
+#### cloud.vk.com
+domain:vkcloud-static.ru
+domain:apptracer.ru
+domain:vk.team
+domain:vktech-static.ru
+domain:mrgcdn.ru
+
+#### contell.ru
+domain:verbox.ru
+domain:me-talk.ru
+
+#### datahouse.ru
+domain:ooouptime.ru
+domain:jivo.ru
+domain:jivosite.com
+domain:filanco.ru
+domain:yastatic.net
+
+#### ddos-guard.net
+domain:licdn.com
+domain:mng.tl
+domain:mango-office.ru
+
+#### gosuslugi.ru
+domain:gu-st.ru
+
+#### ihc.ru
+domain:webvisor.org
+domain:tophosts.net
+
+#### ipinfo.io
+domain:typekit.net
+
+#### mail.ru
+domain:okcdn.ru
+domain:vkvideo.ru
+domain:dzeninfra.ru
+domain:yadro.ru
+domain:imgsmail.ru
+domain:mradx.net
+domain:vkuserphoto.ru
+domain:userapi.com
+
+#### memstech.ru
+domain:b2b-mems.ru
+
+#### mws.ru
+domain:beeline.ru
+domain:giraff.io
+domain:lotus-dsp.ru
+domain:giftclick.ru
+domain:getshop.tv
+domain:bidderstack.com
+domain:weborama-tech.ru
+domain:new-programmatic.com
+domain:onetarget.ru
+domain:getads.ru
+domain:admon.pro
+domain:weborama.fr
+domain:dynotech.io
+domain:afp.ai
+domain:bidvol.com
+domain:digitalcaramel.com
+domain:melvad.com
+domain:solta.io
+domain:upravel.com
+domain:abdm.ru
+domain:nitrortb.ru
+
+#### nalog.gov.ru
+domain:nalog.ru
+domain:sputnik.ru
+domain:vashkontrol.ru
+
+#### ok.ru
+domain:cdn-vk.ru
+
+#### raiffeisen.ru
+domain:facct.ru
+
+#### reg.ru
+domain:flocktory.com
+domain:wavesend.ru
+
+#### selectel.ru
+domain:selcdn.net
+
+#### spb.megafon.ru
+domain:popmechanic.ru
+
+#### spb.mts.ru
+domain:avito.ru
+domain:serving-sys.ru
+domain:mtscdn.ru
+domain:hicloud.com
+
+#### tbank-online.com
+domain:tbank.ru
+domain:tinkoff.ru
+domain:2w.ru
+domain:targetads.io
+domain:t-static-online.com
+domain:t-static.ru
+domain:skcrtxr.com
+domain:statad.ru
+domain:cdn-tinkoff.ru
+
+#### timeweb.cloud
+domain:roistat.com
+domain:twcstorage.ru
+
+#### vk.com
+domain:vk-portal.net
+domain:tns-counter.ru
+
+#### vkusnoitochka.ru
+domain:qsrapp.ru

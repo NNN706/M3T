@@ -344,9 +344,6 @@ dbo-dengi.online
 mtsdengi.ru
 payment.ru
 gorodpay.ru
-
-
-
 t-technologies.ru
 tinkoffjournal.ru
 tinsurance.ru
@@ -364,16 +361,11 @@ investalfabank.com
 beta-bank.com
 res-nsdi.ru
 auth-nsdi.ru
-
-
 volnamobile.ru
-
-
 magnit.com
 auchan.ru
 av.ru
 bristol.ru
-
 dostaevsky.ru
 metro-cc.ru
 krasnoeibeloe.ru
@@ -392,13 +384,10 @@ mnogolososya.ru
 myapelsin.ru
 clubx5.ru 
 geobasket.ru
-
-
 taxsee.com
 citydrive.ru
 whoosh.bike
 ostrovok.ru
-
 dellin.ru
 topdelivery.ru
 rutubelist.ru
@@ -470,7 +459,6 @@ kontur.rumotivtelecom.ru
 multiqr.ru
 multiqrpay.ru
 my.games
-
 odkl.ru
 ok.me
 o3.ru
@@ -483,7 +471,6 @@ rg.ru
 ria.ru
 ruwiki.ru
 sbdv.ru
-
 sirena-travel.ru
 smailru.net
 sferum-dev.ru
@@ -1075,14 +1062,6 @@ api.dashly.app
 api.dashlytrack.app
 api.mindbox.cloud  
 bilet.nspk.ru
-arenda.yandex.ru clck.yandex.com clck.yandex.net ads.yandex.com yandex-bank.net yandex-metrica.ru yandex.aero yandex.asia yandex.az yandex.co.il yandex.com.am yandex.com.ge yandex.com.tr yandex.com.ua yandex.de yandex.ee yandex.eu yandex.fi yandex.fr yandex.it yandex.jobs yandex.kg yandex.lt yandex.lv yandex.md yandex.mobi yandex.org yandex.pl yandex.st yandex.sx yandex.tj yandex.tm yandex.tr yandex.ua yandex.uz yandexadexchange.net yandexcom.net yandexgo.com yandexwebcache.net yandexwebcache.org metrika.yandex.com metrika.yandex.net metrika.yandex.ru counter.yandex.ru clck.yandex.ru yandex.com yandex.by yandex.kz yandex.cloud yandexcloud.net yandexmetrica.com trvl.yandex.net go.yandex ads.yandex ads.yandex.ru adv.yandex.com adv.yandex.ru appmetrica.yandex.com appmetrica.yandex.net appmetrica.yandex.ru adfox.yandex.ru adsdk.yandex.ru amc.yandex.ru mc.yandex.net pixel.yandex.com taxi.yandex.ru report.ap.yandex-net.ru
-ozon.app ozon.com.by ozon.com.kz ozon.dev ozon.express ozon.global ozon.li ozon.market ozon.tech ozon.tm ozon.travel ozoncamp.pro ozoncom.by ozonglobalevents.com ozonpartners.by ozonrocet.by ozonroket.by ozonru.co.il ozonru.com ozonru.eu rocketozon.by ozon-dostavka.ru ozone.ru ozonru.me ozon.com ozon.by ozon.kz ozonusercontent.com st.ozone.ru ir.ozone.ru vt-1.ozone.ru xapi.ozon.ru seller.ozon.ru pay.ozon.ru securepay.ozon.ru adv.ozon.ru invest.ozon.ru ord.ozon.ru autodiscover.ord.ozon.ru owa.ozon.ru learning.ozon.ru mapi.learning.ozon.ru ws.seller.ozon.ru bank.ozon.ru agency-adv.ozon.ru analytics-adv.ozon.ru ad.ozone.ru beginners-adv.ozon.ru google-analytics-suite.ozon.ru loyalnost-adv.ozon.ru new-adv.ozon.ru prodvizhenie-adv.ozon.ru questions-adv.ozon.ru sentry.ozon.ru xapi.ozon.by xapi.ozon.com xapi.ozon.com.by xapi.ozon.com.kz xapi.ozon.kz xapi.ozonru.me
-sentry.rustore.ru click.rustore.ru ads-integration.rustore.ru rustore.team rustore.tv ads.rustore.ru adv.rustore.ru pixel.rustore.ru stats.rustore.ru
-2gis.ae 2gis.am 2gis.az 2gis.by 2gis.com.cy 2gis.cz 2gis.ge 2gis.kg 2gis.tech 2gis.tj 2gis.uz reviews.2gis.com 2gis.kz disk.2gis.com api.2gis.ru keys.api.2gis.com favorites.api.2gis.com styles.api.2gis.com tile0.maps.2gis.com tile1.maps.2gis.com tile2.maps.2gis.com tile3.maps.2gis.com tile4.maps.2gis.com api.photo.2gis.com 2gis.com filekeeper-vod.2gis.com i0.photo.2gis.com jam.api.2gis.com catalog.api.2gis.com api.reviews.2gis.com public-api.reviews.2gis.com mapgl.2gis.com d-assets.2gis.ru s0.bss.2gis.com 
-alt-ad.mail.ru r.mail.ru radar.imgsmail.ru relap.mail.ru ucozmail.com ad4.mail.ru r0.mail.ru r1.mail.ru bs.mail.ru appsmail.ru top-staging.mail.ru t.mail.ru whiteline.mail.ru
-dev.max.ru web.max.ru api.max.ru legal.max.ru st.max.ru botapi.max.ru link.max.ru download.max.ru i.max.ru help.max.ru miniapps.max.ru api.oneme.ru oneme.ru fd.oneme.ru i.oneme.ru
-wildberries.am wildberries.co.il wildberries.es wildberries.eu wildberries.ge wildberries.kg wildberries.kz wildberries.lt wildberries.tj wildberries.tm wildberries.uz sentry.wb.ru marketplace-sentry.wb.ru ads-gate.wildberries.ru ads.dahlmessenger.comads.wildberries.ru advert-api-sandbox.wb.ru advert-api-sandbox.wildberries.ru advert-api.wb.ru advert-api.wildberries.ru advert-media-api.wb.ru advert-media-api.wildberries.ru analytics-stage.wildberries.ru analytics.wildberries.ru marketing-info.wildberries.ru web-analytics.wildberries.ru wbbasket.ru wbstatic.net wildberries.ru paywb.com fw.wb.ru finance.wb.ru jitsi.wb.ru dnd.wb.ru wb.ru a.wb.ru user-geo-data.wildberries.ru banners-website.wildberries.ru chat-prod.wildberries.ru wildberries.by static.nm-static.wbstatic.net wb-basket.ru wbpay.ru wibes.ru rwb.ru rwbautomation.tech wb.am wb.kg wb.kz wbautomation.tech wbcontent.net wbr.by wbwh.tech
-sberpro.vedomosti.ru sentry.dev-my.com sentry.sberauto.com visor.sberbank.ru clickstream.sberbank.ru ads.sber.ru sberbank-tele.com sberpay.ru mysbertips.ru sber.ru sberauto.com sbermarket.ru sbermegamarket.ru sbermobile.ru sberpb.ru sberdevices.ru sberdisk.ru sberindex.ru sberhealth.ru sberleasing.ru sberlogistics.ru sbercloud.ru spasibosb.ru spasibosberbank.ru sberbank-insurance.ru sberbankins.ru sbertroika.ru bps-sberbank.by sber-bank.by sberbank.com sber.pro pl-res.online.sberbank.ru cms-res-web.online.sberbank.ru online.sberbank.ru esa-res.online.sberbank.ru id.sber.ru bfds.sberbank.rut2.ru
 clck.yango.com 
 edu.tinkoff.ru
 education.tbank.ru
@@ -1096,13 +1075,11 @@ mvideo.edna.io
 podorozhnik.spb.ru 
 sentry-ng.g.smailru.net
 srch-telemeter10.g.smailru.net
-
 sentry.dev-my.games
 sentry.iptv.rt.ru
 sentry.kontur.host
 sentry.mindbox.ru  
 sentry.popmechanic.ru 
-
 sentry.viqeo.tv
 sentry.x5.rustacks.vk-portal.net
 stats.dahlmessenger.com
