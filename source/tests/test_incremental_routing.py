@@ -93,7 +93,8 @@ with tempfile.TemporaryDirectory() as directory:
         incremental_update(args, entries + [('extra.example', 'extra.example')], {'AS12345'},
                            lambda *_: ([], [], ''))
         browser_call, dns_call = [call.args[0] for call in run.call_args_list]
-        assert browser_call[browser_call.index('--') + 1:] == ['extra.example']
+        assert run.call_args_list[0].kwargs['input'] == 'extra.example\n'
+        assert browser_call[-1] == '-s'
         assert dns_call[dns_call.index('--') + 1:] == ['extra.example', 'pending.example']
 
     args.evidence = resumed

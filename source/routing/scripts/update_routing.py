@@ -207,6 +207,43 @@ def routing_fingerprint(paths):
             for name, path in paths.items()}
 
 
+def collect_browser_pages(scanner_path, browser_entries, flags, deadline, discovery, evidence):
+    # Reuse the production curl/Chromium phase without executing its DNS phase.
+    # Fail closed if SubnetResolve changes its phase boundary.
+    marker = "\nunset inputs\nstage_name='Этап 3/4: DNS'\n"
+    scanner = scanner_path.read_text()
+    if scanner.count(marker) != 1:
+        raise RuntimeError('Не найдена граница этапов Chromium и DNS в SubnetResolve.sh.')
+    browser_phase = scanner.split(marker, 1)[0] + '\nfinish_progress\ncat "$batch/discovery.json"\n'
+    # Bound both argv size and the scanner's per-batch normalization work.
+    # URLs travel over stdin, so even one long URL cannot exceed execve limits.
+    for start in range(0, len(browser_entries), 128):
+        current = browser_entries[start:start + 128]
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            discovery['complete'] = False
+            break
+        print(f'Chromium: исходные сайты {start + 1}–{start + len(current)}/{len(browser_entries)}.', flush=True)
+        try:
+            browser = subprocess.run(['bash', '-c', browser_phase, str(scanner_path), '-parse', '-s',
+                                      *flags], input=' '.join(url for _, url in current) + '\n',
+                                     stdout=subprocess.PIPE, text=True,
+                                     timeout=max(0.1, min(6600, remaining)), check=True)
+            discovery['pages'].extend(json.loads(browser.stdout)['pages'])
+        except (subprocess.SubprocessError, ValueError, OSError) as error:
+            reason = ('истёк лимит времени браузерного пакета' if isinstance(error, subprocess.TimeoutExpired) else
+                      f'не удалось запустить процесс: {error.strerror}' if isinstance(error, OSError) else
+                      'процесс браузера завершился с ошибкой; подробности выше' if isinstance(error, subprocess.CalledProcessError) else
+                      'браузер вернул некорректный JSON')
+            print(f'Chromium: пакет сайтов {start + 1}–{start + len(current)} не завершён: {reason}. '
+                  'Завершённые пакеты сохранены; остальные исходные домены остаются для DNS.', file=sys.stderr)
+            discovery['complete'] = False
+            break
+        finally:
+            if evidence:
+                write_json(evidence / 'discovery.json', {**discovery, 'complete': False})
+
+
 def incremental_update(args, entries, explicit, collect, exclusion=None, *, table=None):
     """Workflow mode. Append verified discoveries to the published baseline."""
     resume = getattr(args, 'resume', None)
@@ -374,22 +411,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
         browser_entries = [(host, url) for host, url in entries if host not in restored]
         print(f'Chromium: восстановлено страниц {len(restored)}, новых запросов {len(browser_entries)}.', flush=True)
     if browser_entries:
-        # Reuse the production curl/Chromium phase without executing its DNS phase.
-        # Fail closed if SubnetResolve changes its phase boundary.
-        marker = "\nunset inputs\nstage_name='Этап 3/4: DNS'\n"
-        scanner = args.scanner.read_text()
-        if scanner.count(marker) != 1:
-            raise RuntimeError('Не найдена граница этапов Chromium и DNS в SubnetResolve.sh.')
-        browser_phase = scanner.split(marker, 1)[0] + '\nfinish_progress\ncat "$batch/discovery.json"\n'
-        try:
-            browser = subprocess.run(['bash', '-c', browser_phase, str(args.scanner), '-parse', '-s',
-                                      *flags, '--', *[url for _, url in browser_entries]],
-                                     stdout=subprocess.PIPE, text=True,
-                                     timeout=max(0.1, min(6600, deadline - time.monotonic())), check=True)
-            discovery['pages'].extend(json.loads(browser.stdout)['pages'])
-        except (subprocess.SubprocessError, ValueError) as error:
-            print(f'Chromium: сбор страниц не завершён ({error.__class__.__name__}). Исходные домены сохранены.', file=sys.stderr)
-            discovery['complete'] = False
+        collect_browser_pages(args.scanner, browser_entries, flags, deadline, discovery, args.evidence)
     discovery['complete'] = discovery['complete'] and all(not page['errors'] for page in discovery['pages'])
     discovery['domains'] = sorted({host for host, _ in entries} |
                                   {host for page in discovery['pages'] for host in page['domains']})
