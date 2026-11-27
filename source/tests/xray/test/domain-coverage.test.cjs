@@ -63,14 +63,17 @@ test('full active matcher cannot replace a generated suffix rule; coverage never
   assert.equal(build(built,{rules:[]},domains),built);
 });
 
-test('published compact rules preserve observed root/subdomain coverage and introduce no new patterns', () => {
+test('current inputs compact without losing root/subdomain coverage or introducing new patterns', () => {
   const fs = require('node:fs'), path = require('node:path');
   const root = path.resolve(__dirname, '../../../..');
   const source = JSON.parse(fs.readFileSync(path.join(root, 'source/routing/state/sources.json')));
-  const output = JSON.parse(fs.readFileSync(path.join(root, 'source/routing/generated/domains.json')));
-  const template = jsonc.parse(fs.readFileSync(path.join(root, 'Templates/Routing-(RU-Direct)/routing-ru.json'),'utf8'));
+  const templateText = fs.readFileSync(path.join(root, 'Templates/Routing-(RU-Direct)/routing-ru.json'),'utf8');
+  const template = jsonc.parse(templateText);
   const manualPath = path.join(root, 'source/routing/domains.txt');
   const manual = fs.existsSync(manualPath) ? readManual(fs.readFileSync(manualPath,'utf8')) : {rules: []};
+  // Input edits intentionally precede publication. Test fresh assembly, not
+  // equality between a previous output snapshot and the new manual input.
+  const output = compactDomains(templateText, source.domain_observations, manual, source.excluded_domains || []);
   const original = respectExclusions([...source.domain_observations.rules,...manual.rules], source.excluded_domains || []).flatMap(rule => rule.domain);
   const compact = output.rules.flatMap(rule => rule.domain);
   const active = activeMatchers(template.routing.rules);
