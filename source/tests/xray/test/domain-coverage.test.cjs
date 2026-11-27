@@ -69,7 +69,8 @@ test('published compact rules preserve observed root/subdomain coverage and intr
   const source = JSON.parse(fs.readFileSync(path.join(root, 'source/routing/state/sources.json')));
   const output = JSON.parse(fs.readFileSync(path.join(root, 'source/routing/generated/domains.json')));
   const template = jsonc.parse(fs.readFileSync(path.join(root, 'Templates/Routing-(RU-Direct)/routing-ru.json'),'utf8'));
-  const manual = readManual(fs.readFileSync(path.join(root, 'source/routing/domains.txt'),'utf8'));
+  const manualPath = path.join(root, 'source/routing/domains.txt');
+  const manual = fs.existsSync(manualPath) ? readManual(fs.readFileSync(manualPath,'utf8')) : {rules: []};
   const original = respectExclusions([...source.domain_observations.rules,...manual.rules], source.excluded_domains || []).flatMap(rule => rule.domain);
   const compact = output.rules.flatMap(rule => rule.domain);
   const active = activeMatchers(template.routing.rules);
