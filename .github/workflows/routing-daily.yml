@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Queue full scan on test
+      - name: Queue full scan on selected branch
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run routing-update.yml --repo "$GITHUB_REPOSITORY" --ref test -f full_refresh=true
+          TARGET_BRANCH: ${{ github.ref_name }}
+        run: gh workflow run routing-update.yml --repo "$GITHUB_REPOSITORY" --ref "$TARGET_BRANCH" -f full_refresh=true
