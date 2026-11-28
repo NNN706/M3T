@@ -100,7 +100,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ -f "$ROUTING_RESUME/discovery.json" ]; then exit 0; fi
+          if [ -f "$ROUTING_RESUME/completeness.json" ] && jq -e '(.sites_browser_pending // 1) == 0' "$ROUTING_RESUME/completeness.json" >/dev/null; then exit 0; fi
           runtime="$XDG_CACHE_HOME/SubnetResolve/playwright-1.64.1"
           mkdir -p "$runtime"
           npm install --prefix "$runtime" --no-audit --no-fund --ignore-scripts playwright@1.64.1
@@ -118,12 +118,14 @@ jobs:
           python3 source/tests/test_asn_routes.py
           python3 source/tests/test_dns_fallback.py
           python3 source/tests/test_exclusion_routing.py
+          python3 source/tests/test_rolling_pipeline.py
+          python3 source/tests/test_exclusion_budget.py
           python3 source/tests/test_browser_batches.py
           python3 source/tests/test_incremental_routing.py
           python3 source/tests/test_publish_routing.py
           python3 source/tests/test_prefix_limits.py
           python3 source/tests/test_routing_report.py
-          node --test source/tests/xray/test/routing.test.cjs source/tests/xray/test/domain-coverage.test.cjs
+          node --test source/tests/xray/test/routing.test.cjs source/tests/xray/test/domain-coverage.test.cjs source/tests/xray/test/domain-scale.test.cjs
       - name: Scan sites and compact prefixes
         shell: bash
         env:

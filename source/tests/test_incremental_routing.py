@@ -85,17 +85,17 @@ with tempfile.TemporaryDirectory() as directory:
     checkout()
     extra = {'site': 'extra.example', 'domains': ['extra.example'], 'errors': []}
     with patch('update_routing.subprocess.run', side_effect=[
+        subprocess.CompletedProcess([], 0, json.dumps(dict(good, domain='pending.example'))),
         subprocess.CompletedProcess([], 0, json.dumps({'pages': [extra], 'complete': True})),
-        subprocess.CompletedProcess([], 0, json.dumps({'domains': [
-            dict(good, domain='extra.example'), dict(good, domain='pending.example'),
-        ]})),
+        subprocess.CompletedProcess([], 0, json.dumps(dict(good, domain='extra.example'))),
     ]) as run:
         incremental_update(args, entries + [('extra.example', 'extra.example')], {'AS12345'},
                            lambda *_: ([], [], ''))
-        browser_call, dns_call = [call.args[0] for call in run.call_args_list]
-        assert run.call_args_list[0].kwargs['input'] == 'extra.example\n'
+        pending_call, browser_call, dns_call = [call.args[0] for call in run.call_args_list]
+        assert pending_call[-1] == 'pending.example'
+        assert run.call_args_list[1].kwargs['input'] == 'extra.example\n'
         assert browser_call[-1] == '-s'
-        assert dns_call[dns_call.index('--') + 1:] == ['extra.example', 'pending.example']
+        assert dns_call[dns_call.index('--') + 1:] == ['extra.example']
 
     args.evidence = resumed
     args.resume = args.evidence
@@ -105,6 +105,7 @@ with tempfile.TemporaryDirectory() as directory:
         incremental_update(args, entries, set(), lambda *_: (_ for _ in ()).throw(AssertionError('ASN stage repeated')))
         run.assert_not_called()
     assert args.output.read_bytes() == prepared_output
+    args.output.write_bytes(args.output.read_bytes() + b' ')
     try:
         incremental_update(args, entries, set(), lambda *_: ([], [], ''))
     except RuntimeError as error:
@@ -161,12 +162,16 @@ with tempfile.TemporaryDirectory() as directory:
             {'domain': 'old.site.example', 'complete': False, 'results': []},
         ]}
         discovery = {'pages': [{'site': 'site.example', 'domains': [], 'errors': []}]}
-        with patch('update_routing.subprocess.run', side_effect=[
-            subprocess.CompletedProcess([], 0, json.dumps(discovery)),
-            subprocess.CompletedProcess([], 3, json.dumps(scan)),
-        ]) as run:
+        def scan_phase(command, **kwargs):
+            if command[1] == '-c':
+                return subprocess.CompletedProcess(command, 0, json.dumps(discovery))
+            hosts = command[command.index('--') + 1:]
+            return subprocess.CompletedProcess(command, 3, json.dumps({'domains': [
+                row for row in scan['domains'] if row['domain'] in hosts]}))
+        with patch('update_routing.subprocess.run', side_effect=scan_phase) as run:
             incremental_update(args, [('site.example', 'https://site.example')], set(), lambda *_: ([], [], ''))
-            assert run.call_args.args[0][-2:] == ['old.site.example', 'site.example']
+            dns_calls = [call.args[0] for call in run.call_args_list if call.args[0][1] != '-c']
+            assert [call[call.index('--')+1:] for call in dns_calls] == [['site.example'], ['old.site.example']]
         saved = json.loads(args.sources_output.read_text())
         prefixes = {prefix for rule in saved['rules'] for prefix in rule['ip']}
         assert {'198.51.100.0/24', '203.0.113.0/24'} <= prefixes

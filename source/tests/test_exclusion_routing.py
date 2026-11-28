@@ -138,7 +138,7 @@ with tempfile.TemporaryDirectory() as directory:
         run.assert_not_called()
         dns.assert_not_called()
     assert all(path.read_bytes() == payload for path, payload in published.items())
-    evidence_file = 'scanner-output-1.json'
+    evidence_file = next(args.resume.glob('scanner-output-*.json')).name
     assert (args.evidence / evidence_file).read_bytes() == (args.resume / evidence_file).read_bytes()
 
     # IPv4 is unchanged, but IPv6 changed. The prepared rules must be rebuilt.

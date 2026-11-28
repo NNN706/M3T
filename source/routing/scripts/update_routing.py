@@ -207,7 +207,7 @@ def routing_fingerprint(paths):
             for name, path in paths.items()}
 
 
-def collect_browser_pages(scanner_path, browser_entries, flags, deadline, discovery, evidence):
+def collect_browser_pages(scanner_path, browser_entries, flags, deadline, discovery, evidence, on_batch=None):
     # Reuse the production curl/Chromium phase without executing its DNS phase.
     # Fail closed if SubnetResolve changes its phase boundary.
     marker = "\nunset inputs\nstage_name='Этап 3/4: DNS'\n"
@@ -224,12 +224,19 @@ def collect_browser_pages(scanner_path, browser_entries, flags, deadline, discov
             discovery['complete'] = False
             break
         print(f'Chromium: исходные сайты {start + 1}–{start + len(current)}/{len(browser_entries)}.', flush=True)
+        page_start = len(discovery['pages'])
         try:
             browser = subprocess.run(['bash', '-c', browser_phase, str(scanner_path), '-parse', '-s',
                                       *flags], input=' '.join(url for _, url in current) + '\n',
                                      stdout=subprocess.PIPE, text=True,
-                                     timeout=max(0.1, min(6600, remaining)), check=True)
-            discovery['pages'].extend(json.loads(browser.stdout)['pages'])
+                                     timeout=max(0.1, min(6600, remaining / 2)), check=True)
+            pages = json.loads(browser.stdout)['pages']
+            if on_batch is not None:
+                returned = {page['site'] for page in pages}
+                pages += [{'site': host, 'domains': [],
+                           'errors': ['Браузер не вернул данные сайта; домен будет проверен через DNS/BGP']}
+                          for host, _ in current if host not in returned]
+            discovery['pages'].extend(pages)
         except (subprocess.SubprocessError, ValueError, OSError) as error:
             reason = ('истёк лимит времени браузерного пакета' if isinstance(error, subprocess.TimeoutExpired) else
                       f'не удалось запустить процесс: {error.strerror}' if isinstance(error, OSError) else
@@ -242,6 +249,84 @@ def collect_browser_pages(scanner_path, browser_entries, flags, deadline, discov
         finally:
             if evidence:
                 write_json(evidence / 'discovery.json', {**discovery, 'complete': False})
+        if on_batch is not None and on_batch(discovery['pages'][page_start:]) is False:
+            discovery['complete'] = False
+            break
+
+
+def reusable_dns_row(row):
+    if row.get('complete') is True and (row.get('results') or row.get('excluded_ips')):
+        return True
+    # A final Check-Host response without A records is not an API failure.
+    # Remember it during resume instead of spending every run on the same NXDOMAINs.
+    errors = row.get('errors', [])
+    return not row.get('results') and not row.get('excluded_ips') and bool(errors) and all(
+        error.get('check_host') for error in errors)
+
+
+def cached_dns_compatible(row, exclusion, stable_index):
+    if exclusion is None or stable_index:
+        return True
+    # DNS names/addresses do not expire just because an unrelated ASN changed
+    # an announcement. Reuse rows whose included/excluded membership is unchanged.
+    if not row.get('results') and not row.get('excluded_ips'):
+        return True
+    for route in row.get('results', []):
+        if route.get('asn') in exclusion.asns or not route.get('ips'):
+            return False
+        if any(any(exclusion._overlaps(ipaddress.ip_network(ip))) for ip in route['ips']):
+            return False
+    return all(any(exclusion._overlaps(ipaddress.ip_network(ip))) for ip in row.get('excluded_ips', []))
+
+
+def scan_dns_batches(args, hosts, responses, flags, ipv4_index, deadline):
+    remaining = [host for host in hosts if host not in responses]
+    for start in range(0, len(remaining), 30):
+        batch = remaining[start:start + 30]
+        budget = deadline - time.monotonic()
+        if budget <= 0:
+            print('Истёк общий лимит DNS/BGP. Сохраняем завершённые пакеты.', file=sys.stderr)
+            return False
+        try:
+            with ExitStack() as stack:
+                env = os.environ.copy()
+                if ipv4_index is not None:
+                    index_file = stack.enter_context(tempfile.NamedTemporaryFile(mode='w', encoding='utf-8'))
+                    json.dump(ipv4_index, index_file, separators=(',', ':'))
+                    index_file.flush()
+                    env['SUBNET_EXCLUDED_IPV4_INDEX'] = index_file.name
+                scan = subprocess.run(['bash', str(args.scanner), '-s', *flags, '--', *batch],
+                                      stdout=subprocess.PIPE, text=True, timeout=budget, env=env)
+        except subprocess.TimeoutExpired:
+            print('Истёк лимит DNS/BGP. Сохраняем найденные имена и полученные префиксы.', file=sys.stderr)
+            return False
+        if args.evidence:
+            (args.evidence / f'scanner-output-{sha256(chr(10).join(batch).encode()).hexdigest()[:16]}.json').write_text(scan.stdout)
+        if scan.returncode not in (0, 3):
+            print(f'DNS/BGP завершился с ошибкой {scan.returncode}. Сохраняем обнаруженные имена. См. журнал.', file=sys.stderr)
+            return False
+        try:
+            data = json.loads(scan.stdout)
+        except json.JSONDecodeError:
+            print('DNS/BGP вернул некорректный JSON. Сохраняем обнаруженные имена и готовые пакеты.',
+                  file=sys.stderr)
+            return False
+        rows = data['domains'] if 'domains' in data else [data]
+        received = {row['domain']: row for row in rows}
+        if len(received) != len(rows) or set(received) != set(batch):
+            raise ValueError(f'DNS/BGP вернул другой список доменов. Нет: {sorted(set(batch)-received.keys())}. '
+                             f'Лишние: {sorted(received.keys()-set(batch))}.')
+        responses.update(received)
+        if args.evidence:
+            # Append each completed packet; rewriting the entire growing map per
+            # packet is quadratic and can consume the publication reserve.
+            with (args.evidence / 'dns-checkpoint.ndjson').open('a') as journal:
+                for row in received.values():
+                    if reusable_dns_row(row):
+                        journal.write(json.dumps(row, ensure_ascii=False, separators=(',', ':')) + '\n')
+        print(f'DNS/BGP: сохранён пакет {start + 1}–{start + len(batch)}/{len(remaining)}; '
+              f'накоплено ответов {len(responses)}.', flush=True)
+    return True
 
 
 def incremental_update(args, entries, explicit, collect, exclusion=None, *, table=None):
@@ -251,6 +336,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     # Share the scan budget with Chromium and reserve time for ASN export and
     # writing partial results before the workflow's hard timeout.
     deadline = time.monotonic() + (13800 if full_refresh else 5400)
+    # Reserve time inside the scanner budget as well as the workflow's outer margin.
+    work_deadline = deadline - (600 if full_refresh else 300)
     outputs = {'IP.json': args.output, 'domains.json': args.domains_output, 'sources.json': args.sources_output}
     invalid = sorted(host for host, _ in entries if len(host) > 253 or '.' not in host
                      or not all(re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?', label)
@@ -355,7 +442,24 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
             raise RuntimeError('В артефакте нет checkpoint.json. Этот запуск нельзя продолжить автоматически.')
         saved = json.loads((resume / 'checkpoint.json').read_text())
         changed = [name for name, digest in manifest['inputs'].items()
-                   if name not in ('sites', 'asn_file') and saved.get('inputs', {}).get(name) != digest]
+                   if name not in ('sites', 'asn_file', 'dns_provenance') and saved.get('inputs', {}).get(name) != digest]
+        published = {}
+        if (resume / 'prepared.json').is_file():
+            publication = json.loads((resume / 'prepared.json').read_text())
+            for name in outputs:
+                path = resume / name
+                if path.is_file() and publication.get('files', {}).get(name) == routing_fingerprint({name: path})[name]:
+                    published[name] = publication['files'][name]
+        # A successful partial publication becomes the next run's baseline.
+        # Permit those exact outputs; user/config changes remain incompatible.
+        output_names = {name: name for name in outputs}
+        output_names['manual_ips'] = 'ip.txt'
+        exact_core = all(manifest['inputs'].get(name) == published.get(name)
+                         for name in ('IP.json', 'sources.json')) and bool(published)
+        changed = [name for name in changed if not (
+            published.get(output_names.get(name)) is not None and
+            manifest['inputs'][name] == published[output_names[name]]
+            or name == 'domains.json' and exact_core)]
         if (saved.get('version') != manifest['version'] or changed
                 or saved.get('full_refresh', False) != full_refresh):
             detail = ', '.join(changed) or 'версия формата'
@@ -371,8 +475,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
             if prepared.get('files') != routing_fingerprint(saved_files) or not all(p.is_file() for p in saved_files.values()):
                 raise RuntimeError('Контрольная точка публикации повреждена: файлы не совпадают с контрольными суммами.')
             status = json.loads(saved_files['completeness.json'].read_text())
-            if not any(status.get(key) for key in ('domains_without_complete_dns_bgp',
-                                                    'asns_without_prefixes', 'asn_export_error')):
+            if status.get('sites_browser_pending', 0) == 0 and not any(status.get(key) for key in ('domains_without_complete_dns_bgp',
+                                                    'asns_without_prefixes', 'asn_export_error', 'exclusion_checks_pending')):
                 for name, path in outputs.items():
                     path.parent.mkdir(parents=True, exist_ok=True)
                     copyfile(saved_files[name], path)
@@ -400,6 +504,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     ) else set()
     discovery = {'domains': [], 'pages': [], 'complete': True}
     browser_entries = entries
+    restored = set()
     flags = ['-v'] if args.verbose else []
     if resume and (resume / 'discovery.json').is_file():
         old_discovery = json.loads((resume / 'discovery.json').read_text())
@@ -410,12 +515,53 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
         restored = {page['site'] for page in discovery['pages']}
         browser_entries = [(host, url) for host, url in entries if host not in restored]
         print(f'Chromium: восстановлено страниц {len(restored)}, новых запросов {len(browser_entries)}.', flush=True)
-    if browser_entries:
-        collect_browser_pages(args.scanner, browser_entries, flags, deadline, discovery, args.evidence)
-    discovery['complete'] = discovery['complete'] and all(not page['errors'] for page in discovery['pages'])
-    discovery['domains'] = sorted({host for host, _ in entries} |
+    responses = {}
+    if resume:
+        saved_dns = {}
+        if (resume / 'dns-checkpoint.json').is_file():
+            saved_dns.update(json.loads((resume / 'dns-checkpoint.json').read_text()))
+        if (resume / 'dns-checkpoint.ndjson').is_file():
+            with (resume / 'dns-checkpoint.ndjson').open() as journal:
+                for line in journal:
+                    try:
+                        row = json.loads(line)
+                    except ValueError:
+                        if not line.endswith('\n'):
+                            print('DNS/BGP: незавершённая последняя строка журнала пропущена.', file=sys.stderr)
+                            break
+                        raise ValueError('DNS/BGP: повреждена контрольная точка журнала.')
+                    saved_dns[row['domain']] = row
+        if any(row['domain'] != host or not reusable_dns_row(row) for host, row in saved_dns.items()):
+            raise ValueError('DNS/BGP: контрольная точка содержит неполные или незапрошенные домены.')
+        responses.update({host: row for host, row in saved_dns.items()
+                          if cached_dns_compatible(row, exclusion,
+                              saved.get('ipv4_exclusions') == manifest.get('ipv4_exclusions'))})
+        print(f'DNS/BGP: восстановлено доменов {len(responses)}.', flush=True)
+    if args.evidence:
+        write_json(args.evidence / 'dns-checkpoint.json', responses)
+    requested = set()
+
+    def resolve_pages(pages):
+        names = {name for page in pages for name in (page['site'], *page['domains'])}
+        if not full_refresh:
+            names = {host for host in names if host in retry_names or host not in known | previous_excluded}
+        todo = sorted(names - requested)
+        requested.update(todo)
+        return scan_dns_batches(args, todo, responses, flags, ipv4_index, work_deadline)
+
+    # Drain saved browser work first; resume must not spend another run on browser only.
+    can_continue = resolve_pages(discovery['pages'])
+    if browser_entries and can_continue:
+        collect_browser_pages(args.scanner, browser_entries, flags, work_deadline, discovery,
+                              args.evidence, on_batch=resolve_pages)
+    all_sites = {host for host, _ in entries}
+    processed_sites = {page['site'] for page in discovery['pages']}
+    discovery['complete'] = (discovery['complete'] and processed_sites == all_sites
+                             and all(not page['errors'] for page in discovery['pages']))
+    # Unvisited seeds stay in the manifest, rather than entering generated rules unexamined.
+    discovery['domains'] = sorted(processed_sites |
                                   {host for page in discovery['pages'] for host in page['domains']})
-    tags = {host for host, _ in entries}
+    tags = processed_sites
     candidates = {
         host: {host} | {name for matcher in domain_groups.get(host, ())
                         if not full_refresh and (name := matcher.split(':', 1)[1]) in retry_names}
@@ -423,73 +569,27 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     }
     for page in discovery['pages']:
         candidates[page['site']].update(page['domains'])
-        for error in page['errors']:
+        for error in ([] if page['site'] in restored else page['errors']):
             message = error.removesuffix('; домен будет проверен через DNS/BGP')
             print(f"[{page['site']}] {message}", file=sys.stderr)
-    discovered = set().union(*candidates.values())
+    discovered = set().union(*candidates.values()) if candidates else set()
     pending = sorted(discovered | known) if full_refresh else sorted(
         host for host in discovered if host in retry_names or host not in known | previous_excluded
     )
     skipped_existing = len(discovered - set(pending))
-    print(f'DNS Check-Host: на проверку {len(pending)}, пропущено известных {skipped_existing}.', flush=True)
+    # Backfill old names after active work; callbacks have already finished each visited batch.
+    leftovers = sorted(set(pending) - requested)
+    requested.update(leftovers)
+    scan_dns_batches(args, leftovers, responses, flags, ipv4_index, work_deadline)
+    pending_set = set(pending)
+    responses = {host: row for host, row in responses.items() if host in pending_set}
+    print(f'DNS Check-Host: в очереди {len(requested)}, результатов {len(responses)}, '
+          f'пропущено известных {skipped_existing}; сайты {len(processed_sites)}/{len(all_sites)}.', flush=True)
     observations = []
-    responses = {}
     if args.evidence:
-        args.evidence.mkdir(parents=True, exist_ok=True)
         write_json(args.evidence / 'discovery.json', discovery)
-    if resume and (resume / 'dns-checkpoint.json').is_file() and (
-            saved.get('ipv4_exclusions') == manifest.get('ipv4_exclusions')):
-        saved_dns = json.loads((resume / 'dns-checkpoint.json').read_text())
-        if any(
-            row['domain'] != host or row['complete'] is not True or not (row['results'] or row.get('excluded_ips'))
-            for host, row in saved_dns.items()
-        ):
-            raise ValueError('DNS/BGP: контрольная точка содержит неполные или незапрошенные домены.')
-        responses.update({host: row for host, row in saved_dns.items() if host in pending})
-        print(f'DNS/BGP: восстановлено доменов {len(responses)}.', flush=True)
-    remaining = [host for host in pending if host not in responses]
-    if args.evidence:
-        write_json(args.evidence / 'dns-checkpoint.json', responses)
-    for start in range(0, len(remaining), 30):
-        batch = remaining[start:start + 30]
-        budget = deadline - time.monotonic()
-        if budget <= 0:
-            print('Истёк общий лимит DNS/BGP. Сохраняем завершённые пакеты.', file=sys.stderr)
-            break
-        try:
-            with ExitStack() as stack:
-                env = os.environ.copy()
-                if ipv4_index is not None:
-                    index_file = stack.enter_context(tempfile.NamedTemporaryFile(mode='w', encoding='utf-8'))
-                    json.dump(ipv4_index, index_file, separators=(',', ':'))
-                    index_file.flush()
-                    env['SUBNET_EXCLUDED_IPV4_INDEX'] = index_file.name
-                scan = subprocess.run(['bash', str(args.scanner), '-s', *flags, '--', *batch],
-                                      stdout=subprocess.PIPE, text=True, timeout=budget, env=env)
-        except subprocess.TimeoutExpired:
-            print('Истёк лимит DNS/BGP. Сохраняем найденные имена и полученные префиксы.', file=sys.stderr)
-            break
-        if args.evidence:
-            (args.evidence / f'scanner-output-{start // 32 + 1}.json').write_text(scan.stdout)
-        if scan.returncode not in (0, 3):
-            print(f'DNS/BGP завершился с ошибкой {scan.returncode}. Сохраняем обнаруженные имена. См. журнал.', file=sys.stderr)
-            break
-        try:
-            data = json.loads(scan.stdout)
-        except json.JSONDecodeError:
-            print('DNS/BGP вернул некорректный JSON. Сохраняем обнаруженные имена и готовые пакеты.',
-                  file=sys.stderr)
-            break
-        rows = data['domains'] if 'domains' in data else [data]
-        received = {row['domain']: row for row in rows}
-        if len(received) != len(rows) or set(received) != set(batch):
-            raise ValueError(f'DNS/BGP вернул другой список доменов. Нет: {sorted(set(batch)-received.keys())}. '
-                             f'Лишние: {sorted(received.keys()-set(batch))}.')
-        responses.update(received)
-        if args.evidence:
-            write_json(args.evidence / 'dns-checkpoint.json', {
-                host: row for host, row in responses.items() if row['complete'] is True and (row['results'] or row.get('excluded_ips'))
-            })
+        write_json(args.evidence / 'dns-checkpoint.json', {
+            host: row for host, row in responses.items() if reusable_dns_row(row)})
     explicit = set(explicit) - excluded_asns
     resolved = {}
     excluded_ips = set()
@@ -511,7 +611,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
         excluded_ips.update(row.get('excluded_ips', []))
     excluded_domains = set()
     if exclusion:
-        excluded_domains = exclusion.excluded_domains(known | discovered, set() if full_refresh else previous_excluded, responses)
+        excluded_domains = exclusion.excluded_domains(known | discovered, set() if full_refresh else previous_excluded, responses,
+                                                       deadline=min(deadline, time.monotonic() + 30))
         print(f'Исключения ASN: исключено доменов — {len(excluded_domains & (known | discovered))}; '
               f'пропущено уникальных IPv4 перед WHOIS — {len(excluded_ips)}.', flush=True)
     unresolved = [host for host in pending if host not in responses or responses[host]['complete'] is not True]
@@ -535,7 +636,8 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
             reason = 'no_ipv4_from_check_host'
         incomplete_details[host] = {'reason': reason, 'errors': errors}
     if unresolved:
-        print('DNS/BGP без полного результата. Домены остаются на повтор: ' + ', '.join(unresolved), file=sys.stderr)
+        print(f'DNS/BGP без полного результата: {len(unresolved)} доменов остаются на повтор. '
+              + ', '.join(unresolved[:20]) + (' …' if len(unresolved) > 20 else ''), file=sys.stderr)
     if args.evidence:
         write_json(args.evidence / 'bgp-observations.json', observations)
     asn_error = None
@@ -546,12 +648,19 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
         as_rules, as_missing = [], sorted(explicit)
         print(f'Выгрузка ASN недоступна: {error}. Сохраняем прежние ASN и результаты по доменам.', file=sys.stderr)
         report = '## Покрытие ASN\n\nВыгрузка BGP.tools недоступна. См. журнал запуска.\n'
+    report = ('## Прогресс полного списка\n\n'
+              '| Показатель | Количество |\n| --- | ---: |\n'
+              f'| Исходных сайтов | {len(all_sites)} |\n'
+              f'| Обработано сайтов, включая ошибки открытия | {len(processed_sites)} |\n'
+              f'| Осталось сайтов | {len(all_sites - processed_sites)} |\n'
+              f'| Сохранено DNS/BGP-ответов, включая отсутствие A-записей | {len(responses)} |\n'
+              f'| Отложено проверок ASN-исключений | {len(getattr(exclusion, "unchecked_domains", set()))} |\n\n' + report)
     print(report, flush=True)
-    complete = discovery['complete'] and not unresolved and not as_missing and not invalid and asn_error is None
+    complete = discovery['complete'] and not getattr(exclusion, 'unchecked_domains', set()) and not unresolved and not as_missing and not invalid and asn_error is None
     if full_refresh:
         # Old names are queried to backfill evidence, even if no current site
         # requests them. Only the active discoveries can veto replacement.
-        complete = (discovery['complete'] and not (discovered & set(unresolved))
+        complete = (discovery['complete'] and not getattr(exclusion, 'unchecked_domains', set()) and not (discovered & set(unresolved))
                     and not as_missing and not invalid and asn_error is None)
         if complete:
             source_groups = {tag: prefixes for tag, prefixes in source_groups.items() if tag == 'legacy'}
@@ -605,6 +714,11 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
     if args.evidence:
         (args.evidence / 'scan-summary.md').write_text(report)
         write_json(args.evidence / 'completeness.json', {
+            'sites_total': len(all_sites), 'sites_browser_completed': len(processed_sites),
+            'sites_browser_pending': len(all_sites - processed_sites),
+            'sites_skipped_before_browser': sum(bool(page.get('skipped')) for page in discovery['pages']),
+            'sites_with_browser_errors': sum(bool(page['errors']) and not page.get('skipped') for page in discovery['pages']),
+            'exclusion_checks_pending': sorted(getattr(exclusion, 'unchecked_domains', set())),
             'complete': complete, 'mode': 'full-refresh' if full_refresh else 'incremental', 'invalid_sites': invalid, 'dns_requested': len(pending),
             'dns_skipped_existing': skipped_existing,
             'domains_without_complete_dns_bgp': unresolved,
@@ -646,7 +760,7 @@ def incremental_update(args, entries, explicit, collect, exclusion=None, *, tabl
 
 
 def prepared_evidence(directory):
-    paths = [directory / 'discovery.json', directory / 'dns-checkpoint.json',
+    paths = [directory / 'discovery.json', directory / 'dns-checkpoint.json', directory / 'dns-checkpoint.ndjson',
              *sorted(directory.glob('scanner-output-*.json'))]
     return {path.name: path for path in paths if path.is_file()}
 

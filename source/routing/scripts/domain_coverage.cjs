@@ -26,15 +26,44 @@ function minimize(rules, active = []) {
     .sort((a, b) => compare(rules[a.group].ruleTag, rules[b.group].ruleTag)
       || compare(a.value, b.value) || a.index - b.index);
   const kept = new Set();
-  for (let i = 0; i < candidates.length; i++) {
-    const current = candidates[i];
-    if (active.some(value => covers(value, current.value))) continue;
-    if (candidates.some((other, j) => j !== i && covers(other.value, current.value)
-      && (!covers(current.value, other.value) || j < i))) continue;
-    kept.add(current);
+  const parsed = new Map(candidates.map(row => [row, matcher(row.value)]));
+  const activeValues = active.map(matcher).filter(Boolean);
+  const activeKeywords = activeValues.filter(row => row.kind === 'keyword').map(row => row.text);
+  const domains = new Set(activeValues.filter(row => row.kind === 'domain').map(row => row.text));
+  const fulls = new Set(activeValues.filter(row => row.kind === 'full').map(row => row.text));
+  const keywords = candidates.filter(row => parsed.get(row)?.kind === 'keyword');
+  const minimalKeywords = keywords.filter((row, i) => !activeKeywords.some(text => parsed.get(row).text.includes(text))
+    && !keywords.some((other, j) => j !== i && covers(other.value, row.value)
+      && (!covers(row.value, other.value) || j < i)));
+  for (const row of minimalKeywords) kept.add(row);
+  const keywordTexts = [...activeKeywords, ...minimalKeywords.map(row => parsed.get(row).text)];
+  const suffixCovered = text => {
+    const labels = text.split('.');
+    for (let i = 0; i < labels.length; i++) if (domains.has(labels.slice(i).join('.'))) return true;
+    return false;
+  };
+  // Broad suffixes precede descendants, but equal matchers retain their original
+  // deterministic owner. No pairwise comparison of hundreds of thousands of hosts.
+  const ordered = candidates.filter(row => parsed.get(row)?.kind !== 'keyword').sort((a, b) => {
+    const left = parsed.get(a), right = parsed.get(b);
+    const rank = value => value?.kind === 'domain' ? 0 : value?.kind === 'full' ? 1 : 2;
+    return rank(left) - rank(right)
+      || (left?.kind === 'domain' ? left.text.split('.').length - right.text.split('.').length : 0);
+  });
+  for (const row of ordered) {
+    const value = parsed.get(row);
+    if (!value) { kept.add(row); continue; }
+    if (keywordTexts.some(text => value.text.includes(text)) || suffixCovered(value.text)) continue;
+    if (value.kind === 'full' && fulls.has(value.text)) continue;
+    kept.add(row);
+    (value.kind === 'domain' ? domains : fulls).add(value.text);
   }
-  return rules.map((rule, group) => ({...rule, domain: [...new Set(candidates
-    .filter(row => row.group === group && kept.has(row)).map(row => row.value))].sort()}))
+  const grouped = new Map();
+  for (const row of candidates) if (kept.has(row)) {
+    if (!grouped.has(row.group)) grouped.set(row.group, new Set());
+    grouped.get(row.group).add(row.value);
+  }
+  return rules.map((rule, group) => ({...rule, domain: [...(grouped.get(group) || [])].sort()}))
     .filter(rule => rule.domain.length).sort((a, b) => compare(a.ruleTag, b.ruleTag));
 }
 function readManual(text, label = 'domains.txt') {

@@ -4,7 +4,10 @@ from concurrent.futures import ThreadPoolExecutor
 import ipaddress
 import re
 from pathlib import Path
-import socket
+import json
+import subprocess
+import sys
+import time
 
 from asn_routes import cached_export, table_prefixes
 
@@ -26,9 +29,16 @@ def read_excluded_asns(path):
 
 
 def lookup_addresses(host):
+    # getaddrinfo has no per-call timeout. Isolate it so a resolver stall cannot
+    # keep the publishing process (or its executor threads) alive indefinitely.
+    code = ('import json,socket,sys; '
+            'print(json.dumps(list({r[4][0] for r in socket.getaddrinfo('
+            'sys.argv[1],None,type=socket.SOCK_STREAM)})))')
     try:
-        return {record[4][0] for record in socket.getaddrinfo(host + '.', None, type=socket.SOCK_STREAM)}
-    except socket.gaierror:
+        reply = subprocess.run([sys.executable, '-c', code, host + '.'],
+                               capture_output=True, text=True, timeout=2, check=True)
+        return set(json.loads(reply.stdout))
+    except (subprocess.SubprocessError, OSError, ValueError):
         return set()
 
 
@@ -67,23 +77,38 @@ class ExclusionPolicy:
             index.setdefault(str(network.num_addresses), {})[str(int(network.network_address))] = True
         return index
 
-    def excluded_domains(self, hosts, previous, responses):
+    def excluded_domains(self, hosts, previous, responses, *, deadline=None):
         excluded = set(previous)
+        self.unchecked_domains = set()
         if not self.asns:
             return excluded
         for host, row in responses.items():
             if row.get('excluded_ips') or any(route.get('asn') in self.asns for route in row['results']):
                 excluded.add(host)
-        candidates = sorted(set(hosts) - excluded)
+        # WHOIS/exclusion-index evidence already answered the ASN question.
+        verified = {host for host, row in responses.items()
+                    if row.get('results') and all(route.get('asn') for route in row['results'])}
+        final_no_a = {host for host, row in responses.items()
+                      if not row.get('results') and not row.get('excluded_ips') and row.get('errors')
+                      and all(error.get('check_host') for error in row['errors'])}
+        candidates = sorted(set(hosts) - excluded - verified - final_no_a)
+        self.unchecked_domains = set(candidates)
         with ThreadPoolExecutor(max_workers=24) as pool:
-            for host, addresses in zip(candidates, pool.map(lookup_addresses, candidates)):
-                for address in addresses:
-                    ip = ipaddress.ip_address(address)
-                    version = ip.version
-                    index = bisect_left(self.ends[version], int(ip))
-                    if index < len(self.ranges[version]) and ip in self.ranges[version][index]:
-                        excluded.add(host)
-                        break
+            # Submit at most one cohort at a time; never queue half a million
+            # socket calls that executor shutdown would then wait to finish.
+            for start in range(0, len(candidates), 24):
+                if deadline is not None and time.monotonic() >= deadline:
+                    break
+                cohort = candidates[start:start + 24]
+                for host, addresses in zip(cohort, pool.map(lookup_addresses, cohort)):
+                    self.unchecked_domains.discard(host)
+                    for address in addresses:
+                        ip = ipaddress.ip_address(address)
+                        version = ip.version
+                        index = bisect_left(self.ends[version], int(ip))
+                        if index < len(self.ranges[version]) and ip in self.ranges[version][index]:
+                            excluded.add(host)
+                            break
         return excluded
 
     def filter_domain_rules(self, domains, excluded):
