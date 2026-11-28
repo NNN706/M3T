@@ -1,6 +1,13 @@
 {
   "rules": [
     {
+      "ruleTag": "1l-s2s.mail.ru",
+      "domain": [
+        "domain:ok9-14.vkuser.net",
+        "domain:ok9-6.vkuser.net"
+      ]
+    },
+    {
       "ruleTag": "2gis.ru",
       "domain": [
         "domain:2gis.ru"
@@ -29,7 +36,8 @@
     {
       "ruleTag": "afisha.mail.ru",
       "domain": [
-        "domain:vk9-1.vkuser.net"
+        "domain:vk9-1.vkuser.net",
+        "domain:vk9-5.vkuser.net"
       ]
     },
     {
@@ -107,6 +115,7 @@
         "domain:crm.allclient.ru",
         "domain:crm.bigtehshop.ru",
         "domain:crm.elama-partner.ru",
+        "domain:crm.greatresult.ru",
         "domain:crm.lead-fixer.ru",
         "domain:crm.sigmatraffic.ru",
         "domain:datadrivenpromotion.com",
@@ -137,7 +146,6 @@
         "domain:nrich.ai",
         "domain:ohmy.bid",
         "domain:opendsp.ru",
-        "domain:otclick-adv.ru",
         "domain:otm-r.com",
         "domain:prodmp.ru",
         "domain:programmatica.com",
@@ -199,12 +207,16 @@
     {
       "ruleTag": "datahouse.ru",
       "domain": [
+        "domain:code.jivo.ru",
+        "domain:code.jivosite.com",
         "domain:datahouse.ru",
         "domain:filanco.ru",
-        "domain:jivo.ru",
-        "domain:jivosite.com",
+        "domain:node-sber1-az1-23.jivo.ru",
         "domain:ooouptime.ru",
-        "domain:yastatic.net"
+        "domain:telemetry.jivo.ru",
+        "domain:yastatic.net",
+        "full:jivo.ru",
+        "full:jivosite.com"
       ]
     },
     {
@@ -213,7 +225,6 @@
         "domain:ddos-guard.net",
         "domain:mango-office.ru",
         "domain:mng.tl",
-        "domain:px.ads.linkedin.com",
         "full:licdn.com"
       ]
     },
@@ -289,15 +300,10 @@
       ]
     },
     {
-      "ruleTag": "ifconfig.me",
-      "domain": [
-        "domain:platform.twitter.com"
-      ]
-    },
-    {
       "ruleTag": "ihc.ru",
       "domain": [
         "domain:ihc.ru",
+        "domain:telemetry.jivosite.com",
         "domain:tophosts.net",
         "domain:webvisor.org"
       ]
@@ -504,6 +510,7 @@
     {
       "ruleTag": "rutube.sport",
       "domain": [
+        "domain:cdn.betcity.ru",
         "domain:rutube.sport"
       ]
     },
